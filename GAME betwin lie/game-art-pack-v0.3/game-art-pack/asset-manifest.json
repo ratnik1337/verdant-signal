@@ -1,0 +1,807 @@
+{
+  "package": "Verdant Signal game-art-pack",
+  "version": "0.3.0",
+  "status": "partial-asset-pass-0.3-aviator-vfx",
+  "assets": [
+    {
+      "asset_id": "aviator_plane_body",
+      "game": "Aviator",
+      "kind": "plane-body",
+      "file": "aviator/models/plane-body.png",
+      "image": {
+        "format": "PNG",
+        "width": 955,
+        "height": 650,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "13c9358df40a0e91ab851091ef495c53fc24212dd56f5fbeabb0c94867dd6ffe",
+      "animation": null,
+      "pivot_normalized": null,
+      "anchors": {},
+      "source_reference": "sources/references/e618aec3-be34-4c16-b9e6-fe45344265dd(4).png",
+      "status": "standalone-still; pivot and in-game scale not calibrated",
+      "notes": "Standalone aircraft body, propeller removed; mounting point still needs in-game calibration."
+    },
+    {
+      "asset_id": "aviator_propeller",
+      "game": "Aviator",
+      "kind": "propeller",
+      "file": "aviator/models/propeller.png",
+      "image": {
+        "format": "PNG",
+        "width": 650,
+        "height": 573,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "c314d86f98ff825065811d1e1dd8a039e987ab568787ffff6a6a7ce6832c3abd",
+      "animation": null,
+      "pivot_normalized": null,
+      "anchors": {},
+      "source_reference": "sources/references/e618aec3-be34-4c16-b9e6-fe45344265dd(4).png",
+      "status": "standalone-still; pivot and in-game scale not calibrated",
+      "notes": "Detached matching three-blade propeller; center pivot."
+    },
+    {
+      "asset_id": "apple_whole",
+      "game": "Apple of Fortune",
+      "kind": "whole-apple",
+      "file": "apple/objects/apple-whole.png",
+      "image": {
+        "format": "PNG",
+        "width": 1335,
+        "height": 1178,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "311ddcce44940cb6f20c9430097762680f1bf225e5382c4cb476f511a2565e86",
+      "animation": null,
+      "pivot_normalized": null,
+      "anchors": {},
+      "source_reference": "sources/references/aaaca61a-5a7a-47b8-8e19-a67a8cd16d58(4).png",
+      "status": "standalone-still; pivot and in-game scale not calibrated",
+      "notes": "Standalone ripe red apple."
+    },
+    {
+      "asset_id": "apple_bitten",
+      "game": "Apple of Fortune",
+      "kind": "bitten-apple",
+      "file": "apple/objects/apple-bitten.png",
+      "image": {
+        "format": "PNG",
+        "width": 1335,
+        "height": 1178,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "39ca1bbb3d17860cbd5a286b3f39cfe7878f4cab4f62e8cd90921ce9bf86ce36",
+      "animation": null,
+      "pivot_normalized": null,
+      "anchors": {},
+      "source_reference": "sources/references/aaaca61a-5a7a-47b8-8e19-a67a8cd16d58(4).png",
+      "status": "standalone-still; pivot and in-game scale not calibrated",
+      "notes": "Matched-shape bite variant; same general camera and leaf placement."
+    },
+    {
+      "asset_id": "apple_heroine_original",
+      "game": "Apple of Fortune",
+      "kind": "heroine-concept",
+      "file": "apple/characters/heroine-original-concept.png",
+      "image": {
+        "format": "PNG",
+        "width": 1024,
+        "height": 1536,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          254
+        ]
+      },
+      "sha256": "1690e852f3a50fe190d0f5e4c31dc784a6c9351b5e396590db0548ca7adf92d7",
+      "animation": null,
+      "pivot_normalized": null,
+      "anchors": {},
+      "source_reference": "sources/references/aaaca61a-5a7a-47b8-8e19-a67a8cd16d58(4).png",
+      "status": "standalone-still; pivot and in-game scale not calibrated",
+      "notes": "Original adult heroine concept in blue and gold; not a verified exact character match."
+    },
+    {
+      "asset_id": "apple_queen_original",
+      "game": "Apple of Fortune",
+      "kind": "queen-concept",
+      "file": "apple/characters/queen-original-concept.png",
+      "image": {
+        "format": "PNG",
+        "width": 1024,
+        "height": 1536,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          254
+        ]
+      },
+      "sha256": "c3a324b649b410e45c7c6deb8b40e0f70e2d48ad87aa7c5e1828c66f6c0fefac",
+      "animation": null,
+      "pivot_normalized": null,
+      "anchors": {},
+      "source_reference": "sources/references/aaaca61a-5a7a-47b8-8e19-a67a8cd16d58(4).png",
+      "status": "standalone-still; pivot and in-game scale not calibrated",
+      "notes": "Original queen concept with crown, fur mantle, apple and book; not a verified exact character match."
+    },
+    {
+      "asset_id": "chicken_idle_reconstruction",
+      "game": "Chicken Road",
+      "kind": "idle-concept",
+      "file": "chicken/models/chick-idle-reconstruction.png",
+      "image": {
+        "format": "PNG",
+        "width": 1241,
+        "height": 1268,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "f3057032f1995e7c610e849e9d00d96220152f76c8fb3f15a97ffb330e10beb4",
+      "animation": null,
+      "pivot_normalized": null,
+      "anchors": {},
+      "source_reference": null,
+      "status": "standalone-still; pivot and in-game scale not calibrated",
+      "notes": "Single idle pose; reconstructed because no Chicken Road reference was attached."
+    },
+    {
+      "asset_id": "football_goalkeeper_concept",
+      "game": "Football Penalties",
+      "kind": "unassigned-goalkeeper-concept",
+      "file": "football/concepts/goalkeeper-green-unassigned.png",
+      "image": {
+        "format": "PNG",
+        "width": 1024,
+        "height": 1536,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          254
+        ]
+      },
+      "sha256": "72247a336e65fd3e5d5ebe9a022cb94f796bfa2f410b3a32b57ea7fe7d06355e",
+      "animation": null,
+      "pivot_normalized": null,
+      "anchors": {},
+      "source_reference": "sources/references/9ec14a85-edf5-4b8b-8e19-a67a8cd16d58(4).png",
+      "status": "standalone-still; pivot and in-game scale not calibrated",
+      "notes": "Generic green-kit keeper concept; deliberately not mapped to De Gea or another named player."
+    },
+    {
+      "asset_id": "aviator_mountain_ridge_layer",
+      "game": "Aviator",
+      "kind": "mountain-layer",
+      "file": "aviator/backgrounds/mountain-ridge-layer-reconstruction.png",
+      "image": {
+        "format": "PNG",
+        "width": 2126,
+        "height": 740,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "40021d5d38e9bf9f57ef9ec5bfad244fd457dc5a045d99e72c77cf3f1984bfc2",
+      "animation": null,
+      "pivot_normalized": null,
+      "anchors": {},
+      "source_reference": "sources/references/b28b0175-6ebe-4ee9-a873-8146cab2cc34(4).png",
+      "status": "standalone-still; reconstructed; pivot and in-game scale not calibrated",
+      "notes": "Transparent indigo mountain ridges reconstructed from the approved scene reference; still needs in-game parallax calibration."
+    },
+    {
+      "asset_id": "apple_closed_wooden_tile",
+      "game": "Apple of Fortune",
+      "kind": "closed-board-tile",
+      "file": "apple/tiles/closed-wooden-board-tile-reconstruction.png",
+      "image": {
+        "format": "PNG",
+        "width": 1774,
+        "height": 887,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "64c3f5375687635cfc74c8b0d3cee73f82ae86e292a30199dec7a94e2c4b0df6",
+      "animation": null,
+      "pivot_normalized": null,
+      "anchors": {},
+      "source_reference": "sources/references/d9d0ee90-4b74-409a-80b4-d67bc59d5108(4).png",
+      "status": "standalone-still; reconstructed; pivot and in-game scale not calibrated",
+      "notes": "Blank wood tile reconstruction matching the warm board palette; face contains no fruit or text. Frame joins and scale still need integration check."
+    },
+    {
+      "asset_id": "chicken_traffic_van",
+      "game": "Chicken Road",
+      "kind": "vehicle-obstacle",
+      "file": "chicken/obstacles/traffic-van-reconstruction.png",
+      "image": {
+        "format": "PNG",
+        "width": 1426,
+        "height": 1103,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "580b0cbb96b5cc196c8d064923e2060ef2fa8dc38f57c1ecb8a60602ca799ab1",
+      "animation": null,
+      "pivot_normalized": null,
+      "anchors": {},
+      "source_reference": null,
+      "status": "standalone-still; reconstructed; pivot and in-game scale not calibrated",
+      "notes": "Single orange-red traffic van reconstruction; no dedicated Chicken Road reference was supplied."
+    },
+    {
+      "asset_id": "aviator_plane_crash_explosion_atlas",
+      "game": "Aviator",
+      "kind": "animation-atlas",
+      "file": "aviator/effects-vfx/plane-crash-explosion-atlas.png",
+      "image": {
+        "format": "PNG",
+        "width": 3072,
+        "height": 384,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "8e6381dc0c213aa9d71ad52de3e6611c49f2d5e438020cb16f80904942f13963",
+      "animation": {
+        "frame_count": 8,
+        "frame_width": 384,
+        "frame_height": 384,
+        "layout": "horizontal",
+        "pivot_normalized": [
+          0.5,
+          0.5
+        ],
+        "timing_ms": [
+          50,
+          50,
+          60,
+          70,
+          80,
+          100,
+          120,
+          160
+        ],
+        "loop": "once"
+      },
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "anchors": {
+        "effect_center": [
+          0.5,
+          0.5
+        ]
+      },
+      "source_reference": "sources/references/e618aec3-be34-4c16-b9e6-fe45344265dd(4).png",
+      "status": "transparent-animation-atlas; visual effect center set",
+      "notes": "Eight-frame crash sequence: impact, flash, fireball, collapse, smoke and fading embers."
+    },
+    {
+      "asset_id": "aviator_smoke_trail_atlas",
+      "game": "Aviator",
+      "kind": "animation-atlas",
+      "file": "aviator/effects-vfx/smoke-trail-atlas.png",
+      "image": {
+        "format": "PNG",
+        "width": 2304,
+        "height": 384,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "0f35e63d713750b404811dea0602a9442ebc1aed70e7569af5575e2f377f1877",
+      "animation": {
+        "frame_count": 6,
+        "frame_width": 384,
+        "frame_height": 384,
+        "layout": "horizontal",
+        "pivot_normalized": [
+          0.5,
+          0.5
+        ],
+        "timing_ms": [
+          80,
+          80,
+          80,
+          80,
+          100,
+          120
+        ],
+        "loop": "loop"
+      },
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "anchors": {
+        "effect_center": [
+          0.5,
+          0.5
+        ]
+      },
+      "source_reference": "sources/references/e618aec3-be34-4c16-b9e6-fe45344265dd(4).png",
+      "status": "transparent-animation-atlas; visual effect center set",
+      "notes": "Six smoke phases for exhaust/crash aftermath; preview is a loop."
+    },
+    {
+      "asset_id": "aviator_crash_sparks_atlas",
+      "game": "Aviator",
+      "kind": "animation-atlas",
+      "file": "aviator/effects-vfx/crash-sparks-atlas.png",
+      "image": {
+        "format": "PNG",
+        "width": 2304,
+        "height": 384,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "71836a766bad2f060d9dd13e406540234c13d1b7e82f358b066c29dceec7ccab",
+      "animation": {
+        "frame_count": 6,
+        "frame_width": 384,
+        "frame_height": 384,
+        "layout": "horizontal",
+        "pivot_normalized": [
+          0.5,
+          0.5
+        ],
+        "timing_ms": [
+          50,
+          50,
+          60,
+          80,
+          100,
+          120
+        ],
+        "loop": "once"
+      },
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "anchors": {
+        "effect_center": [
+          0.5,
+          0.5
+        ]
+      },
+      "source_reference": "sources/references/e618aec3-be34-4c16-b9e6-fe45344265dd(4).png",
+      "status": "transparent-animation-atlas; visual effect center set",
+      "notes": "Six-frame radial spark and ember burst."
+    },
+    {
+      "asset_id": "aviator_engine_glow_atlas",
+      "game": "Aviator",
+      "kind": "animation-atlas",
+      "file": "aviator/effects-vfx/engine-glow-atlas.png",
+      "image": {
+        "format": "PNG",
+        "width": 2304,
+        "height": 384,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "f92ea65ceeb97aa8dc65fe3db8860f3b0590cce8563eeff4853cd9c5c7cc6757",
+      "animation": {
+        "frame_count": 6,
+        "frame_width": 384,
+        "frame_height": 384,
+        "layout": "horizontal",
+        "pivot_normalized": [
+          0.5,
+          0.5
+        ],
+        "timing_ms": [
+          80,
+          80,
+          80,
+          80,
+          80,
+          80
+        ],
+        "loop": "loop"
+      },
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "anchors": {
+        "effect_center": [
+          0.5,
+          0.5
+        ]
+      },
+      "source_reference": "sources/references/e618aec3-be34-4c16-b9e6-fe45344265dd(4).png",
+      "status": "transparent-animation-atlas; visual effect center set",
+      "notes": "Six-frame warm exhaust pulse, centered for attachment at the engine mount."
+    },
+    {
+      "asset_id": "aviator_propeller_spin_atlas",
+      "game": "Aviator",
+      "kind": "animation-atlas",
+      "file": "aviator/animations/propeller-spin-atlas.png",
+      "image": {
+        "format": "PNG",
+        "width": 3072,
+        "height": 384,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "2ff41d45bbf9977233c7a21fe80528f33b61d7eaba0f44cb80c1e65854eaa551",
+      "animation": {
+        "frame_count": 8,
+        "frame_width": 384,
+        "frame_height": 384,
+        "layout": "horizontal",
+        "pivot_normalized": [
+          0.5,
+          0.5
+        ],
+        "timing_ms": [
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60,
+          60
+        ],
+        "loop": "loop",
+        "rotation_step_degrees": 45
+      },
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "anchors": {
+        "rotation_center": [
+          0.5,
+          0.5
+        ]
+      },
+      "source_reference": "aviator/models/propeller.png",
+      "status": "transparent-animation-atlas; center pivot preserved",
+      "notes": "Eight evenly spaced rotation frames derived from the existing detached propeller sprite."
+    },
+    {
+      "asset_id": "aviator_trail_segment",
+      "game": "Aviator",
+      "kind": "stretchable-trail",
+      "file": "aviator/effects-vfx/trail-segment.png",
+      "image": {
+        "format": "PNG",
+        "width": 1024,
+        "height": 256,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "8145032d8b263dd6ea8bbffc203e2848feed1440164c2754cef44deaef9815a8",
+      "animation": null,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "anchors": {
+        "stretch_axis": "x",
+        "tail_side": "left",
+        "engine_side": "right"
+      },
+      "source_reference": "sources/references/e618aec3-be34-4c16-b9e6-fe45344265dd(4).png",
+      "status": "transparent-stretchable-sprite; attachment still needs scene calibration",
+      "notes": "Horizontal yellow-orange exhaust ribbon intended for repeat/stretch use behind the plane."
+    },
+    {
+      "asset_id": "aviator_crash_flash",
+      "game": "Aviator",
+      "kind": "crash-flash",
+      "file": "aviator/effects-vfx/crash-flash.png",
+      "image": {
+        "format": "PNG",
+        "width": 384,
+        "height": 384,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "603d78c000106f02c91738cae3534772ab059572eeeab47f8f906970005a48f5",
+      "animation": null,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "anchors": {
+        "effect_center": [
+          0.5,
+          0.5
+        ]
+      },
+      "source_reference": "sources/references/e618aec3-be34-4c16-b9e6-fe45344265dd(4).png",
+      "status": "transparent-standalone-vfx",
+      "notes": "Standalone keyframe extracted from the crash sequence for one-shot impact use."
+    },
+    {
+      "asset_id": "aviator_after_crash_smoke",
+      "game": "Aviator",
+      "kind": "after-crash-smoke",
+      "file": "aviator/effects-vfx/after-crash-smoke.png",
+      "image": {
+        "format": "PNG",
+        "width": 384,
+        "height": 384,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "28a271470fa5afa1cc6a556686d70b56fa820f458f23de1fe75b2cb3fd3b1d54",
+      "animation": null,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "anchors": {
+        "effect_center": [
+          0.5,
+          0.5
+        ]
+      },
+      "source_reference": "sources/references/e618aec3-be34-4c16-b9e6-fe45344265dd(4).png",
+      "status": "transparent-standalone-vfx",
+      "notes": "Standalone warm charcoal smoke-and-embers keyframe."
+    },
+    {
+      "asset_id": "aviator_ember_spark",
+      "game": "Aviator",
+      "kind": "ember-spark",
+      "file": "aviator/effects-vfx/ember-spark.png",
+      "image": {
+        "format": "PNG",
+        "width": 384,
+        "height": 384,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "b0a17071741510b691532a61a57151fecb341ed5db42ce718b056b270c39283c",
+      "animation": null,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "anchors": {
+        "effect_center": [
+          0.5,
+          0.5
+        ]
+      },
+      "source_reference": "sources/references/e618aec3-be34-4c16-b9e6-fe45344265dd(4).png",
+      "status": "transparent-standalone-vfx",
+      "notes": "Standalone fading ember burst keyframe."
+    },
+    {
+      "asset_id": "aviator_engine_glow",
+      "game": "Aviator",
+      "kind": "engine-glow",
+      "file": "aviator/effects-vfx/engine-glow.png",
+      "image": {
+        "format": "PNG",
+        "width": 384,
+        "height": 384,
+        "mode": "RGBA",
+        "alpha_channel": true,
+        "alpha_range": [
+          0,
+          255
+        ]
+      },
+      "sha256": "b0f6f8ca3f04f74b308b5b8cff035033befba68f73fd6d010129b42d3f097891",
+      "animation": null,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "anchors": {
+        "effect_center": [
+          0.5,
+          0.5
+        ]
+      },
+      "source_reference": "sources/references/e618aec3-be34-4c16-b9e6-fe45344265dd(4).png",
+      "status": "transparent-standalone-vfx",
+      "notes": "Bright standalone pulse frame for engine attachment."
+    }
+  ],
+  "animations": [
+    {
+      "animation_id": "aviator_plane_crash",
+      "game": "Aviator",
+      "atlas": "aviator/effects-vfx/plane-crash-explosion-atlas.png",
+      "frames_dir": "aviator/effects-vfx/frames/crash/",
+      "frame_count": 8,
+      "frame_size": [
+        384,
+        384
+      ],
+      "layout": "horizontal",
+      "timing_ms": [
+        50,
+        50,
+        60,
+        70,
+        80,
+        100,
+        120,
+        160
+      ],
+      "loop": "once",
+      "preview": "aviator/animations/previews/plane-crash-explosion.gif",
+      "notes": "Crash sequence with a warm gold-orange flash, fireball, smoke and embers."
+    },
+    {
+      "animation_id": "aviator_smoke_trail",
+      "game": "Aviator",
+      "atlas": "aviator/effects-vfx/smoke-trail-atlas.png",
+      "frames_dir": "aviator/effects-vfx/frames/smoke/",
+      "frame_count": 6,
+      "frame_size": [
+        384,
+        384
+      ],
+      "layout": "horizontal",
+      "timing_ms": [
+        80,
+        80,
+        80,
+        80,
+        100,
+        120
+      ],
+      "loop": "loop",
+      "preview": "aviator/animations/previews/smoke-trail.gif",
+      "notes": "Soft volumetric smoke phases for exhaust or post-crash drift."
+    },
+    {
+      "animation_id": "aviator_crash_sparks",
+      "game": "Aviator",
+      "atlas": "aviator/effects-vfx/crash-sparks-atlas.png",
+      "frames_dir": "aviator/effects-vfx/frames/sparks/",
+      "frame_count": 6,
+      "frame_size": [
+        384,
+        384
+      ],
+      "layout": "horizontal",
+      "timing_ms": [
+        50,
+        50,
+        60,
+        80,
+        100,
+        120
+      ],
+      "loop": "once",
+      "preview": "aviator/animations/previews/crash-sparks.gif",
+      "notes": "Short radial spark/ember burst."
+    },
+    {
+      "animation_id": "aviator_engine_glow_pulse",
+      "game": "Aviator",
+      "atlas": "aviator/effects-vfx/engine-glow-atlas.png",
+      "frames_dir": "aviator/effects-vfx/frames/engine-glow/",
+      "frame_count": 6,
+      "frame_size": [
+        384,
+        384
+      ],
+      "layout": "horizontal",
+      "timing_ms": [
+        80,
+        80,
+        80,
+        80,
+        80,
+        80
+      ],
+      "loop": "loop",
+      "preview": "aviator/animations/previews/engine-glow.gif",
+      "notes": "Warm centered engine-light pulse."
+    },
+    {
+      "animation_id": "aviator_propeller_spin",
+      "game": "Aviator",
+      "atlas": "aviator/animations/propeller-spin-atlas.png",
+      "frames_dir": "aviator/animations/frames/propeller-spin/",
+      "frame_count": 8,
+      "frame_size": [
+        384,
+        384
+      ],
+      "layout": "horizontal",
+      "timing_ms": [
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60
+      ],
+      "loop": "loop",
+      "preview": "aviator/animations/previews/propeller-spin.gif",
+      "rotation_step_degrees": 45,
+      "notes": "Eight-frame spin around the propeller center pivot."
+    }
+  ]
+}

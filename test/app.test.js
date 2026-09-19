@@ -7,9 +7,9 @@ const request = require('supertest');
 
 const { createApp } = require('../server/app');
 
-function makeApp() {
+async function makeApp() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'verdant-signal-'));
-  const app = createApp({
+  const app = await createApp({
     dbPath: path.join(dir, 'test.sqlite'),
     sessionSecret: 'test-session-secret-with-enough-length',
     adminPassword: 'admin-test-password',
@@ -40,14 +40,14 @@ async function loginAndProfile(app, playerId = 'player-alpha', code = 'ACCESS-12
 }
 
 test('health endpoint proves the new app boots', async () => {
-  const app = makeApp();
+  const app = await makeApp();
   const response = await request(app).get('/api/health');
   assert.equal(response.status, 200);
   assert.equal(response.body.status, 'ok');
 });
 
 test('login rejects malformed Player ID and accepts a new access session', async () => {
-  const app = makeApp();
+  const app = await makeApp();
   const invalid = await request(app).post('/api/auth/login').send({ playerId: '<script>', accessCode: 'secret' });
   assert.equal(invalid.status, 400);
   assert.equal(invalid.body.error.code, 'INVALID_INPUT');
@@ -59,7 +59,7 @@ test('login rejects malformed Player ID and accepts a new access session', async
 });
 
 test('profile validation stores safe fields and ignores client system fields', async () => {
-  const app = makeApp();
+  const app = await makeApp();
   const agent = await loginAndProfile(app, 'player-profile', 'ACCESS-789');
   const bad = await agent.patch('/api/player/profile').send({
     nickname: '<b>x</b>',
@@ -89,7 +89,7 @@ test('profile validation stores safe fields and ignores client system fields', a
 });
 
 test('catalogs include broad country and ISO-4217 currency coverage', async () => {
-  const app = makeApp();
+  const app = await makeApp();
   const response = await request(app).get('/api/catalogs');
   assert.equal(response.status, 200);
   assert.ok(response.body.countries.length >= 200);
@@ -100,7 +100,7 @@ test('catalogs include broad country and ISO-4217 currency coverage', async () =
 });
 
 test('activity creates one calendar day and increments signals without duplicate days', async () => {
-  const app = makeApp();
+  const app = await makeApp();
   const agent = await loginAndProfile(app, 'player-activity', 'ACCESS-ACT');
   const first = await agent.post('/api/player/activity').send({ game: 'aviator', event: 'signal' });
   const second = await agent.post('/api/player/activity').send({ game: 'mines', event: 'signal' });
@@ -114,7 +114,7 @@ test('activity creates one calendar day and increments signals without duplicate
 });
 
 test('player session exposes masked identity, configurable withdrawal threshold and logout', async () => {
-  const app = makeApp();
+  const app = await makeApp();
   const agent = await loginAndProfile(app, 'player-session', 'ACCESS-SESSION');
   const me = await agent.get('/api/player/me');
   assert.equal(me.status, 200);
@@ -130,7 +130,7 @@ test('player session exposes masked identity, configurable withdrawal threshold 
 });
 
 test('level thresholds award a configured bonus once and calculate withdrawal date', async () => {
-  const app = makeApp();
+  const app = await makeApp();
   const agent = await loginAndProfile(app, 'player-levels', 'ACCESS-LVL');
   const player = app.locals.db.prepare('SELECT id FROM players LIMIT 1').get();
   for (let day = 0; day < 91; day += 1) {
@@ -149,7 +149,7 @@ test('level thresholds award a configured bonus once and calculate withdrawal da
 });
 
 test('game analysis accepts the five supported games and rejects unknown games', async () => {
-  const app = makeApp();
+  const app = await makeApp();
   const agent = await loginAndProfile(app, 'player-games', 'ACCESS-GAMES');
   for (const game of ['aviator', 'chicken-road', 'apple-of-fortune', 'mines', 'football-penalties']) {
     const response = await agent.post(`/api/games/${game}/analyze`).send({ difficulty: 'balanced' });
@@ -162,7 +162,7 @@ test('game analysis accepts the five supported games and rejects unknown games',
 });
 
 test('admin auth and player detail never reveal access codes', async () => {
-  const app = makeApp();
+  const app = await makeApp();
   const agent = await loginAndProfile(app, 'player-admin', 'ACCESS-SECRET');
   await agent.post('/api/games/football-penalties/analyze').send({});
   const admin = request.agent(app);
@@ -181,7 +181,7 @@ test('admin auth and player detail never reveal access codes', async () => {
 });
 
 test('localization assets and protected admin page are served', async () => {
-  const app = makeApp();
+  const app = await makeApp();
   for (const language of ['en', 'ru', 'uk', 'pl', 'es', 'pt', 'de', 'fr', 'it', 'tr', 'ar']) {
     const translation = await request(app).get(`/i18n/${language}.js`);
     assert.equal(translation.status, 200);
@@ -194,7 +194,7 @@ test('localization assets and protected admin page are served', async () => {
 });
 
 test('login rate limiting returns the unified error envelope', async () => {
-  const app = makeApp();
+  const app = await makeApp();
   const responses = [];
   for (let index = 0; index < 55; index += 1) {
     responses.push(await request(app).post('/api/auth/login').send({ playerId: 'rate-player', accessCode: 'bad' }));

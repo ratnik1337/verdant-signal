@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "footballpenalties_goalkeeper_save_left",
+  "game": "FootballPenalties",
+  "name": "goalkeeper-save-left",
+  "stateFrom": "shot-ready",
+  "stateTo": "save",
+  "frameCount": 10,
+  "frameSize": [
+    384,
+    384
+  ],
+  "fps": 16,
+  "durationMs": 630,
+  "timingMs": [
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      1
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "feetPivot": {
+      "x": 0.5,
+      "y": 0.98
+    },
+    "leftHandReach": {
+      "x": 0.2,
+      "y": 0.55
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "football/concepts/goalkeeper-green-unassigned.png",
+      "bundledPath": "SourceArt/football/concepts/goalkeeper-green-unassigned.png",
+      "sha256": "72247a336e65fd3e5d5ebe9a022cb94f796bfa2f410b3a32b57ea7fe7d06355e"
+    }
+  ],
+  "generatedElements": [
+    "ball marker and save burst"
+  ],
+  "qualityStatus": "placeholder_only",
+  "integrationReady": false,
+  "purpose": "Left dive and save endpoint using a mirrored/rotated version of the supplied keeper concept.",
+  "limitations": [
+    "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence.",
+    "Transform-only keeper variant with generated marker; frame edge clipping and hand-to-ball collision are unverified."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        7,
+        151,
+        273,
+        361
+      ],
+      [
+        44,
+        127,
+        266,
+        372
+      ],
+      [
+        76,
+        109,
+        266,
+        376
+      ],
+      [
+        52,
+        96,
+        280,
+        378
+      ],
+      [
+        36,
+        86,
+        308,
+        377
+      ],
+      [
+        24,
+        79,
+        352,
+        378
+      ],
+      [
+        17,
+        76,
+        379,
+        378
+      ],
+      [
+        13,
+        73,
+        384,
+        378
+      ],
+      [
+        13,
+        73,
+        384,
+        378
+      ],
+      [
+        13,
+        158,
+        384,
+        379
+      ]
+    ],
+    "sheet": "FootballPenalties/goalkeeper-save-left/sheet.png",
+    "preview": "FootballPenalties/goalkeeper-save-left/preview-strip.png"
+  }
+}

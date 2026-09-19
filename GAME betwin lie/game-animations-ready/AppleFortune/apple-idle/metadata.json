@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "applefortune_apple_idle",
+  "game": "AppleFortune",
+  "name": "apple-idle",
+  "stateFrom": "closed",
+  "stateTo": "closed",
+  "frameCount": 8,
+  "frameSize": [
+    256,
+    256
+  ],
+  "fps": 10,
+  "durationMs": 800,
+  "timingMs": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+  ],
+  "loop": "loop",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.53
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "appleCenter": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "tileCenter": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "shadowCenter": {
+      "x": 0.5,
+      "y": 0.86
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "apple/objects/apple-whole.png",
+      "bundledPath": "SourceArt/apple/objects/apple-whole.png",
+      "sha256": "311ddcce44940cb6f20c9430097762680f1bf225e5382c4cb476f511a2565e86"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "review_required",
+  "integrationReady": false,
+  "purpose": "Quiet apple idle with a restrained breathing scale.",
+  "limitations": [
+    "Board contact/joins and event timing are not calibrated against the responsive game board."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        94,
+        89,
+        163,
+        167
+      ],
+      [
+        93,
+        89,
+        164,
+        168
+      ],
+      [
+        93,
+        88,
+        165,
+        168
+      ],
+      [
+        94,
+        88,
+        165,
+        167
+      ],
+      [
+        94,
+        89,
+        163,
+        167
+      ],
+      [
+        95,
+        89,
+        162,
+        166
+      ],
+      [
+        95,
+        90,
+        162,
+        165
+      ],
+      [
+        95,
+        90,
+        163,
+        166
+      ]
+    ],
+    "sheet": "AppleFortune/apple-idle/sheet.png",
+    "preview": "AppleFortune/apple-idle/preview-strip.png"
+  }
+}

@@ -1,0 +1,2360 @@
+{
+  "package": "Audited animation pack first pass",
+  "version": "1.1.0",
+  "generatedAt": "2026-09-15",
+  "sourceArchive": "game-art-pack-v0.3(3).zip",
+  "sourceRoot": "SourceArt/",
+  "outputUnits": "PNG RGBA frames + horizontal PNG sprite sheets",
+  "frameContract": "Every sequence has fixed-size frames and uses normalized pivot coordinates. Do not infer collision boxes from transparent pixels.",
+  "games": [
+    "Aviator",
+    "Chicken",
+    "AppleFortune",
+    "Mines",
+    "FootballPenalties"
+  ],
+  "galleries": {
+    "Aviator": "Aviator/preview/contact-sheet.png",
+    "Chicken": "Chicken/preview/contact-sheet.png",
+    "AppleFortune": "AppleFortune/preview/contact-sheet.png",
+    "Mines": "Mines/preview/contact-sheet.png",
+    "FootballPenalties": "FootballPenalties/preview/contact-sheet.png"
+  },
+  "animations": [
+    {
+      "id": "aviator_plane_idle",
+      "game": "Aviator",
+      "name": "plane-idle",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "Aviator/plane-idle/frames/frame-00.png",
+        "Aviator/plane-idle/frames/frame-01.png",
+        "Aviator/plane-idle/frames/frame-02.png",
+        "Aviator/plane-idle/frames/frame-03.png",
+        "Aviator/plane-idle/frames/frame-04.png",
+        "Aviator/plane-idle/frames/frame-05.png",
+        "Aviator/plane-idle/frames/frame-06.png",
+        "Aviator/plane-idle/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 12,
+      "timingMs": [
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83
+      ],
+      "loop": "loop",
+      "pivot": [
+        0.5,
+        0.55
+      ],
+      "stateFrom": "idle",
+      "stateTo": "idle",
+      "sourceAssets": [
+        "aviator/models/plane-body.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Subtle breathing hover; the aircraft remains centered and readable on mobile.",
+      "spriteSheet": "Aviator/plane-idle/sheet.png",
+      "preview": "Aviator/plane-idle/preview-strip.png",
+      "durationMs": 664,
+      "bundledSourceAssets": [
+        "SourceArt/aviator/models/plane-body.png"
+      ],
+      "qualityStatus": "review_required",
+      "integrationReady": true,
+      "anchors": {
+        "planeCenter": {
+          "x": 0.5,
+          "y": 0.53
+        },
+        "nose": {
+          "x": 0.94,
+          "y": 0.31
+        },
+        "propellerMount": {
+          "x": 0.98,
+          "y": 0.31
+        },
+        "engineMount": {
+          "x": 0.8,
+          "y": 0.43
+        },
+        "tail": {
+          "x": 0.08,
+          "y": 0.55
+        },
+        "smokeOrigin": {
+          "x": 0.08,
+          "y": 0.55
+        },
+        "trailOrigin": {
+          "x": 0.06,
+          "y": 0.55
+        },
+        "crashCenter": {
+          "x": 0.5,
+          "y": 0.5
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+      ]
+    },
+    {
+      "id": "aviator_round_launch",
+      "game": "Aviator",
+      "name": "round-launch",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "Aviator/round-launch/frames/frame-00.png",
+        "Aviator/round-launch/frames/frame-01.png",
+        "Aviator/round-launch/frames/frame-02.png",
+        "Aviator/round-launch/frames/frame-03.png",
+        "Aviator/round-launch/frames/frame-04.png",
+        "Aviator/round-launch/frames/frame-05.png",
+        "Aviator/round-launch/frames/frame-06.png",
+        "Aviator/round-launch/frames/frame-07.png",
+        "Aviator/round-launch/frames/frame-08.png",
+        "Aviator/round-launch/frames/frame-09.png"
+      ],
+      "frameCount": 10,
+      "fps": 16,
+      "timingMs": [
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.55
+      ],
+      "stateFrom": "ready",
+      "stateTo": "takeoff",
+      "sourceAssets": [
+        "aviator/models/plane-body.png",
+        "aviator/models/propeller.png",
+        "aviator/effects-vfx/engine-glow.png",
+        "aviator/effects-vfx/trail-segment.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Short wind-up into takeoff with linked propeller, glow and exhaust layers.",
+      "spriteSheet": "Aviator/round-launch/sheet.png",
+      "preview": "Aviator/round-launch/preview-strip.png",
+      "durationMs": 630,
+      "bundledSourceAssets": [
+        "SourceArt/aviator/models/plane-body.png",
+        "SourceArt/aviator/models/propeller.png",
+        "SourceArt/aviator/effects-vfx/engine-glow.png",
+        "SourceArt/aviator/effects-vfx/trail-segment.png"
+      ],
+      "qualityStatus": "review_required",
+      "integrationReady": true,
+      "anchors": {
+        "planeCenter": {
+          "x": 0.5,
+          "y": 0.53
+        },
+        "nose": {
+          "x": 0.94,
+          "y": 0.31
+        },
+        "propellerMount": {
+          "x": 0.98,
+          "y": 0.31
+        },
+        "engineMount": {
+          "x": 0.8,
+          "y": 0.43
+        },
+        "tail": {
+          "x": 0.08,
+          "y": 0.55
+        },
+        "smokeOrigin": {
+          "x": 0.08,
+          "y": 0.55
+        },
+        "trailOrigin": {
+          "x": 0.06,
+          "y": 0.55
+        },
+        "crashCenter": {
+          "x": 0.5,
+          "y": 0.5
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+      ]
+    },
+    {
+      "id": "aviator_flight_loop",
+      "game": "Aviator",
+      "name": "flight-loop",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "Aviator/flight-loop/frames/frame-00.png",
+        "Aviator/flight-loop/frames/frame-01.png",
+        "Aviator/flight-loop/frames/frame-02.png",
+        "Aviator/flight-loop/frames/frame-03.png",
+        "Aviator/flight-loop/frames/frame-04.png",
+        "Aviator/flight-loop/frames/frame-05.png",
+        "Aviator/flight-loop/frames/frame-06.png",
+        "Aviator/flight-loop/frames/frame-07.png",
+        "Aviator/flight-loop/frames/frame-08.png",
+        "Aviator/flight-loop/frames/frame-09.png",
+        "Aviator/flight-loop/frames/frame-10.png",
+        "Aviator/flight-loop/frames/frame-11.png"
+      ],
+      "frameCount": 12,
+      "fps": 18,
+      "timingMs": [
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56
+      ],
+      "loop": "loop",
+      "pivot": [
+        0.5,
+        0.55
+      ],
+      "stateFrom": "flying",
+      "stateTo": "flying",
+      "sourceAssets": [
+        "aviator/models/plane-body.png",
+        "aviator/models/propeller.png",
+        "aviator/effects-vfx/engine-glow.png",
+        "aviator/effects-vfx/trail-segment.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Production flight loop: plane rises on an arc while exhaust and propeller keep a separate cadence.",
+      "spriteSheet": "Aviator/flight-loop/sheet.png",
+      "preview": "Aviator/flight-loop/preview-strip.png",
+      "durationMs": 672,
+      "bundledSourceAssets": [
+        "SourceArt/aviator/models/plane-body.png",
+        "SourceArt/aviator/models/propeller.png",
+        "SourceArt/aviator/effects-vfx/engine-glow.png",
+        "SourceArt/aviator/effects-vfx/trail-segment.png"
+      ],
+      "qualityStatus": "review_required",
+      "integrationReady": true,
+      "anchors": {
+        "planeCenter": {
+          "x": 0.5,
+          "y": 0.53
+        },
+        "nose": {
+          "x": 0.94,
+          "y": 0.31
+        },
+        "propellerMount": {
+          "x": 0.98,
+          "y": 0.31
+        },
+        "engineMount": {
+          "x": 0.8,
+          "y": 0.43
+        },
+        "tail": {
+          "x": 0.08,
+          "y": 0.55
+        },
+        "smokeOrigin": {
+          "x": 0.08,
+          "y": 0.55
+        },
+        "trailOrigin": {
+          "x": 0.06,
+          "y": 0.55
+        },
+        "crashCenter": {
+          "x": 0.5,
+          "y": 0.5
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene.",
+        "Frames 0 and 11 touch the canvas boundary; inspect crop when placing over a game scene."
+      ]
+    },
+    {
+      "id": "aviator_propeller_spin",
+      "game": "Aviator",
+      "name": "propeller-spin",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "Aviator/propeller-spin/frames/frame-00.png",
+        "Aviator/propeller-spin/frames/frame-01.png",
+        "Aviator/propeller-spin/frames/frame-02.png",
+        "Aviator/propeller-spin/frames/frame-03.png",
+        "Aviator/propeller-spin/frames/frame-04.png",
+        "Aviator/propeller-spin/frames/frame-05.png",
+        "Aviator/propeller-spin/frames/frame-06.png",
+        "Aviator/propeller-spin/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 14,
+      "timingMs": [
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71
+      ],
+      "loop": "loop",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "takeoff",
+      "stateTo": "flying",
+      "sourceAssets": [
+        "aviator/animations/propeller-spin-atlas.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Standalone layer from the supplied propeller atlas for independent plane compositing.",
+      "spriteSheet": "Aviator/propeller-spin/sheet.png",
+      "preview": "Aviator/propeller-spin/preview-strip.png",
+      "durationMs": 568,
+      "bundledSourceAssets": [
+        "SourceArt/aviator/animations/propeller-spin-atlas.png"
+      ],
+      "qualityStatus": "scene_anchor_required",
+      "integrationReady": true,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+      ]
+    },
+    {
+      "id": "aviator_engine_glow_pulse",
+      "game": "Aviator",
+      "name": "engine-glow-pulse",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "Aviator/engine-glow-pulse/frames/frame-00.png",
+        "Aviator/engine-glow-pulse/frames/frame-01.png",
+        "Aviator/engine-glow-pulse/frames/frame-02.png",
+        "Aviator/engine-glow-pulse/frames/frame-03.png",
+        "Aviator/engine-glow-pulse/frames/frame-04.png",
+        "Aviator/engine-glow-pulse/frames/frame-05.png"
+      ],
+      "frameCount": 6,
+      "fps": 12,
+      "timingMs": [
+        83,
+        83,
+        83,
+        83,
+        83,
+        83
+      ],
+      "loop": "loop",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "takeoff",
+      "stateTo": "flying",
+      "sourceAssets": [
+        "aviator/effects-vfx/engine-glow-atlas.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Standalone exhaust glow layer from the supplied atlas.",
+      "spriteSheet": "Aviator/engine-glow-pulse/sheet.png",
+      "preview": "Aviator/engine-glow-pulse/preview-strip.png",
+      "durationMs": 498,
+      "bundledSourceAssets": [
+        "SourceArt/aviator/effects-vfx/engine-glow-atlas.png"
+      ],
+      "qualityStatus": "scene_anchor_required",
+      "integrationReady": true,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+      ]
+    },
+    {
+      "id": "aviator_smoke_trail_loop",
+      "game": "Aviator",
+      "name": "smoke-trail-loop",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "Aviator/smoke-trail-loop/frames/frame-00.png",
+        "Aviator/smoke-trail-loop/frames/frame-01.png",
+        "Aviator/smoke-trail-loop/frames/frame-02.png",
+        "Aviator/smoke-trail-loop/frames/frame-03.png",
+        "Aviator/smoke-trail-loop/frames/frame-04.png",
+        "Aviator/smoke-trail-loop/frames/frame-05.png"
+      ],
+      "frameCount": 6,
+      "fps": 12,
+      "timingMs": [
+        83,
+        83,
+        83,
+        83,
+        83,
+        83
+      ],
+      "loop": "loop",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "flying",
+      "stateTo": "flying",
+      "sourceAssets": [
+        "aviator/effects-vfx/smoke-trail-atlas.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Standalone looping smoke layer from the supplied atlas.",
+      "spriteSheet": "Aviator/smoke-trail-loop/sheet.png",
+      "preview": "Aviator/smoke-trail-loop/preview-strip.png",
+      "durationMs": 498,
+      "bundledSourceAssets": [
+        "SourceArt/aviator/effects-vfx/smoke-trail-atlas.png"
+      ],
+      "qualityStatus": "scene_anchor_required",
+      "integrationReady": true,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+      ]
+    },
+    {
+      "id": "aviator_crash_sparks",
+      "game": "Aviator",
+      "name": "crash-sparks",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "Aviator/crash-sparks/frames/frame-00.png",
+        "Aviator/crash-sparks/frames/frame-01.png",
+        "Aviator/crash-sparks/frames/frame-02.png",
+        "Aviator/crash-sparks/frames/frame-03.png",
+        "Aviator/crash-sparks/frames/frame-04.png",
+        "Aviator/crash-sparks/frames/frame-05.png"
+      ],
+      "frameCount": 6,
+      "fps": 14,
+      "timingMs": [
+        71,
+        71,
+        71,
+        71,
+        71,
+        71
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "crashed",
+      "stateTo": "round-ended",
+      "sourceAssets": [
+        "aviator/effects-vfx/crash-sparks-atlas.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Standalone impact spark layer from the supplied atlas.",
+      "spriteSheet": "Aviator/crash-sparks/sheet.png",
+      "preview": "Aviator/crash-sparks/preview-strip.png",
+      "durationMs": 426,
+      "bundledSourceAssets": [
+        "SourceArt/aviator/effects-vfx/crash-sparks-atlas.png"
+      ],
+      "qualityStatus": "scene_anchor_required",
+      "integrationReady": true,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+      ]
+    },
+    {
+      "id": "aviator_crash_explosion",
+      "game": "Aviator",
+      "name": "crash-explosion",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "Aviator/crash-explosion/frames/frame-00.png",
+        "Aviator/crash-explosion/frames/frame-01.png",
+        "Aviator/crash-explosion/frames/frame-02.png",
+        "Aviator/crash-explosion/frames/frame-03.png",
+        "Aviator/crash-explosion/frames/frame-04.png",
+        "Aviator/crash-explosion/frames/frame-05.png",
+        "Aviator/crash-explosion/frames/frame-06.png",
+        "Aviator/crash-explosion/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 14,
+      "timingMs": [
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.58
+      ],
+      "stateFrom": "flying",
+      "stateTo": "crashed",
+      "sourceAssets": [
+        "aviator/effects-vfx/plane-crash-explosion-atlas.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Existing production explosion atlas extracted into fixed-size frames.",
+      "spriteSheet": "Aviator/crash-explosion/sheet.png",
+      "preview": "Aviator/crash-explosion/preview-strip.png",
+      "durationMs": 568,
+      "bundledSourceAssets": [
+        "SourceArt/aviator/effects-vfx/plane-crash-explosion-atlas.png"
+      ],
+      "qualityStatus": "scene_anchor_required",
+      "integrationReady": true,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+      ]
+    },
+    {
+      "id": "aviator_after_crash_dissipate",
+      "game": "Aviator",
+      "name": "after-crash-dissipate",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "Aviator/after-crash-dissipate/frames/frame-00.png",
+        "Aviator/after-crash-dissipate/frames/frame-01.png",
+        "Aviator/after-crash-dissipate/frames/frame-02.png",
+        "Aviator/after-crash-dissipate/frames/frame-03.png",
+        "Aviator/after-crash-dissipate/frames/frame-04.png",
+        "Aviator/after-crash-dissipate/frames/frame-05.png",
+        "Aviator/after-crash-dissipate/frames/frame-06.png",
+        "Aviator/after-crash-dissipate/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 12,
+      "timingMs": [
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.58
+      ],
+      "stateFrom": "crashed",
+      "stateTo": "round-ended",
+      "sourceAssets": [
+        "aviator/effects-vfx/after-crash-smoke.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Residual smoke fades and scales out, leaving the next round clear.",
+      "spriteSheet": "Aviator/after-crash-dissipate/sheet.png",
+      "preview": "Aviator/after-crash-dissipate/preview-strip.png",
+      "durationMs": 664,
+      "bundledSourceAssets": [
+        "SourceArt/aviator/effects-vfx/after-crash-smoke.png"
+      ],
+      "qualityStatus": "scene_anchor_required",
+      "integrationReady": true,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+      ]
+    },
+    {
+      "id": "chicken_chick_idle",
+      "game": "Chicken",
+      "name": "chick-idle",
+      "frameSize": [
+        320,
+        320
+      ],
+      "frames": [
+        "Chicken/chick-idle/frames/frame-00.png",
+        "Chicken/chick-idle/frames/frame-01.png",
+        "Chicken/chick-idle/frames/frame-02.png",
+        "Chicken/chick-idle/frames/frame-03.png",
+        "Chicken/chick-idle/frames/frame-04.png",
+        "Chicken/chick-idle/frames/frame-05.png",
+        "Chicken/chick-idle/frames/frame-06.png",
+        "Chicken/chick-idle/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 10,
+      "timingMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "loop": "loop",
+      "pivot": [
+        0.5,
+        0.93
+      ],
+      "stateFrom": "idle",
+      "stateTo": "idle",
+      "sourceAssets": [
+        "chicken/models/chick-idle-reconstruction.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Breathing idle with feather-safe micro motion.",
+      "spriteSheet": "Chicken/chick-idle/sheet.png",
+      "preview": "Chicken/chick-idle/preview-strip.png",
+      "durationMs": 800,
+      "bundledSourceAssets": [
+        "SourceArt/chicken/models/chick-idle-reconstruction.png"
+      ],
+      "qualityStatus": "transform_first_pass",
+      "integrationReady": false,
+      "anchors": {
+        "groundPivot": {
+          "x": 0.5,
+          "y": 0.82
+        },
+        "leftFootContact": {
+          "x": 0.31,
+          "y": 0.82
+        },
+        "rightFootContact": {
+          "x": 0.7,
+          "y": 0.82
+        },
+        "bodyCenter": {
+          "x": 0.5,
+          "y": 0.55
+        },
+        "headCenter": {
+          "x": 0.5,
+          "y": 0.28
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Motion is derived from a single still, not hand-drawn poses or a skeletal rig."
+      ]
+    },
+    {
+      "id": "chicken_chick_jump_forward",
+      "game": "Chicken",
+      "name": "chick-jump-forward",
+      "frameSize": [
+        320,
+        320
+      ],
+      "frames": [
+        "Chicken/chick-jump-forward/frames/frame-00.png",
+        "Chicken/chick-jump-forward/frames/frame-01.png",
+        "Chicken/chick-jump-forward/frames/frame-02.png",
+        "Chicken/chick-jump-forward/frames/frame-03.png",
+        "Chicken/chick-jump-forward/frames/frame-04.png",
+        "Chicken/chick-jump-forward/frames/frame-05.png",
+        "Chicken/chick-jump-forward/frames/frame-06.png",
+        "Chicken/chick-jump-forward/frames/frame-07.png",
+        "Chicken/chick-jump-forward/frames/frame-08.png",
+        "Chicken/chick-jump-forward/frames/frame-09.png"
+      ],
+      "frameCount": 10,
+      "fps": 14,
+      "timingMs": [
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.93
+      ],
+      "stateFrom": "ready",
+      "stateTo": "landed",
+      "sourceAssets": [
+        "chicken/models/chick-idle-reconstruction.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Readably staged hop to the next tile; the ground pivot remains stable.",
+      "spriteSheet": "Chicken/chick-jump-forward/sheet.png",
+      "preview": "Chicken/chick-jump-forward/preview-strip.png",
+      "durationMs": 710,
+      "bundledSourceAssets": [
+        "SourceArt/chicken/models/chick-idle-reconstruction.png"
+      ],
+      "qualityStatus": "transform_first_pass",
+      "integrationReady": false,
+      "anchors": {
+        "groundPivot": {
+          "x": 0.5,
+          "y": 0.87
+        },
+        "leftFootContact": {
+          "x": 0.34,
+          "y": 0.87
+        },
+        "rightFootContact": {
+          "x": 0.68,
+          "y": 0.87
+        },
+        "bodyCenter": {
+          "x": 0.5,
+          "y": 0.55
+        },
+        "headCenter": {
+          "x": 0.5,
+          "y": 0.28
+        },
+        "landingPoint": {
+          "x": 0.5,
+          "y": 0.87
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Motion is derived from a single still, not hand-drawn poses or a skeletal rig."
+      ]
+    },
+    {
+      "id": "chicken_chick_success_bounce",
+      "game": "Chicken",
+      "name": "chick-success-bounce",
+      "frameSize": [
+        320,
+        320
+      ],
+      "frames": [
+        "Chicken/chick-success-bounce/frames/frame-00.png",
+        "Chicken/chick-success-bounce/frames/frame-01.png",
+        "Chicken/chick-success-bounce/frames/frame-02.png",
+        "Chicken/chick-success-bounce/frames/frame-03.png",
+        "Chicken/chick-success-bounce/frames/frame-04.png",
+        "Chicken/chick-success-bounce/frames/frame-05.png",
+        "Chicken/chick-success-bounce/frames/frame-06.png",
+        "Chicken/chick-success-bounce/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 12,
+      "timingMs": [
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.93
+      ],
+      "stateFrom": "landed",
+      "stateTo": "success",
+      "sourceAssets": [
+        "chicken/models/chick-idle-reconstruction.png"
+      ],
+      "generatedElements": [
+        "green success ring"
+      ],
+      "purpose": "Small celebratory bounce with a restrained signal ring.",
+      "spriteSheet": "Chicken/chick-success-bounce/sheet.png",
+      "preview": "Chicken/chick-success-bounce/preview-strip.png",
+      "durationMs": 664,
+      "bundledSourceAssets": [
+        "SourceArt/chicken/models/chick-idle-reconstruction.png"
+      ],
+      "qualityStatus": "transform_first_pass",
+      "integrationReady": false,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Motion is derived from a single still, not hand-drawn poses or a skeletal rig."
+      ]
+    },
+    {
+      "id": "chicken_chick_danger_reaction",
+      "game": "Chicken",
+      "name": "chick-danger-reaction",
+      "frameSize": [
+        320,
+        320
+      ],
+      "frames": [
+        "Chicken/chick-danger-reaction/frames/frame-00.png",
+        "Chicken/chick-danger-reaction/frames/frame-01.png",
+        "Chicken/chick-danger-reaction/frames/frame-02.png",
+        "Chicken/chick-danger-reaction/frames/frame-03.png",
+        "Chicken/chick-danger-reaction/frames/frame-04.png",
+        "Chicken/chick-danger-reaction/frames/frame-05.png"
+      ],
+      "frameCount": 6,
+      "fps": 14,
+      "timingMs": [
+        71,
+        71,
+        71,
+        71,
+        71,
+        71
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.93
+      ],
+      "stateFrom": "approach",
+      "stateTo": "danger",
+      "sourceAssets": [
+        "chicken/models/chick-idle-reconstruction.png",
+        "chicken/obstacles/traffic-van-reconstruction.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Alert recoil and small shake before a traffic collision decision.",
+      "spriteSheet": "Chicken/chick-danger-reaction/sheet.png",
+      "preview": "Chicken/chick-danger-reaction/preview-strip.png",
+      "durationMs": 426,
+      "bundledSourceAssets": [
+        "SourceArt/chicken/models/chick-idle-reconstruction.png",
+        "SourceArt/chicken/obstacles/traffic-van-reconstruction.png"
+      ],
+      "qualityStatus": "transform_first_pass",
+      "integrationReady": false,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Motion is derived from a single still, not hand-drawn poses or a skeletal rig."
+      ]
+    },
+    {
+      "id": "chicken_chick_fail_fall",
+      "game": "Chicken",
+      "name": "chick-fail-fall",
+      "frameSize": [
+        320,
+        320
+      ],
+      "frames": [
+        "Chicken/chick-fail-fall/frames/frame-00.png",
+        "Chicken/chick-fail-fall/frames/frame-01.png",
+        "Chicken/chick-fail-fall/frames/frame-02.png",
+        "Chicken/chick-fail-fall/frames/frame-03.png",
+        "Chicken/chick-fail-fall/frames/frame-04.png",
+        "Chicken/chick-fail-fall/frames/frame-05.png",
+        "Chicken/chick-fail-fall/frames/frame-06.png",
+        "Chicken/chick-fail-fall/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 12,
+      "timingMs": [
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.93
+      ],
+      "stateFrom": "danger",
+      "stateTo": "failed",
+      "sourceAssets": [
+        "chicken/models/chick-idle-reconstruction.png"
+      ],
+      "generatedElements": [
+        "impact ring"
+      ],
+      "purpose": "Soft fail fall with controlled rotation and no hard cut.",
+      "spriteSheet": "Chicken/chick-fail-fall/sheet.png",
+      "preview": "Chicken/chick-fail-fall/preview-strip.png",
+      "durationMs": 664,
+      "bundledSourceAssets": [
+        "SourceArt/chicken/models/chick-idle-reconstruction.png"
+      ],
+      "qualityStatus": "transform_first_pass",
+      "integrationReady": false,
+      "anchors": {
+        "groundPivot": {
+          "x": 0.5,
+          "y": 1.0
+        },
+        "bodyCenter": {
+          "x": 0.5,
+          "y": 0.63
+        },
+        "headCenter": {
+          "x": 0.5,
+          "y": 0.42
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Motion is derived from a single still, not hand-drawn poses or a skeletal rig."
+      ]
+    },
+    {
+      "id": "chicken_vehicle_crossing",
+      "game": "Chicken",
+      "name": "vehicle-crossing",
+      "frameSize": [
+        320,
+        320
+      ],
+      "frames": [
+        "Chicken/vehicle-crossing/frames/frame-00.png",
+        "Chicken/vehicle-crossing/frames/frame-01.png",
+        "Chicken/vehicle-crossing/frames/frame-02.png",
+        "Chicken/vehicle-crossing/frames/frame-03.png",
+        "Chicken/vehicle-crossing/frames/frame-04.png",
+        "Chicken/vehicle-crossing/frames/frame-05.png",
+        "Chicken/vehicle-crossing/frames/frame-06.png",
+        "Chicken/vehicle-crossing/frames/frame-07.png",
+        "Chicken/vehicle-crossing/frames/frame-08.png",
+        "Chicken/vehicle-crossing/frames/frame-09.png"
+      ],
+      "frameCount": 10,
+      "fps": 16,
+      "timingMs": [
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63
+      ],
+      "loop": "loop",
+      "pivot": [
+        0.5,
+        0.78
+      ],
+      "stateFrom": "road-active",
+      "stateTo": "road-active",
+      "sourceAssets": [
+        "chicken/obstacles/traffic-van-reconstruction.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Looping obstacle crossing the lane; use collision boxes from code, not alpha bounds.",
+      "spriteSheet": "Chicken/vehicle-crossing/sheet.png",
+      "preview": "Chicken/vehicle-crossing/preview-strip.png",
+      "durationMs": 630,
+      "bundledSourceAssets": [
+        "SourceArt/chicken/obstacles/traffic-van-reconstruction.png"
+      ],
+      "qualityStatus": "transform_first_pass",
+      "integrationReady": false,
+      "anchors": {
+        "vehicleCenter": {
+          "x": 0.5,
+          "y": 0.6
+        },
+        "groundPivot": {
+          "x": 0.5,
+          "y": 0.87
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Motion is derived from a single still, not hand-drawn poses or a skeletal rig.",
+        "Frames 0 and 9 are fully transparent by design: vehicle enters/exits offscreen. Treat as a one-shot crossing despite the legacy loop flag, or trim endpoints before looping."
+      ]
+    },
+    {
+      "id": "applefortune_apple_idle",
+      "game": "AppleFortune",
+      "name": "apple-idle",
+      "frameSize": [
+        256,
+        256
+      ],
+      "frames": [
+        "AppleFortune/apple-idle/frames/frame-00.png",
+        "AppleFortune/apple-idle/frames/frame-01.png",
+        "AppleFortune/apple-idle/frames/frame-02.png",
+        "AppleFortune/apple-idle/frames/frame-03.png",
+        "AppleFortune/apple-idle/frames/frame-04.png",
+        "AppleFortune/apple-idle/frames/frame-05.png",
+        "AppleFortune/apple-idle/frames/frame-06.png",
+        "AppleFortune/apple-idle/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 10,
+      "timingMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "loop": "loop",
+      "pivot": [
+        0.5,
+        0.53
+      ],
+      "stateFrom": "closed",
+      "stateTo": "closed",
+      "sourceAssets": [
+        "apple/objects/apple-whole.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Quiet apple idle with a restrained breathing scale.",
+      "spriteSheet": "AppleFortune/apple-idle/sheet.png",
+      "preview": "AppleFortune/apple-idle/preview-strip.png",
+      "durationMs": 800,
+      "bundledSourceAssets": [
+        "SourceArt/apple/objects/apple-whole.png"
+      ],
+      "qualityStatus": "review_required",
+      "integrationReady": true,
+      "anchors": {
+        "appleCenter": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "tileCenter": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "shadowCenter": {
+          "x": 0.5,
+          "y": 0.86
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Board contact/joins and event timing are not calibrated against the responsive game board."
+      ]
+    },
+    {
+      "id": "applefortune_selection_pulse",
+      "game": "AppleFortune",
+      "name": "selection-pulse",
+      "frameSize": [
+        256,
+        256
+      ],
+      "frames": [
+        "AppleFortune/selection-pulse/frames/frame-00.png",
+        "AppleFortune/selection-pulse/frames/frame-01.png",
+        "AppleFortune/selection-pulse/frames/frame-02.png",
+        "AppleFortune/selection-pulse/frames/frame-03.png",
+        "AppleFortune/selection-pulse/frames/frame-04.png",
+        "AppleFortune/selection-pulse/frames/frame-05.png",
+        "AppleFortune/selection-pulse/frames/frame-06.png",
+        "AppleFortune/selection-pulse/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 14,
+      "timingMs": [
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.53
+      ],
+      "stateFrom": "closed",
+      "stateTo": "selected",
+      "sourceAssets": [
+        "apple/objects/apple-whole.png"
+      ],
+      "generatedElements": [
+        "soft green selection ring"
+      ],
+      "purpose": "Selection acknowledgement that leaves result reveal to the following state.",
+      "spriteSheet": "AppleFortune/selection-pulse/sheet.png",
+      "preview": "AppleFortune/selection-pulse/preview-strip.png",
+      "durationMs": 568,
+      "bundledSourceAssets": [
+        "SourceArt/apple/objects/apple-whole.png"
+      ],
+      "qualityStatus": "generated_vfx_overlay",
+      "integrationReady": false,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Board contact/joins and event timing are not calibrated against the responsive game board."
+      ]
+    },
+    {
+      "id": "applefortune_safe_reveal",
+      "game": "AppleFortune",
+      "name": "safe-reveal",
+      "frameSize": [
+        256,
+        256
+      ],
+      "frames": [
+        "AppleFortune/safe-reveal/frames/frame-00.png",
+        "AppleFortune/safe-reveal/frames/frame-01.png",
+        "AppleFortune/safe-reveal/frames/frame-02.png",
+        "AppleFortune/safe-reveal/frames/frame-03.png",
+        "AppleFortune/safe-reveal/frames/frame-04.png",
+        "AppleFortune/safe-reveal/frames/frame-05.png",
+        "AppleFortune/safe-reveal/frames/frame-06.png",
+        "AppleFortune/safe-reveal/frames/frame-07.png",
+        "AppleFortune/safe-reveal/frames/frame-08.png",
+        "AppleFortune/safe-reveal/frames/frame-09.png"
+      ],
+      "frameCount": 10,
+      "fps": 16,
+      "timingMs": [
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.53
+      ],
+      "stateFrom": "selected",
+      "stateTo": "safe",
+      "sourceAssets": [
+        "apple/objects/apple-whole.png"
+      ],
+      "generatedElements": [
+        "green reveal ring"
+      ],
+      "purpose": "Clean safe result reveal using the approved whole apple asset.",
+      "spriteSheet": "AppleFortune/safe-reveal/sheet.png",
+      "preview": "AppleFortune/safe-reveal/preview-strip.png",
+      "durationMs": 630,
+      "bundledSourceAssets": [
+        "SourceArt/apple/objects/apple-whole.png"
+      ],
+      "qualityStatus": "review_required",
+      "integrationReady": true,
+      "anchors": {
+        "appleCenter": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "tileCenter": {
+          "x": 0.5,
+          "y": 0.5
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Board contact/joins and event timing are not calibrated against the responsive game board."
+      ]
+    },
+    {
+      "id": "applefortune_loss_reveal",
+      "game": "AppleFortune",
+      "name": "loss-reveal",
+      "frameSize": [
+        256,
+        256
+      ],
+      "frames": [
+        "AppleFortune/loss-reveal/frames/frame-00.png",
+        "AppleFortune/loss-reveal/frames/frame-01.png",
+        "AppleFortune/loss-reveal/frames/frame-02.png",
+        "AppleFortune/loss-reveal/frames/frame-03.png",
+        "AppleFortune/loss-reveal/frames/frame-04.png",
+        "AppleFortune/loss-reveal/frames/frame-05.png",
+        "AppleFortune/loss-reveal/frames/frame-06.png",
+        "AppleFortune/loss-reveal/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 14,
+      "timingMs": [
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.53
+      ],
+      "stateFrom": "selected",
+      "stateTo": "loss",
+      "sourceAssets": [
+        "apple/objects/apple-bitten.png"
+      ],
+      "generatedElements": [
+        "warm fail ring"
+      ],
+      "purpose": "Loss reveal using the approved bitten apple asset; no extra symbols are baked into the art.",
+      "spriteSheet": "AppleFortune/loss-reveal/sheet.png",
+      "preview": "AppleFortune/loss-reveal/preview-strip.png",
+      "durationMs": 568,
+      "bundledSourceAssets": [
+        "SourceArt/apple/objects/apple-bitten.png"
+      ],
+      "qualityStatus": "review_required",
+      "integrationReady": true,
+      "anchors": {
+        "appleCenter": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "tileCenter": {
+          "x": 0.5,
+          "y": 0.5
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Board contact/joins and event timing are not calibrated against the responsive game board."
+      ]
+    },
+    {
+      "id": "applefortune_level_transition",
+      "game": "AppleFortune",
+      "name": "level-transition",
+      "frameSize": [
+        256,
+        256
+      ],
+      "frames": [
+        "AppleFortune/level-transition/frames/frame-00.png",
+        "AppleFortune/level-transition/frames/frame-01.png",
+        "AppleFortune/level-transition/frames/frame-02.png",
+        "AppleFortune/level-transition/frames/frame-03.png",
+        "AppleFortune/level-transition/frames/frame-04.png",
+        "AppleFortune/level-transition/frames/frame-05.png",
+        "AppleFortune/level-transition/frames/frame-06.png",
+        "AppleFortune/level-transition/frames/frame-07.png",
+        "AppleFortune/level-transition/frames/frame-08.png",
+        "AppleFortune/level-transition/frames/frame-09.png"
+      ],
+      "frameCount": 10,
+      "fps": 12,
+      "timingMs": [
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.53
+      ],
+      "stateFrom": "safe",
+      "stateTo": "next-level",
+      "sourceAssets": [
+        "apple/objects/apple-whole.png",
+        "apple/tiles/closed-wooden-board-tile-reconstruction.png"
+      ],
+      "generatedElements": [
+        "green progression ring"
+      ],
+      "purpose": "Short transition beat between rows/levels; code should swap the board after completion.",
+      "spriteSheet": "AppleFortune/level-transition/sheet.png",
+      "preview": "AppleFortune/level-transition/preview-strip.png",
+      "durationMs": 830,
+      "bundledSourceAssets": [
+        "SourceArt/apple/objects/apple-whole.png",
+        "SourceArt/apple/tiles/closed-wooden-board-tile-reconstruction.png"
+      ],
+      "qualityStatus": "review_required",
+      "integrationReady": true,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Board contact/joins and event timing are not calibrated against the responsive game board."
+      ]
+    },
+    {
+      "id": "applefortune_board_reset",
+      "game": "AppleFortune",
+      "name": "board-reset",
+      "frameSize": [
+        256,
+        256
+      ],
+      "frames": [
+        "AppleFortune/board-reset/frames/frame-00.png",
+        "AppleFortune/board-reset/frames/frame-01.png",
+        "AppleFortune/board-reset/frames/frame-02.png",
+        "AppleFortune/board-reset/frames/frame-03.png",
+        "AppleFortune/board-reset/frames/frame-04.png",
+        "AppleFortune/board-reset/frames/frame-05.png",
+        "AppleFortune/board-reset/frames/frame-06.png",
+        "AppleFortune/board-reset/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 16,
+      "timingMs": [
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "round-ended",
+      "stateTo": "closed",
+      "sourceAssets": [
+        "apple/tiles/closed-wooden-board-tile-reconstruction.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Neutral tile reset/fade that makes the next board state easy for code to synchronize.",
+      "spriteSheet": "AppleFortune/board-reset/sheet.png",
+      "preview": "AppleFortune/board-reset/preview-strip.png",
+      "durationMs": 504,
+      "bundledSourceAssets": [
+        "SourceArt/apple/tiles/closed-wooden-board-tile-reconstruction.png"
+      ],
+      "qualityStatus": "review_required",
+      "integrationReady": true,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Board contact/joins and event timing are not calibrated against the responsive game board."
+      ]
+    },
+    {
+      "id": "mines_tile_idle",
+      "game": "Mines",
+      "name": "tile-idle",
+      "frameSize": [
+        256,
+        256
+      ],
+      "frames": [
+        "Mines/tile-idle/frames/frame-00.png",
+        "Mines/tile-idle/frames/frame-01.png",
+        "Mines/tile-idle/frames/frame-02.png",
+        "Mines/tile-idle/frames/frame-03.png",
+        "Mines/tile-idle/frames/frame-04.png",
+        "Mines/tile-idle/frames/frame-05.png",
+        "Mines/tile-idle/frames/frame-06.png",
+        "Mines/tile-idle/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 10,
+      "timingMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "loop": "loop",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "closed",
+      "stateTo": "closed",
+      "sourceAssets": [
+        "gems/references/approved-mines-scene.png"
+      ],
+      "generatedElements": [
+        "cropped closed tile from approved board reference"
+      ],
+      "purpose": "Closed-cell idle based on the supplied approved board reference.",
+      "spriteSheet": "Mines/tile-idle/sheet.png",
+      "preview": "Mines/tile-idle/preview-strip.png",
+      "durationMs": 800,
+      "bundledSourceAssets": [
+        "SourceArt/gems/references/approved-mines-scene.png"
+      ],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {
+        "tileCenter": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "gemCenter": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "mineCenter": {
+          "x": 0.5,
+          "y": 0.5
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Contains generated placeholder symbols and/or a crop from a UI reference; replace with clean source artwork before production."
+      ]
+    },
+    {
+      "id": "mines_tile_press",
+      "game": "Mines",
+      "name": "tile-press",
+      "frameSize": [
+        256,
+        256
+      ],
+      "frames": [
+        "Mines/tile-press/frames/frame-00.png",
+        "Mines/tile-press/frames/frame-01.png",
+        "Mines/tile-press/frames/frame-02.png",
+        "Mines/tile-press/frames/frame-03.png",
+        "Mines/tile-press/frames/frame-04.png",
+        "Mines/tile-press/frames/frame-05.png"
+      ],
+      "frameCount": 6,
+      "fps": 16,
+      "timingMs": [
+        63,
+        63,
+        63,
+        63,
+        63,
+        63
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "closed",
+      "stateTo": "opening",
+      "sourceAssets": [
+        "gems/references/approved-mines-scene.png"
+      ],
+      "generatedElements": [
+        "cropped closed tile from approved board reference"
+      ],
+      "purpose": "Tactile press compression and release.",
+      "spriteSheet": "Mines/tile-press/sheet.png",
+      "preview": "Mines/tile-press/preview-strip.png",
+      "durationMs": 378,
+      "bundledSourceAssets": [
+        "SourceArt/gems/references/approved-mines-scene.png"
+      ],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Contains generated placeholder symbols and/or a crop from a UI reference; replace with clean source artwork before production."
+      ]
+    },
+    {
+      "id": "mines_gem_open",
+      "game": "Mines",
+      "name": "gem-open",
+      "frameSize": [
+        256,
+        256
+      ],
+      "frames": [
+        "Mines/gem-open/frames/frame-00.png",
+        "Mines/gem-open/frames/frame-01.png",
+        "Mines/gem-open/frames/frame-02.png",
+        "Mines/gem-open/frames/frame-03.png",
+        "Mines/gem-open/frames/frame-04.png",
+        "Mines/gem-open/frames/frame-05.png",
+        "Mines/gem-open/frames/frame-06.png",
+        "Mines/gem-open/frames/frame-07.png",
+        "Mines/gem-open/frames/frame-08.png",
+        "Mines/gem-open/frames/frame-09.png"
+      ],
+      "frameCount": 10,
+      "fps": 16,
+      "timingMs": [
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "opening",
+      "stateTo": "safe",
+      "sourceAssets": [
+        "gems/references/approved-mines-scene.png"
+      ],
+      "generatedElements": [
+        "cyan gem drawn as continuation of the supplied blue-crystal palette",
+        "green/cyan ring"
+      ],
+      "purpose": "Safe reveal; the source pack has no isolated crystal export, so the gem is a documented generated element.",
+      "spriteSheet": "Mines/gem-open/sheet.png",
+      "preview": "Mines/gem-open/preview-strip.png",
+      "durationMs": 630,
+      "bundledSourceAssets": [
+        "SourceArt/gems/references/approved-mines-scene.png"
+      ],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {
+        "tileCenter": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "gemCenter": {
+          "x": 0.5,
+          "y": 0.5
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Contains generated placeholder symbols and/or a crop from a UI reference; replace with clean source artwork before production."
+      ]
+    },
+    {
+      "id": "mines_mine_open",
+      "game": "Mines",
+      "name": "mine-open",
+      "frameSize": [
+        256,
+        256
+      ],
+      "frames": [
+        "Mines/mine-open/frames/frame-00.png",
+        "Mines/mine-open/frames/frame-01.png",
+        "Mines/mine-open/frames/frame-02.png",
+        "Mines/mine-open/frames/frame-03.png",
+        "Mines/mine-open/frames/frame-04.png",
+        "Mines/mine-open/frames/frame-05.png",
+        "Mines/mine-open/frames/frame-06.png",
+        "Mines/mine-open/frames/frame-07.png",
+        "Mines/mine-open/frames/frame-08.png",
+        "Mines/mine-open/frames/frame-09.png"
+      ],
+      "frameCount": 10,
+      "fps": 14,
+      "timingMs": [
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71,
+        71
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "opening",
+      "stateTo": "mine",
+      "sourceAssets": [
+        "gems/references/approved-mines-scene.png"
+      ],
+      "generatedElements": [
+        "orange/red mine symbol drawn because no isolated mine export exists",
+        "impact rays"
+      ],
+      "purpose": "Mine reveal with a compact mobile-safe fail burst.",
+      "spriteSheet": "Mines/mine-open/sheet.png",
+      "preview": "Mines/mine-open/preview-strip.png",
+      "durationMs": 710,
+      "bundledSourceAssets": [
+        "SourceArt/gems/references/approved-mines-scene.png"
+      ],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {
+        "tileCenter": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "mineCenter": {
+          "x": 0.5,
+          "y": 0.5
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Contains generated placeholder symbols and/or a crop from a UI reference; replace with clean source artwork before production."
+      ]
+    },
+    {
+      "id": "mines_round_complete_reset",
+      "game": "Mines",
+      "name": "round-complete-reset",
+      "frameSize": [
+        256,
+        256
+      ],
+      "frames": [
+        "Mines/round-complete-reset/frames/frame-00.png",
+        "Mines/round-complete-reset/frames/frame-01.png",
+        "Mines/round-complete-reset/frames/frame-02.png",
+        "Mines/round-complete-reset/frames/frame-03.png",
+        "Mines/round-complete-reset/frames/frame-04.png",
+        "Mines/round-complete-reset/frames/frame-05.png",
+        "Mines/round-complete-reset/frames/frame-06.png",
+        "Mines/round-complete-reset/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 12,
+      "timingMs": [
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "safe-or-mine",
+      "stateTo": "reset",
+      "sourceAssets": [
+        "gems/references/approved-mines-scene.png"
+      ],
+      "generatedElements": [
+        "signal reset ring"
+      ],
+      "purpose": "Round-end fade to a clean closed-cell state.",
+      "spriteSheet": "Mines/round-complete-reset/sheet.png",
+      "preview": "Mines/round-complete-reset/preview-strip.png",
+      "durationMs": 664,
+      "bundledSourceAssets": [
+        "SourceArt/gems/references/approved-mines-scene.png"
+      ],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Contains generated placeholder symbols and/or a crop from a UI reference; replace with clean source artwork before production."
+      ]
+    },
+    {
+      "id": "footballpenalties_goalkeeper_idle",
+      "game": "FootballPenalties",
+      "name": "goalkeeper-idle",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "FootballPenalties/goalkeeper-idle/frames/frame-00.png",
+        "FootballPenalties/goalkeeper-idle/frames/frame-01.png",
+        "FootballPenalties/goalkeeper-idle/frames/frame-02.png",
+        "FootballPenalties/goalkeeper-idle/frames/frame-03.png",
+        "FootballPenalties/goalkeeper-idle/frames/frame-04.png",
+        "FootballPenalties/goalkeeper-idle/frames/frame-05.png",
+        "FootballPenalties/goalkeeper-idle/frames/frame-06.png",
+        "FootballPenalties/goalkeeper-idle/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 10,
+      "timingMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "loop": "loop",
+      "pivot": [
+        0.5,
+        1
+      ],
+      "stateFrom": "ready",
+      "stateTo": "ready",
+      "sourceAssets": [
+        "football/concepts/goalkeeper-green-unassigned.png"
+      ],
+      "generatedElements": [],
+      "purpose": "Keeper breathing stance based on the only supplied football character asset.",
+      "spriteSheet": "FootballPenalties/goalkeeper-idle/sheet.png",
+      "preview": "FootballPenalties/goalkeeper-idle/preview-strip.png",
+      "durationMs": 800,
+      "bundledSourceAssets": [
+        "SourceArt/football/concepts/goalkeeper-green-unassigned.png"
+      ],
+      "qualityStatus": "concept_only",
+      "integrationReady": false,
+      "anchors": {
+        "feetPivot": {
+          "x": 0.5,
+          "y": 0.98
+        },
+        "leftHandReach": {
+          "x": 0.28,
+          "y": 0.62
+        },
+        "rightHandReach": {
+          "x": 0.72,
+          "y": 0.62
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence."
+      ]
+    },
+    {
+      "id": "footballpenalties_shot_prep",
+      "game": "FootballPenalties",
+      "name": "shot-prep",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "FootballPenalties/shot-prep/frames/frame-00.png",
+        "FootballPenalties/shot-prep/frames/frame-01.png",
+        "FootballPenalties/shot-prep/frames/frame-02.png",
+        "FootballPenalties/shot-prep/frames/frame-03.png",
+        "FootballPenalties/shot-prep/frames/frame-04.png",
+        "FootballPenalties/shot-prep/frames/frame-05.png",
+        "FootballPenalties/shot-prep/frames/frame-06.png",
+        "FootballPenalties/shot-prep/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 12,
+      "timingMs": [
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        1
+      ],
+      "stateFrom": "ready",
+      "stateTo": "shot-ready",
+      "sourceAssets": [
+        "football/concepts/goalkeeper-green-unassigned.png"
+      ],
+      "generatedElements": [
+        "neutral shot marker"
+      ],
+      "purpose": "Neutral preparation beat; no kicker model exists in the source pack.",
+      "spriteSheet": "FootballPenalties/shot-prep/sheet.png",
+      "preview": "FootballPenalties/shot-prep/preview-strip.png",
+      "durationMs": 664,
+      "bundledSourceAssets": [
+        "SourceArt/football/concepts/goalkeeper-green-unassigned.png"
+      ],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence."
+      ]
+    },
+    {
+      "id": "footballpenalties_ball_flight_left",
+      "game": "FootballPenalties",
+      "name": "ball-flight-left",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "FootballPenalties/ball-flight-left/frames/frame-00.png",
+        "FootballPenalties/ball-flight-left/frames/frame-01.png",
+        "FootballPenalties/ball-flight-left/frames/frame-02.png",
+        "FootballPenalties/ball-flight-left/frames/frame-03.png",
+        "FootballPenalties/ball-flight-left/frames/frame-04.png",
+        "FootballPenalties/ball-flight-left/frames/frame-05.png",
+        "FootballPenalties/ball-flight-left/frames/frame-06.png",
+        "FootballPenalties/ball-flight-left/frames/frame-07.png",
+        "FootballPenalties/ball-flight-left/frames/frame-08.png",
+        "FootballPenalties/ball-flight-left/frames/frame-09.png",
+        "FootballPenalties/ball-flight-left/frames/frame-10.png",
+        "FootballPenalties/ball-flight-left/frames/frame-11.png"
+      ],
+      "frameCount": 12,
+      "fps": 18,
+      "timingMs": [
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "shot-ready",
+      "stateTo": "ball-arrived",
+      "sourceAssets": [],
+      "generatedElements": [
+        "neutral football marker drawn because the archive has no isolated ball asset",
+        "motion trail"
+      ],
+      "purpose": "Ball trajectory variant (left); final outcome is chosen by game logic.",
+      "spriteSheet": "FootballPenalties/ball-flight-left/sheet.png",
+      "preview": "FootballPenalties/ball-flight-left/preview-strip.png",
+      "durationMs": 672,
+      "bundledSourceAssets": [],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence.",
+        "Flight is a generated marker/trail over a static keeper concept; no football artwork or verified goal collision."
+      ]
+    },
+    {
+      "id": "footballpenalties_ball_flight_center",
+      "game": "FootballPenalties",
+      "name": "ball-flight-center",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "FootballPenalties/ball-flight-center/frames/frame-00.png",
+        "FootballPenalties/ball-flight-center/frames/frame-01.png",
+        "FootballPenalties/ball-flight-center/frames/frame-02.png",
+        "FootballPenalties/ball-flight-center/frames/frame-03.png",
+        "FootballPenalties/ball-flight-center/frames/frame-04.png",
+        "FootballPenalties/ball-flight-center/frames/frame-05.png",
+        "FootballPenalties/ball-flight-center/frames/frame-06.png",
+        "FootballPenalties/ball-flight-center/frames/frame-07.png",
+        "FootballPenalties/ball-flight-center/frames/frame-08.png",
+        "FootballPenalties/ball-flight-center/frames/frame-09.png",
+        "FootballPenalties/ball-flight-center/frames/frame-10.png",
+        "FootballPenalties/ball-flight-center/frames/frame-11.png"
+      ],
+      "frameCount": 12,
+      "fps": 18,
+      "timingMs": [
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "shot-ready",
+      "stateTo": "ball-arrived",
+      "sourceAssets": [],
+      "generatedElements": [
+        "neutral football marker drawn because the archive has no isolated ball asset",
+        "motion trail"
+      ],
+      "purpose": "Ball trajectory variant (center); final outcome is chosen by game logic.",
+      "spriteSheet": "FootballPenalties/ball-flight-center/sheet.png",
+      "preview": "FootballPenalties/ball-flight-center/preview-strip.png",
+      "durationMs": 672,
+      "bundledSourceAssets": [],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence.",
+        "Flight is a generated marker/trail over a static keeper concept; no football artwork or verified goal collision."
+      ]
+    },
+    {
+      "id": "footballpenalties_ball_flight_right",
+      "game": "FootballPenalties",
+      "name": "ball-flight-right",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "FootballPenalties/ball-flight-right/frames/frame-00.png",
+        "FootballPenalties/ball-flight-right/frames/frame-01.png",
+        "FootballPenalties/ball-flight-right/frames/frame-02.png",
+        "FootballPenalties/ball-flight-right/frames/frame-03.png",
+        "FootballPenalties/ball-flight-right/frames/frame-04.png",
+        "FootballPenalties/ball-flight-right/frames/frame-05.png",
+        "FootballPenalties/ball-flight-right/frames/frame-06.png",
+        "FootballPenalties/ball-flight-right/frames/frame-07.png",
+        "FootballPenalties/ball-flight-right/frames/frame-08.png",
+        "FootballPenalties/ball-flight-right/frames/frame-09.png",
+        "FootballPenalties/ball-flight-right/frames/frame-10.png",
+        "FootballPenalties/ball-flight-right/frames/frame-11.png"
+      ],
+      "frameCount": 12,
+      "fps": 18,
+      "timingMs": [
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56,
+        56
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "stateFrom": "shot-ready",
+      "stateTo": "ball-arrived",
+      "sourceAssets": [],
+      "generatedElements": [
+        "neutral football marker drawn because the archive has no isolated ball asset",
+        "motion trail"
+      ],
+      "purpose": "Ball trajectory variant (right); final outcome is chosen by game logic.",
+      "spriteSheet": "FootballPenalties/ball-flight-right/sheet.png",
+      "preview": "FootballPenalties/ball-flight-right/preview-strip.png",
+      "durationMs": 672,
+      "bundledSourceAssets": [],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence.",
+        "Flight is a generated marker/trail over a static keeper concept; no football artwork or verified goal collision."
+      ]
+    },
+    {
+      "id": "footballpenalties_goalkeeper_save_left",
+      "game": "FootballPenalties",
+      "name": "goalkeeper-save-left",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "FootballPenalties/goalkeeper-save-left/frames/frame-00.png",
+        "FootballPenalties/goalkeeper-save-left/frames/frame-01.png",
+        "FootballPenalties/goalkeeper-save-left/frames/frame-02.png",
+        "FootballPenalties/goalkeeper-save-left/frames/frame-03.png",
+        "FootballPenalties/goalkeeper-save-left/frames/frame-04.png",
+        "FootballPenalties/goalkeeper-save-left/frames/frame-05.png",
+        "FootballPenalties/goalkeeper-save-left/frames/frame-06.png",
+        "FootballPenalties/goalkeeper-save-left/frames/frame-07.png",
+        "FootballPenalties/goalkeeper-save-left/frames/frame-08.png",
+        "FootballPenalties/goalkeeper-save-left/frames/frame-09.png"
+      ],
+      "frameCount": 10,
+      "fps": 16,
+      "timingMs": [
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        1
+      ],
+      "stateFrom": "shot-ready",
+      "stateTo": "save",
+      "sourceAssets": [
+        "football/concepts/goalkeeper-green-unassigned.png"
+      ],
+      "generatedElements": [
+        "ball marker and save burst"
+      ],
+      "purpose": "Left dive and save endpoint using a mirrored/rotated version of the supplied keeper concept.",
+      "spriteSheet": "FootballPenalties/goalkeeper-save-left/sheet.png",
+      "preview": "FootballPenalties/goalkeeper-save-left/preview-strip.png",
+      "durationMs": 630,
+      "bundledSourceAssets": [
+        "SourceArt/football/concepts/goalkeeper-green-unassigned.png"
+      ],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {
+        "feetPivot": {
+          "x": 0.5,
+          "y": 0.98
+        },
+        "leftHandReach": {
+          "x": 0.2,
+          "y": 0.55
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence.",
+        "Transform-only keeper variant with generated marker; frame edge clipping and hand-to-ball collision are unverified."
+      ]
+    },
+    {
+      "id": "footballpenalties_goalkeeper_save_right",
+      "game": "FootballPenalties",
+      "name": "goalkeeper-save-right",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "FootballPenalties/goalkeeper-save-right/frames/frame-00.png",
+        "FootballPenalties/goalkeeper-save-right/frames/frame-01.png",
+        "FootballPenalties/goalkeeper-save-right/frames/frame-02.png",
+        "FootballPenalties/goalkeeper-save-right/frames/frame-03.png",
+        "FootballPenalties/goalkeeper-save-right/frames/frame-04.png",
+        "FootballPenalties/goalkeeper-save-right/frames/frame-05.png",
+        "FootballPenalties/goalkeeper-save-right/frames/frame-06.png",
+        "FootballPenalties/goalkeeper-save-right/frames/frame-07.png",
+        "FootballPenalties/goalkeeper-save-right/frames/frame-08.png",
+        "FootballPenalties/goalkeeper-save-right/frames/frame-09.png"
+      ],
+      "frameCount": 10,
+      "fps": 16,
+      "timingMs": [
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63,
+        63
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        1
+      ],
+      "stateFrom": "shot-ready",
+      "stateTo": "save",
+      "sourceAssets": [
+        "football/concepts/goalkeeper-green-unassigned.png"
+      ],
+      "generatedElements": [
+        "ball marker and save burst"
+      ],
+      "purpose": "Right dive and save endpoint using a mirrored/rotated version of the supplied keeper concept.",
+      "spriteSheet": "FootballPenalties/goalkeeper-save-right/sheet.png",
+      "preview": "FootballPenalties/goalkeeper-save-right/preview-strip.png",
+      "durationMs": 630,
+      "bundledSourceAssets": [
+        "SourceArt/football/concepts/goalkeeper-green-unassigned.png"
+      ],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {
+        "feetPivot": {
+          "x": 0.5,
+          "y": 0.98
+        },
+        "rightHandReach": {
+          "x": 0.8,
+          "y": 0.55
+        }
+      },
+      "anchorConfidence": "visual estimate; not calibrated in project scene",
+      "limitations": [
+        "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence.",
+        "Transform-only keeper variant with generated marker; frame edge clipping and hand-to-ball collision are unverified."
+      ]
+    },
+    {
+      "id": "footballpenalties_goal_result",
+      "game": "FootballPenalties",
+      "name": "goal-result",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "FootballPenalties/goal-result/frames/frame-00.png",
+        "FootballPenalties/goal-result/frames/frame-01.png",
+        "FootballPenalties/goal-result/frames/frame-02.png",
+        "FootballPenalties/goal-result/frames/frame-03.png",
+        "FootballPenalties/goal-result/frames/frame-04.png",
+        "FootballPenalties/goal-result/frames/frame-05.png",
+        "FootballPenalties/goal-result/frames/frame-06.png",
+        "FootballPenalties/goal-result/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 12,
+      "timingMs": [
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        1
+      ],
+      "stateFrom": "ball-arrived",
+      "stateTo": "goal",
+      "sourceAssets": [
+        "football/concepts/goalkeeper-green-unassigned.png"
+      ],
+      "generatedElements": [
+        "green goal burst",
+        "neutral ball marker"
+      ],
+      "purpose": "Goal result with the keeper holding scene space and a compact success VFX.",
+      "spriteSheet": "FootballPenalties/goal-result/sheet.png",
+      "preview": "FootballPenalties/goal-result/preview-strip.png",
+      "durationMs": 664,
+      "bundledSourceAssets": [
+        "SourceArt/football/concepts/goalkeeper-green-unassigned.png"
+      ],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence."
+      ]
+    },
+    {
+      "id": "footballpenalties_miss_result",
+      "game": "FootballPenalties",
+      "name": "miss-result",
+      "frameSize": [
+        384,
+        384
+      ],
+      "frames": [
+        "FootballPenalties/miss-result/frames/frame-00.png",
+        "FootballPenalties/miss-result/frames/frame-01.png",
+        "FootballPenalties/miss-result/frames/frame-02.png",
+        "FootballPenalties/miss-result/frames/frame-03.png",
+        "FootballPenalties/miss-result/frames/frame-04.png",
+        "FootballPenalties/miss-result/frames/frame-05.png",
+        "FootballPenalties/miss-result/frames/frame-06.png",
+        "FootballPenalties/miss-result/frames/frame-07.png"
+      ],
+      "frameCount": 8,
+      "fps": 12,
+      "timingMs": [
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83
+      ],
+      "loop": "once",
+      "pivot": [
+        0.5,
+        1
+      ],
+      "stateFrom": "ball-arrived",
+      "stateTo": "miss",
+      "sourceAssets": [
+        "football/concepts/goalkeeper-green-unassigned.png"
+      ],
+      "generatedElements": [
+        "neutral ball marker",
+        "amber miss accent"
+      ],
+      "purpose": "Miss endpoint with no baked-in text or score.",
+      "spriteSheet": "FootballPenalties/miss-result/sheet.png",
+      "preview": "FootballPenalties/miss-result/preview-strip.png",
+      "durationMs": 664,
+      "bundledSourceAssets": [
+        "SourceArt/football/concepts/goalkeeper-green-unassigned.png"
+      ],
+      "qualityStatus": "placeholder_only",
+      "integrationReady": false,
+      "anchors": {},
+      "anchorConfidence": "not supplied / not measured",
+      "limitations": [
+        "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence."
+      ]
+    }
+  ],
+  "missingSourceNotes": [
+    "The source pack contains no isolated footballer/kicker model; shot-prep is neutral and the keeper is the only supplied football character.",
+    "The source pack contains no isolated football ball export; ball-flight uses a generated neutral ball marker and motion trail.",
+    "The source pack contains no isolated Mines crystal or mine export; gem-open and mine-open use documented generated symbols over a cropped tile from the approved Mines reference.",
+    "Chicken and Football character exports are still/concept images; motion is transform-based and does not claim new skeletal detail."
+  ],
+  "readiness": "PARTIAL — not a complete production-ready pack; see REQUESTED_COVERAGE.json and ANIMATION_HANDOFF.md.",
+  "animationCount": 35,
+  "sourceAssetAudit": "ASSET_AUDIT.csv",
+  "coverageReport": "REQUESTED_COVERAGE.json",
+  "validationScript": "tools/validate_pack.py"
+}

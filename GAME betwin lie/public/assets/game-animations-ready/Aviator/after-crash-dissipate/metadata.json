@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "aviator_after_crash_dissipate",
+  "game": "Aviator",
+  "name": "after-crash-dissipate",
+  "stateFrom": "crashed",
+  "stateTo": "round-ended",
+  "frameCount": 8,
+  "frameSize": [
+    384,
+    384
+  ],
+  "fps": 12,
+  "durationMs": 664,
+  "timingMs": [
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.58
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "aviator/effects-vfx/after-crash-smoke.png",
+      "bundledPath": "SourceArt/aviator/effects-vfx/after-crash-smoke.png",
+      "sha256": "28a271470fa5afa1cc6a556686d70b56fa820f458f23de1fe75b2cb3fd3b1d54"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "scene_anchor_required",
+  "integrationReady": false,
+  "purpose": "Residual smoke fades and scales out, leaving the next round clear.",
+  "limitations": [
+    "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+  ],
+  "layerMode": "standalone_layer",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        170,
+        181,
+        237,
+        243
+      ],
+      [
+        172,
+        176,
+        242,
+        242
+      ],
+      [
+        173,
+        173,
+        246,
+        241
+      ],
+      [
+        174,
+        169,
+        250,
+        240
+      ],
+      [
+        174,
+        165,
+        254,
+        239
+      ],
+      [
+        176,
+        162,
+        258,
+        237
+      ],
+      [
+        177,
+        159,
+        260,
+        236
+      ],
+      [
+        178,
+        155,
+        264,
+        234
+      ]
+    ],
+    "sheet": "Aviator/after-crash-dissipate/sheet.png",
+    "preview": "Aviator/after-crash-dissipate/preview-strip.png"
+  }
+}

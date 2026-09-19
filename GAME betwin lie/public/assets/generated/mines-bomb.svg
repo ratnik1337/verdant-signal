@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="b-glow" cx="52%" cy="58%" r="60%">
+      <stop offset="0%" stop-color="#ffb066" stop-opacity="0.9"/>
+      <stop offset="55%" stop-color="#ff5b2e" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ff5b2e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b-body" cx="38%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#6b7686"/>
+      <stop offset="45%" stop-color="#333c47"/>
+      <stop offset="100%" stop-color="#0f1318"/>
+    </radialGradient>
+    <linearGradient id="b-fuse" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8a5a2c"/>
+      <stop offset="100%" stop-color="#d9a45a"/>
+    </linearGradient>
+    <radialGradient id="b-spark" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff6da"/>
+      <stop offset="35%" stop-color="#ffb347"/>
+      <stop offset="100%" stop-color="#ff5b2e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="52" cy="58" r="47" fill="url(#b-glow)"/>
+  <path d="M50 22 C60 12 70 10 76 14" stroke="url(#b-fuse)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="77" cy="13" r="6" fill="url(#b-spark)"/>
+  <circle cx="77" cy="13" r="2.4" fill="#fff6da"/>
+  <circle cx="52" cy="58" r="34" fill="url(#b-body)" stroke="#05070a" stroke-width="1.5"/>
+  <ellipse cx="40" cy="46" rx="10" ry="7" fill="#8b96a3" opacity="0.55"/>
+  <g stroke="#05070a" stroke-width="1.2" fill="none" opacity="0.5">
+    <path d="M22 58 A30 30 0 0 1 52 28"/>
+    <path d="M52 88 A30 30 0 0 1 22 58" opacity="0.4"/>
+  </g>
+  <g fill="#ff8a4d" opacity="0.9">
+    <polygon points="52,58 60,18 63,25"/>
+    <polygon points="52,58 88,40 84,46"/>
+    <polygon points="52,58 88,76 82,72"/>
+    <polygon points="52,58 60,98 55,90"/>
+    <polygon points="52,58 16,76 22,70"/>
+    <polygon points="52,58 16,40 24,44"/>
+  </g>
+</svg>

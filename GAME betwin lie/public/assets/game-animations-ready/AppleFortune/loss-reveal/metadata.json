@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "applefortune_loss_reveal",
+  "game": "AppleFortune",
+  "name": "loss-reveal",
+  "stateFrom": "selected",
+  "stateTo": "loss",
+  "frameCount": 8,
+  "frameSize": [
+    256,
+    256
+  ],
+  "fps": 14,
+  "durationMs": 568,
+  "timingMs": [
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.53
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "appleCenter": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "tileCenter": {
+      "x": 0.5,
+      "y": 0.5
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "apple/objects/apple-bitten.png",
+      "bundledPath": "SourceArt/apple/objects/apple-bitten.png",
+      "sha256": "39ca1bbb3d17860cbd5a286b3f39cfe7878f4cab4f62e8cd90921ce9bf86ce36"
+    }
+  ],
+  "generatedElements": [
+    "warm fail ring"
+  ],
+  "qualityStatus": "review_required",
+  "integrationReady": false,
+  "purpose": "Loss reveal using the approved bitten apple asset; no extra symbols are baked into the art.",
+  "limitations": [
+    "Board contact/joins and event timing are not calibrated against the responsive game board."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        101,
+        101,
+        155,
+        155
+      ],
+      [
+        78,
+        78,
+        178,
+        178
+      ],
+      [
+        58,
+        58,
+        198,
+        198
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        36,
+        36,
+        220,
+        220
+      ],
+      [
+        32,
+        32,
+        224,
+        224
+      ],
+      [
+        30,
+        30,
+        226,
+        226
+      ],
+      [
+        94,
+        89,
+        164,
+        167
+      ]
+    ],
+    "sheet": "AppleFortune/loss-reveal/sheet.png",
+    "preview": "AppleFortune/loss-reveal/preview-strip.png"
+  }
+}

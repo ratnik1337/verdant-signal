@@ -1,0 +1,29 @@
+/* Betwinner-style single-header workspace: one brand, one language control, games in the top navigation. */
+.workspace { display: block; background: #edf4f1; }
+.side-rail { display: none !important; }
+.workspace-main { min-width: 0; padding: 0 24px 80px; }
+.platform-topbar { position: sticky; top: 0; z-index: 20; margin: 0 -24px 28px; padding-inline: 24px; }
+.topbar-categories { min-width: 0; flex: 1 1 auto; overflow-x: auto; scrollbar-width: none; }
+.topbar-categories::-webkit-scrollbar { display: none; }
+.topbar-game-links { display: inline-flex; align-items: center; gap: 4px; margin-left: 12px; }
+.topbar-game-links .game-nav { min-height: 32px; padding: 0 9px; border-radius: 6px; color: rgba(255,255,255,.86); background: rgba(0,0,0,.12); font-size: .68rem; white-space: nowrap; }
+.topbar-game-links .game-nav:hover, .topbar-game-links .game-nav.active { color: #174534; background: #ffd400; }
+.topbar-game-links .game-nav-icon { color: inherit; font-family: var(--font-mono); font-size: .58rem; }
+.topbar-game-links .game-dot { display: none; }
+.workspace-header { max-width: 1480px; }
+.game-card-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 1100px) {
+  .topbar-brand small { display: none; }
+  .topbar-categories { order: 3; flex-basis: 100%; }
+  .platform-topbar { flex-wrap: wrap; row-gap: 8px; }
+  .game-card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 680px) {
+  .workspace-main { padding-inline: 14px; }
+  .platform-topbar { margin-inline: -14px; padding-inline: 14px; }
+  .game-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .topbar-game-links .game-nav { transition: color 180ms ease, background 180ms ease, transform 180ms ease; }
+  .topbar-game-links .game-nav:hover { transform: translateY(-1px); }
+}

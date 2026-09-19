@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "chicken_chick_fail_fall",
+  "game": "Chicken",
+  "name": "chick-fail-fall",
+  "stateFrom": "danger",
+  "stateTo": "failed",
+  "frameCount": 8,
+  "frameSize": [
+    320,
+    320
+  ],
+  "fps": 12,
+  "durationMs": 664,
+  "timingMs": [
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.93
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "groundPivot": {
+      "x": 0.5,
+      "y": 1.0
+    },
+    "bodyCenter": {
+      "x": 0.5,
+      "y": 0.63
+    },
+    "headCenter": {
+      "x": 0.5,
+      "y": 0.42
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "chicken/models/chick-idle-reconstruction.png",
+      "bundledPath": "SourceArt/chicken/models/chick-idle-reconstruction.png",
+      "sha256": "f3057032f1995e7c610e849e9d00d96220152f76c8fb3f15a97ffb330e10beb4"
+    }
+  ],
+  "generatedElements": [
+    "impact ring"
+  ],
+  "qualityStatus": "transform_first_pass",
+  "integrationReady": false,
+  "purpose": "Soft fail fall with controlled rotation and no hard cut.",
+  "limitations": [
+    "Motion is derived from a single still, not hand-drawn poses or a skeletal rig."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        108,
+        126,
+        214,
+        267
+      ],
+      [
+        110,
+        110,
+        212,
+        275
+      ],
+      [
+        90,
+        90,
+        230,
+        289
+      ],
+      [
+        76,
+        76,
+        244,
+        301
+      ],
+      [
+        68,
+        68,
+        252,
+        311
+      ],
+      [
+        64,
+        64,
+        256,
+        320
+      ],
+      [
+        62,
+        62,
+        258,
+        320
+      ],
+      [
+        112,
+        219,
+        246,
+        320
+      ]
+    ],
+    "sheet": "Chicken/chick-fail-fall/sheet.png",
+    "preview": "Chicken/chick-fail-fall/preview-strip.png"
+  }
+}

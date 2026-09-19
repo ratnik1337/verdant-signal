@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f281d">
+  <title>Verdant Signal / Admin</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="admin-body">
+  <main id="admin-app" class="admin-frame">
+    <section class="auth-card" id="admin-login-view" aria-labelledby="admin-title">
+      <div class="brand-lockup"><span class="brand-mark">V</span><span><strong>VERDANT</strong><small>SIGNAL / ADMIN</small></span></div>
+      <p class="eyebrow">CONTROL PLANE</p>
+      <h1 id="admin-title">Operations desk</h1>
+      <p class="lede">Review consented player activity without exposing access codes or session secrets.</p>
+      <form id="admin-login-form" class="stack-form">
+        <input id="admin-username" name="username" type="text" autocomplete="username" value="admin" hidden>
+        <label for="admin-password">Admin password</label>
+        <input id="admin-password" name="password" type="password" autocomplete="current-password" required minlength="6">
+        <button class="button button-primary" type="submit">Admin sign in</button>
+        <p class="form-message" id="admin-login-message" role="alert" aria-live="polite"></p>
+      </form>
+    </section>
+    <section id="admin-dashboard" class="admin-dashboard" hidden>
+      <header class="admin-header">
+        <div><p class="eyebrow">VERDANT / SIGNAL</p><h1>Player directory</h1></div>
+        <button class="button button-ghost" id="admin-logout" type="button">Sign out</button>
+      </header>
+      <form id="admin-filters" class="filter-bar" aria-label="Filters">
+        <label>Country <select id="filter-country"><option value="">All</option></select></label>
+        <label>Currency <select id="filter-currency"><option value="">All</option></select></label>
+        <label>Level <select id="filter-level"><option value="">All</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+        <label>Presence <select id="filter-online"><option value="">All</option><option value="true">Online</option><option value="false">Offline</option></select></label>
+        <label>Active days <input id="filter-days" type="number" min="0" max="9999" placeholder="0"></label>
+        <label>Profile <select id="filter-profile"><option value="">All</option><option value="true">Complete</option><option value="false">Incomplete</option></select></label>
+        <label>Withdrawal <select id="filter-withdrawal"><option value="">All</option><option value="true">Eligible</option><option value="false">Not eligible</option></select></label>
+        <button class="button button-primary" type="submit">Apply filters</button>
+      </form>
+      <p class="form-message" id="admin-dashboard-message" role="status" aria-live="polite"></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Player ID</th><th>Nickname</th><th>Country</th><th>Currency</th><th>Level</th><th>Active days</th><th>Balance</th><th>Status</th><th></th></tr></thead>
+          <tbody id="player-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <dialog id="player-dialog" class="legal-dialog"><button class="dialog-close" data-close-dialog type="button" aria-label="Close">×</button><div id="player-dialog-content"></div></dialog>
+  <script src="/admin.js" defer></script>
+</body>
+</html>

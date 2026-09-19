@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "chicken_chick_idle",
+  "game": "Chicken",
+  "name": "chick-idle",
+  "stateFrom": "idle",
+  "stateTo": "idle",
+  "frameCount": 8,
+  "frameSize": [
+    320,
+    320
+  ],
+  "fps": 10,
+  "durationMs": 800,
+  "timingMs": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+  ],
+  "loop": "loop",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.93
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "groundPivot": {
+      "x": 0.5,
+      "y": 0.82
+    },
+    "leftFootContact": {
+      "x": 0.31,
+      "y": 0.82
+    },
+    "rightFootContact": {
+      "x": 0.7,
+      "y": 0.82
+    },
+    "bodyCenter": {
+      "x": 0.5,
+      "y": 0.55
+    },
+    "headCenter": {
+      "x": 0.5,
+      "y": 0.28
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "chicken/models/chick-idle-reconstruction.png",
+      "bundledPath": "SourceArt/chicken/models/chick-idle-reconstruction.png",
+      "sha256": "f3057032f1995e7c610e849e9d00d96220152f76c8fb3f15a97ffb330e10beb4"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "transform_first_pass",
+  "integrationReady": false,
+  "purpose": "Breathing idle with feather-safe micro motion.",
+  "limitations": [
+    "Motion is derived from a single still, not hand-drawn poses or a skeletal rig."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        108,
+        122,
+        214,
+        263
+      ],
+      [
+        108,
+        126,
+        214,
+        267
+      ],
+      [
+        107,
+        127,
+        213,
+        267
+      ],
+      [
+        108,
+        124,
+        214,
+        265
+      ],
+      [
+        108,
+        120,
+        215,
+        261
+      ],
+      [
+        107,
+        117,
+        214,
+        259
+      ],
+      [
+        108,
+        118,
+        215,
+        260
+      ],
+      [
+        108,
+        122,
+        214,
+        263
+      ]
+    ],
+    "sheet": "Chicken/chick-idle/sheet.png",
+    "preview": "Chicken/chick-idle/preview-strip.png"
+  }
+}

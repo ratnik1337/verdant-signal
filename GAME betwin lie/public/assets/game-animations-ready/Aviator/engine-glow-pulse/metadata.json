@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "aviator_engine_glow_pulse",
+  "game": "Aviator",
+  "name": "engine-glow-pulse",
+  "stateFrom": "takeoff",
+  "stateTo": "flying",
+  "frameCount": 6,
+  "frameSize": [
+    384,
+    384
+  ],
+  "fps": 12,
+  "durationMs": 498,
+  "timingMs": [
+    83,
+    83,
+    83,
+    83,
+    83,
+    83
+  ],
+  "loop": "loop",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.5
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "aviator/effects-vfx/engine-glow-atlas.png",
+      "bundledPath": "SourceArt/aviator/effects-vfx/engine-glow-atlas.png",
+      "sha256": "f92ea65ceeb97aa8dc65fe3db8860f3b0590cce8563eeff4853cd9c5c7cc6757"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "scene_anchor_required",
+  "integrationReady": false,
+  "purpose": "Standalone exhaust glow layer from the supplied atlas.",
+  "limitations": [
+    "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+  ],
+  "layerMode": "standalone_layer",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        103,
+        135,
+        282,
+        249
+      ],
+      [
+        84,
+        124,
+        302,
+        260
+      ],
+      [
+        62,
+        109,
+        322,
+        274
+      ],
+      [
+        42,
+        97,
+        342,
+        287
+      ],
+      [
+        62,
+        109,
+        322,
+        274
+      ],
+      [
+        84,
+        124,
+        302,
+        260
+      ]
+    ],
+    "sheet": "Aviator/engine-glow-pulse/sheet.png",
+    "preview": "Aviator/engine-glow-pulse/preview-strip.png"
+  }
+}

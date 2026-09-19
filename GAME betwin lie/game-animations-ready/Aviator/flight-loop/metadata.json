@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "aviator_flight_loop",
+  "game": "Aviator",
+  "name": "flight-loop",
+  "stateFrom": "flying",
+  "stateTo": "flying",
+  "frameCount": 12,
+  "frameSize": [
+    384,
+    384
+  ],
+  "fps": 18,
+  "durationMs": 672,
+  "timingMs": [
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56
+  ],
+  "loop": "loop",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.55
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "planeCenter": {
+      "x": 0.5,
+      "y": 0.53
+    },
+    "nose": {
+      "x": 0.94,
+      "y": 0.31
+    },
+    "propellerMount": {
+      "x": 0.98,
+      "y": 0.31
+    },
+    "engineMount": {
+      "x": 0.8,
+      "y": 0.43
+    },
+    "tail": {
+      "x": 0.08,
+      "y": 0.55
+    },
+    "smokeOrigin": {
+      "x": 0.08,
+      "y": 0.55
+    },
+    "trailOrigin": {
+      "x": 0.06,
+      "y": 0.55
+    },
+    "crashCenter": {
+      "x": 0.5,
+      "y": 0.5
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "aviator/models/plane-body.png",
+      "bundledPath": "SourceArt/aviator/models/plane-body.png",
+      "sha256": "13c9358df40a0e91ab851091ef495c53fc24212dd56f5fbeabb0c94867dd6ffe"
+    },
+    {
+      "sourceArchivePath": "aviator/models/propeller.png",
+      "bundledPath": "SourceArt/aviator/models/propeller.png",
+      "sha256": "c314d86f98ff825065811d1e1dd8a039e987ab568787ffff6a6a7ce6832c3abd"
+    },
+    {
+      "sourceArchivePath": "aviator/effects-vfx/engine-glow.png",
+      "bundledPath": "SourceArt/aviator/effects-vfx/engine-glow.png",
+      "sha256": "b0f6f8ca3f04f74b308b5b8cff035033befba68f73fd6d010129b42d3f097891"
+    },
+    {
+      "sourceArchivePath": "aviator/effects-vfx/trail-segment.png",
+      "bundledPath": "SourceArt/aviator/effects-vfx/trail-segment.png",
+      "sha256": "8145032d8b263dd6ea8bbffc203e2848feed1440164c2754cef44deaef9815a8"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "review_required",
+  "integrationReady": false,
+  "purpose": "Production flight loop: plane rises on an arc while exhaust and propeller keep a separate cadence.",
+  "limitations": [
+    "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene.",
+    "Frames 0 and 11 touch the canvas boundary; inspect crop when placing over a game scene."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        0,
+        187,
+        240,
+        300
+      ],
+      [
+        0,
+        157,
+        250,
+        272
+      ],
+      [
+        13,
+        127,
+        267,
+        244
+      ],
+      [
+        26,
+        103,
+        274,
+        221
+      ],
+      [
+        38,
+        83,
+        289,
+        203
+      ],
+      [
+        51,
+        70,
+        303,
+        193
+      ],
+      [
+        63,
+        65,
+        304,
+        189
+      ],
+      [
+        75,
+        67,
+        328,
+        193
+      ],
+      [
+        88,
+        77,
+        340,
+        205
+      ],
+      [
+        100,
+        92,
+        350,
+        223
+      ],
+      [
+        113,
+        115,
+        367,
+        247
+      ],
+      [
+        126,
+        142,
+        375,
+        276
+      ]
+    ],
+    "sheet": "Aviator/flight-loop/sheet.png",
+    "preview": "Aviator/flight-loop/preview-strip.png"
+  }
+}

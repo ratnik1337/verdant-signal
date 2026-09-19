@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "aviator_crash_sparks",
+  "game": "Aviator",
+  "name": "crash-sparks",
+  "stateFrom": "crashed",
+  "stateTo": "round-ended",
+  "frameCount": 6,
+  "frameSize": [
+    384,
+    384
+  ],
+  "fps": 14,
+  "durationMs": 426,
+  "timingMs": [
+    71,
+    71,
+    71,
+    71,
+    71,
+    71
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.5
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "aviator/effects-vfx/crash-sparks-atlas.png",
+      "bundledPath": "SourceArt/aviator/effects-vfx/crash-sparks-atlas.png",
+      "sha256": "71836a766bad2f060d9dd13e406540234c13d1b7e82f358b066c29dceec7ccab"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "scene_anchor_required",
+  "integrationReady": false,
+  "purpose": "Standalone impact spark layer from the supplied atlas.",
+  "limitations": [
+    "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+  ],
+  "layerMode": "standalone_layer",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        110,
+        132,
+        275,
+        360
+      ],
+      [
+        108,
+        119,
+        287,
+        260
+      ],
+      [
+        79,
+        22,
+        304,
+        246
+      ],
+      [
+        95,
+        87,
+        288,
+        283
+      ],
+      [
+        59,
+        129,
+        325,
+        358
+      ],
+      [
+        105,
+        140,
+        242,
+        214
+      ]
+    ],
+    "sheet": "Aviator/crash-sparks/sheet.png",
+    "preview": "Aviator/crash-sparks/preview-strip.png"
+  }
+}

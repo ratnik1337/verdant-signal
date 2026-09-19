@@ -1,0 +1,282 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "partial",
+  "sourceEvidence": "ANIMATION_HANDOFF.md and ASSET_AUDIT.csv",
+  "games": {
+    "Aviator": [
+      {
+        "requestedClip": "plane_idle",
+        "mappedClip": "plane-idle",
+        "status": "present, calibration required"
+      },
+      {
+        "requestedClip": "round_launch",
+        "mappedClip": "round-launch",
+        "status": "present, calibration required"
+      },
+      {
+        "requestedClip": "flight_loop",
+        "mappedClip": "flight-loop",
+        "status": "present, clipping/anchor review required"
+      },
+      {
+        "requestedClip": "propeller_spin",
+        "mappedClip": "propeller-spin",
+        "status": "present as separate layer, mount uncalibrated"
+      },
+      {
+        "requestedClip": "engine_glow_pulse",
+        "mappedClip": "engine-glow-pulse",
+        "status": "present as separate layer, mount uncalibrated"
+      },
+      {
+        "requestedClip": "smoke_trail_loop",
+        "mappedClip": "smoke-trail-loop",
+        "status": "present as separate layer, mount uncalibrated"
+      },
+      {
+        "requestedClip": "loss_of_control",
+        "mappedClip": null,
+        "status": "missing — requires authored plane-control pose/trajectory"
+      },
+      {
+        "requestedClip": "crash_explosion",
+        "mappedClip": "crash-explosion",
+        "status": "present as isolated VFX; crash center must be supplied by runtime"
+      },
+      {
+        "requestedClip": "crash_sparks",
+        "mappedClip": "crash-sparks",
+        "status": "present as isolated VFX; impact origin uncalibrated"
+      },
+      {
+        "requestedClip": "after_crash_dissipate",
+        "mappedClip": "after-crash-dissipate",
+        "status": "present as isolated VFX; placement uncalibrated"
+      },
+      {
+        "requestedClip": "round_reset",
+        "mappedClip": null,
+        "status": "missing — no reset transition"
+      }
+    ],
+    "Chicken": [
+      {
+        "requestedClip": "chick_idle",
+        "mappedClip": "chick-idle",
+        "status": "present, reconstructed single pose"
+      },
+      {
+        "requestedClip": "chick_prepare_jump",
+        "mappedClip": null,
+        "status": "missing — requires authored anticipation pose"
+      },
+      {
+        "requestedClip": "chick_jump_forward",
+        "mappedClip": "chick-jump-forward",
+        "status": "present, transform-based; endpoint/ground line requires calibration"
+      },
+      {
+        "requestedClip": "chick_land",
+        "mappedClip": null,
+        "status": "missing — no isolated landing pose/FX"
+      },
+      {
+        "requestedClip": "chick_success_bounce",
+        "mappedClip": "chick-success-bounce",
+        "status": "present, transform-based with generated ring"
+      },
+      {
+        "requestedClip": "chick_danger_reaction",
+        "mappedClip": "chick-danger-reaction",
+        "status": "present, transform-based"
+      },
+      {
+        "requestedClip": "chick_fail_fall",
+        "mappedClip": "chick-fail-fall",
+        "status": "present, transform-based"
+      },
+      {
+        "requestedClip": "vehicle_crossing",
+        "mappedClip": "vehicle-crossing",
+        "status": "present — transparent first/last frames are intentional offscreen entry/exit; loop works with full cell rendered"
+      },
+      {
+        "requestedClip": "road_reset",
+        "mappedClip": null,
+        "status": "missing — no road/tile assets"
+      }
+    ],
+    "AppleFortune": [
+      {
+        "requestedClip": "apple_idle",
+        "mappedClip": "apple-idle",
+        "status": "present, scale-based object motion"
+      },
+      {
+        "requestedClip": "selection_pulse",
+        "mappedClip": "selection-pulse",
+        "status": "present with generated ring"
+      },
+      {
+        "requestedClip": "safe_reveal",
+        "mappedClip": "safe-reveal",
+        "status": "present, board fit unverified"
+      },
+      {
+        "requestedClip": "loss_reveal",
+        "mappedClip": "loss-reveal",
+        "status": "present, board fit unverified"
+      },
+      {
+        "requestedClip": "win_pulse",
+        "mappedClip": null,
+        "status": "missing — distinct win-success clip not present"
+      },
+      {
+        "requestedClip": "level_transition",
+        "mappedClip": "level-transition",
+        "status": "present, generated ring/transition"
+      },
+      {
+        "requestedClip": "board_reset",
+        "mappedClip": "board-reset",
+        "status": "present, tile-fit unverified"
+      }
+    ],
+    "Mines": [
+      {
+        "requestedClip": "tile_idle",
+        "mappedClip": "tile-idle",
+        "status": "present but based on a crop from a UI reference"
+      },
+      {
+        "requestedClip": "tile_press",
+        "mappedClip": "tile-press",
+        "status": "present but based on a crop from a UI reference"
+      },
+      {
+        "requestedClip": "safe_open",
+        "mappedClip": "gem-open",
+        "status": "partial — same generated-gem reveal; no independent safe-open state"
+      },
+      {
+        "requestedClip": "gem_open",
+        "mappedClip": "gem-open",
+        "status": "present as generated placeholder"
+      },
+      {
+        "requestedClip": "mine_open",
+        "mappedClip": "mine-open",
+        "status": "present as generated placeholder"
+      },
+      {
+        "requestedClip": "mine_explosion",
+        "mappedClip": null,
+        "status": "missing — mine-open is not a dedicated explosion sequence"
+      },
+      {
+        "requestedClip": "fail_flash",
+        "mappedClip": null,
+        "status": "missing — no isolated fail-flash clip"
+      },
+      {
+        "requestedClip": "round_complete",
+        "mappedClip": "round-complete-reset",
+        "status": "partial — reset/completion beat only"
+      },
+      {
+        "requestedClip": "board_reset",
+        "mappedClip": "round-complete-reset",
+        "status": "partial — combined round-complete/reset clip"
+      },
+      {
+        "requestedClip": "win_chain_effect",
+        "mappedClip": null,
+        "status": "missing — no win-chain effect"
+      }
+    ],
+    "FootballPenalties": [
+      {
+        "requestedClip": "goalkeeper_idle",
+        "mappedClip": "goalkeeper-idle",
+        "status": "present as generic keeper concept"
+      },
+      {
+        "requestedClip": "kicker_idle",
+        "mappedClip": null,
+        "status": "missing — no kicker asset"
+      },
+      {
+        "requestedClip": "shot_prep",
+        "mappedClip": "shot-prep",
+        "status": "placeholder only; contains no kicker"
+      },
+      {
+        "requestedClip": "run_up",
+        "mappedClip": null,
+        "status": "missing — no kicker model/poses"
+      },
+      {
+        "requestedClip": "kick",
+        "mappedClip": null,
+        "status": "missing — no foot/ball contact source"
+      },
+      {
+        "requestedClip": "follow_through",
+        "mappedClip": null,
+        "status": "missing — no kicker model/poses"
+      },
+      {
+        "requestedClip": "ball_flight_left",
+        "mappedClip": "ball-flight-left",
+        "status": "placeholder marker/trail, not football art"
+      },
+      {
+        "requestedClip": "ball_flight_center",
+        "mappedClip": "ball-flight-center",
+        "status": "placeholder marker/trail, not football art"
+      },
+      {
+        "requestedClip": "ball_flight_right",
+        "mappedClip": "ball-flight-right",
+        "status": "placeholder marker/trail, not football art"
+      },
+      {
+        "requestedClip": "goalkeeper_save_left",
+        "mappedClip": "goalkeeper-save-left",
+        "status": "transform-only keeper; collision unverified"
+      },
+      {
+        "requestedClip": "goalkeeper_save_center",
+        "mappedClip": null,
+        "status": "missing — no center save"
+      },
+      {
+        "requestedClip": "goalkeeper_save_right",
+        "mappedClip": "goalkeeper-save-right",
+        "status": "transform-only keeper; collision unverified"
+      },
+      {
+        "requestedClip": "goal_result",
+        "mappedClip": "goal-result",
+        "status": "placeholder marker/effect; no goal/net"
+      },
+      {
+        "requestedClip": "miss_result",
+        "mappedClip": "miss-result",
+        "status": "placeholder marker/effect"
+      },
+      {
+        "requestedClip": "celebration",
+        "mappedClip": null,
+        "status": "missing — no player celebration asset"
+      },
+      {
+        "requestedClip": "round_reset",
+        "mappedClip": null,
+        "status": "missing — no reset clip"
+      }
+    ]
+  }
+}

@@ -1,5 +1,6 @@
 const crypto = require('node:crypto');
-const { LEVELS } = require('./levels');
+const { LEVELS, ACCURACY_TIERS } = require('./levels');
+const { generateFakePlayers, getRegionForCountry } = require('./catalogs/names');
 
 const SUPPORTED_GAMES = ['aviator', 'chicken-road', 'apple-of-fortune', 'mines', 'football-penalties'];
 const GAME_LABELS = {
@@ -18,6 +19,42 @@ function utcDate(value = new Date()) {
   return value.toISOString().slice(0, 10);
 }
 
+function randomUnit() {
+  return crypto.randomInt(0, 1_000_000) / 1_000_000;
+}
+
+function weightedIndex(weights) {
+  const roll = randomUnit();
+  let cursor = 0;
+  for (let index = 0; index < weights.length; index += 1) {
+    cursor += weights[index];
+    if (roll < cursor) return index;
+  }
+  return weights.length - 1;
+}
+
+function sampleAviatorMultiplier() {
+  const bucket = weightedIndex([0.52, 0.30, 0.13, 0.045, 0.005]);
+  const ranges = [[1.05, 1.30], [1.30, 1.80], [1.80, 2.80], [2.80, 6.00], [6.00, 16.00]];
+  const [min, max] = ranges[bucket];
+  return Number((min + randomUnit() * (max - min)).toFixed(2));
+}
+
+function sampleChickenSignal(difficulty) {
+  const weights = {
+    calm: [0.48, 0.30, 0.14, 0.06, 0.02],
+    balanced: [0.40, 0.30, 0.18, 0.09, 0.03],
+    sharp: [0.26, 0.30, 0.22, 0.14, 0.08],
+  }[difficulty] || [0.40, 0.30, 0.18, 0.09, 0.03];
+  const targetStep = weightedIndex(weights) + 1;
+  const multipliers = [1.12, 1.28, 1.48, 1.78, 2.25];
+  return { targetStep, safeSteps: Array.from({ length: targetStep }, (_, index) => index + 1), multiplier: `${multipliers[targetStep - 1].toFixed(2)}x` };
+}
+
+function sampleSignalZone() {
+  return weightedIndex([0.24, 0.20, 0.32, 0.20, 0.04]) + 1;
+}
+
 function isIsoDate(value) {
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00.000Z`));
 }
@@ -31,6 +68,18 @@ function calculateProgress(activeDays, level) {
   if (!next) return 100;
   const previous = level.requiredActiveDays;
   return Math.max(0, Math.min(100, Math.round(((activeDays - previous) / (next.requiredActiveDays - previous)) * 100)));
+}
+
+function getAccuracyTier(tier) {
+  return ACCURACY_TIERS.find((t) => t.tier === tier) || ACCURACY_TIERS[0];
+}
+
+function getNextAccuracyTier(currentTier) {
+  return ACCURACY_TIERS.find((t) => t.tier === currentTier + 1) || null;
+}
+
+function getAccuracyTierForDays(activeDays) {
+  return [...ACCURACY_TIERS].reverse().find((tier) => activeDays >= tier.requiredActiveDays) || ACCURACY_TIERS[0];
 }
 
 function calculateConsecutiveDays(db, playerId) {
@@ -57,6 +106,8 @@ function parseGames(value) {
 
 function safePlayer(row) {
   if (!row) return null;
+  const accuracyTierData = getAccuracyTierForDays(row.active_days || 0);
+  const nextAccuracyTier = getNextAccuracyTier(accuracyTierData.tier);
   return {
     id: row.id,
     playerId: row.player_id_hint,
@@ -68,11 +119,21 @@ function safePlayer(row) {
     currencyFractionDigits: row.currency_fraction_digits,
     balanceMinor: row.balance_minor,
     bonusBalanceMinor: row.bonus_balance_minor,
+    bookmakerBalanceMinor: row.bookmaker_balance_minor || 0,
     activeDays: row.active_days,
     consecutiveActiveDays: row.consecutive_active_days,
     lastActivityDate: row.last_activity_date,
     level: row.level,
     levelProgress: row.level_progress,
+    accuracyTier: row.accuracy_tier || 1,
+    accuracy: accuracyTierData.accuracy,
+    accuracyTitle: accuracyTierData.title,
+    nextAccuracyTier: nextAccuracyTier ? {
+      tier: nextAccuracyTier.tier,
+      accuracy: nextAccuracyTier.accuracy,
+      title: nextAccuracyTier.title,
+      requiredActiveDays: nextAccuracyTier.requiredActiveDays,
+    } : null,
     withdrawalEligibleAt: row.withdrawal_eligible_at,
     withdrawalEligible: Boolean(row.withdrawal_eligible_at),
     profileCompleted: Boolean(row.profile_completed_at),
@@ -129,6 +190,7 @@ function createServices({ db, countries, currencies, minWithdrawalMinor }) {
 
       const activeDays = db.prepare('SELECT COUNT(*) AS count FROM player_activity_days WHERE player_id = ?').get(playerId).count;
       const level = getLevelForDays(activeDays);
+      const accuracyTier = getAccuracyTierForDays(activeDays);
       const consecutiveActiveDays = calculateConsecutiveDays(db, playerId);
       const latestActivityDate = db.prepare('SELECT activity_date AS activityDate FROM player_activity_days WHERE player_id = ? ORDER BY activity_date DESC LIMIT 1').get(playerId).activityDate;
       const previousBonus = player.bonus_balance_minor;
@@ -143,9 +205,9 @@ function createServices({ db, countries, currencies, minWithdrawalMinor }) {
       const eligibleAt = player.withdrawal_eligible_at || (activeDays >= 90 ? stamp : null);
       db.prepare(`UPDATE players SET
         active_days = ?, consecutive_active_days = ?, last_activity_date = ?, level = ?, level_progress = ?,
-        bonus_balance_minor = ?, withdrawal_eligible_at = ?, last_seen_at = ?, updated_at = ?
+        accuracy_tier = ?, bonus_balance_minor = ?, withdrawal_eligible_at = ?, last_seen_at = ?, updated_at = ?
         WHERE id = ?`)
-        .run(activeDays, consecutiveActiveDays, latestActivityDate, level.level, calculateProgress(activeDays, level), bonusBalanceMinor, eligibleAt, stamp, stamp, playerId);
+        .run(activeDays, consecutiveActiveDays, latestActivityDate, level.level, calculateProgress(activeDays, level), accuracyTier.tier, bonusBalanceMinor, eligibleAt, stamp, stamp, playerId);
       return db.prepare('SELECT * FROM players WHERE id = ?').get(playerId);
     });
     const updated = transaction();
@@ -178,10 +240,20 @@ function createServices({ db, countries, currencies, minWithdrawalMinor }) {
 
   function getActivePlayers(countryCode) {
     const cutoff = new Date(Date.now() - 20 * 60 * 1000).toISOString();
-    const rows = db.prepare(`SELECT nickname, country_code AS countryCode, country_name AS countryName, last_seen_at AS lastSeenAt
+    const realPlayers = db.prepare(`SELECT nickname, country_code AS countryCode, country_name AS countryName, last_seen_at AS lastSeenAt
       FROM players WHERE profile_completed_at IS NOT NULL AND show_in_activity = 1 AND last_seen_at >= ?
-      ${countryCode ? 'AND country_code = ?' : ''} ORDER BY last_seen_at DESC LIMIT 24`).all(...(countryCode ? [cutoff, countryCode] : [cutoff]));
-    return rows;
+      ${countryCode ? 'AND country_code = ?' : ''} ORDER BY last_seen_at DESC LIMIT 12`).all(...(countryCode ? [cutoff, countryCode] : [cutoff]));
+    const minFakePlayers = 6;
+    const maxTotal = 16;
+    const fakesNeeded = Math.max(minFakePlayers, maxTotal - realPlayers.length);
+    const hourSeed = Math.floor(Date.now() / (1000 * 60 * 60));
+    const fakePlayers = generateFakePlayers(countryCode, fakesNeeded, hourSeed);
+    const combined = [...realPlayers, ...fakePlayers].slice(0, maxTotal);
+    for (let i = combined.length - 1; i > 0; i--) {
+      const j = (hourSeed + i) % (i + 1);
+      [combined[i], combined[j]] = [combined[j], combined[i]];
+    }
+    return combined.map(({ isFake, ...player }) => player);
   }
 
   function analyzeGame(playerId, game, input = {}) {
@@ -190,24 +262,33 @@ function createServices({ db, countries, currencies, minWithdrawalMinor }) {
       error.code = 'INVALID_GAME';
       throw error;
     }
+    const player = getPlayer(playerId);
+    const accuracyData = getAccuracyTierForDays(player?.active_days || 0);
+    const nextTier = getNextAccuracyTier(accuracyData.tier);
     const seed = crypto.createHash('sha256').update(`${playerId}:${game}:${utcDate()}`).digest('hex');
     const numericSeed = Number.parseInt(seed.slice(0, 8), 16);
-    const zone = (numericSeed % 5) + 1;
+    const zone = sampleSignalZone();
     const base = {
       game,
       gameLabel: GAME_LABELS[game],
       demo: true,
       mode: 'SIMULATED DATA',
       status: 'DEMO ANALYSIS',
+      accuracy: accuracyData.accuracy,
+      accuracyTier: accuracyData.tier,
+      accuracyTitle: accuracyData.title,
+      nextAccuracyTier: nextTier ? { tier: nextTier.tier, accuracy: nextTier.accuracy, title: nextTier.title, requiredActiveDays: nextTier.requiredActiveDays } : null,
       generatedAt: nowIso(),
       disclaimer: 'Pattern-based review only. No outcome is guaranteed.',
     };
     let analysis;
     if (game === 'aviator') {
-      analysis = { ...base, multiplier: `${(1.15 + (numericSeed % 75) / 100).toFixed(2)}x`, countdown: 8 + (numericSeed % 7), series: [1.18, 1.27, 1.45, 1.62, 1.33].map((value, index) => `${(value + ((numericSeed >> index) % 8) / 100).toFixed(2)}x`), note: 'The next round remains unknown.' };
+      const multiplier = sampleAviatorMultiplier();
+      analysis = { ...base, multiplier: `${multiplier.toFixed(2)}x`, countdown: 3, series: [1.12, 1.24, 1.38, 1.62, 2.05].map((value, index) => `${(value + randomUnit() * (index > 3 ? 0.18 : 0.10)).toFixed(2)}x`), note: 'The next round remains unknown.' };
     } else if (game === 'chicken-road') {
       const difficulty = ['calm', 'balanced', 'sharp'].includes(input.difficulty) ? input.difficulty : 'balanced';
-      analysis = { ...base, difficulty, safeSteps: [1, 2, 3], currentStep: 3, multiplier: difficulty === 'sharp' ? '1.62x' : difficulty === 'calm' ? '1.24x' : '1.38x', note: 'Each step is probabilistic. A suggested path is not a promise.' };
+      const chicken = sampleChickenSignal(difficulty);
+      analysis = { ...base, difficulty, safeSteps: chicken.safeSteps, currentStep: chicken.targetStep, targetStep: chicken.targetStep, multiplier: chicken.multiplier, note: 'Each step is probabilistic. A suggested path is not a promise.' };
     } else if (game === 'apple-of-fortune') {
       analysis = { ...base, rows: Array.from({ length: 4 }, (_, index) => ({ level: index + 1, recommendedCell: ((zone + index) % 5) + 1, cells: [1, 2, 3, 4, 5], multiplier: `${(1.1 + index * 0.34).toFixed(2)}x` })), note: 'One safe cell is shown for visual simulation; all outcomes remain uncertain.' };
     } else if (game === 'mines') {
@@ -264,4 +345,4 @@ function createServices({ db, countries, currencies, minWithdrawalMinor }) {
   };
 }
 
-module.exports = { createServices, SUPPORTED_GAMES, GAME_LABELS, utcDate, safePlayer };
+module.exports = { createServices, SUPPORTED_GAMES, GAME_LABELS, ACCURACY_TIERS, utcDate, safePlayer, getAccuracyTier, getNextAccuracyTier, getAccuracyTierForDays };

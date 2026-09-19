@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mines_round_complete_reset",
+  "game": "Mines",
+  "name": "round-complete-reset",
+  "stateFrom": "safe-or-mine",
+  "stateTo": "reset",
+  "frameCount": 8,
+  "frameSize": [
+    256,
+    256
+  ],
+  "fps": 12,
+  "durationMs": 664,
+  "timingMs": [
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.5
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "gems/references/approved-mines-scene.png",
+      "bundledPath": "SourceArt/gems/references/approved-mines-scene.png",
+      "sha256": "c8751105ff04db4842fb4e83b93c1df92133fb9d262272e47a77b14559c214cc"
+    }
+  ],
+  "generatedElements": [
+    "signal reset ring"
+  ],
+  "qualityStatus": "placeholder_only",
+  "integrationReady": false,
+  "purpose": "Round-end fade to a clean closed-cell state.",
+  "limitations": [
+    "Contains generated placeholder symbols and/or a crop from a UI reference; replace with clean source artwork before production."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        36,
+        36,
+        220,
+        220
+      ],
+      [
+        32,
+        32,
+        224,
+        224
+      ],
+      [
+        30,
+        30,
+        226,
+        226
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ]
+    ],
+    "sheet": "Mines/round-complete-reset/sheet.png",
+    "preview": "Mines/round-complete-reset/preview-strip.png"
+  }
+}

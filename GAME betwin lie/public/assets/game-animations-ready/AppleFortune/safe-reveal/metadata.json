@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "applefortune_safe_reveal",
+  "game": "AppleFortune",
+  "name": "safe-reveal",
+  "stateFrom": "selected",
+  "stateTo": "safe",
+  "frameCount": 10,
+  "frameSize": [
+    256,
+    256
+  ],
+  "fps": 16,
+  "durationMs": 630,
+  "timingMs": [
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.53
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "appleCenter": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "tileCenter": {
+      "x": 0.5,
+      "y": 0.5
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "apple/objects/apple-whole.png",
+      "bundledPath": "SourceArt/apple/objects/apple-whole.png",
+      "sha256": "311ddcce44940cb6f20c9430097762680f1bf225e5382c4cb476f511a2565e86"
+    }
+  ],
+  "generatedElements": [
+    "green reveal ring"
+  ],
+  "qualityStatus": "review_required",
+  "integrationReady": false,
+  "purpose": "Clean safe result reveal using the approved whole apple asset.",
+  "limitations": [
+    "Board contact/joins and event timing are not calibrated against the responsive game board."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        101,
+        101,
+        155,
+        155
+      ],
+      [
+        101,
+        101,
+        155,
+        155
+      ],
+      [
+        94,
+        94,
+        162,
+        162
+      ],
+      [
+        71,
+        71,
+        185,
+        185
+      ],
+      [
+        53,
+        53,
+        203,
+        203
+      ],
+      [
+        42,
+        42,
+        214,
+        214
+      ],
+      [
+        35,
+        35,
+        221,
+        221
+      ],
+      [
+        32,
+        32,
+        224,
+        224
+      ],
+      [
+        30,
+        30,
+        226,
+        226
+      ],
+      [
+        94,
+        89,
+        163,
+        167
+      ]
+    ],
+    "sheet": "AppleFortune/safe-reveal/sheet.png",
+    "preview": "AppleFortune/safe-reveal/preview-strip.png"
+  }
+}

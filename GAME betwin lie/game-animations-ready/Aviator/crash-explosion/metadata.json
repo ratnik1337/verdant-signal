@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "aviator_crash_explosion",
+  "game": "Aviator",
+  "name": "crash-explosion",
+  "stateFrom": "flying",
+  "stateTo": "crashed",
+  "frameCount": 8,
+  "frameSize": [
+    384,
+    384
+  ],
+  "fps": 14,
+  "durationMs": 568,
+  "timingMs": [
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.58
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "aviator/effects-vfx/plane-crash-explosion-atlas.png",
+      "bundledPath": "SourceArt/aviator/effects-vfx/plane-crash-explosion-atlas.png",
+      "sha256": "8e6381dc0c213aa9d71ad52de3e6611c49f2d5e438020cb16f80904942f13963"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "scene_anchor_required",
+  "integrationReady": false,
+  "purpose": "Existing production explosion atlas extracted into fixed-size frames.",
+  "limitations": [
+    "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+  ],
+  "layerMode": "standalone_layer",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        130,
+        128,
+        253,
+        256
+      ],
+      [
+        106,
+        103,
+        278,
+        281
+      ],
+      [
+        114,
+        126,
+        270,
+        258
+      ],
+      [
+        72,
+        81,
+        311,
+        302
+      ],
+      [
+        36,
+        41,
+        347,
+        343
+      ],
+      [
+        72,
+        72,
+        312,
+        311
+      ],
+      [
+        83,
+        92,
+        300,
+        292
+      ],
+      [
+        138,
+        115,
+        246,
+        268
+      ]
+    ],
+    "sheet": "Aviator/crash-explosion/sheet.png",
+    "preview": "Aviator/crash-explosion/preview-strip.png"
+  }
+}

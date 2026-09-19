@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "applefortune_selection_pulse",
+  "game": "AppleFortune",
+  "name": "selection-pulse",
+  "stateFrom": "closed",
+  "stateTo": "selected",
+  "frameCount": 8,
+  "frameSize": [
+    256,
+    256
+  ],
+  "fps": 14,
+  "durationMs": 568,
+  "timingMs": [
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.53
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "apple/objects/apple-whole.png",
+      "bundledPath": "SourceArt/apple/objects/apple-whole.png",
+      "sha256": "311ddcce44940cb6f20c9430097762680f1bf225e5382c4cb476f511a2565e86"
+    }
+  ],
+  "generatedElements": [
+    "soft green selection ring"
+  ],
+  "qualityStatus": "generated_vfx_overlay",
+  "integrationReady": false,
+  "purpose": "Selection acknowledgement that leaves result reveal to the following state.",
+  "limitations": [
+    "Board contact/joins and event timing are not calibrated against the responsive game board."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        97,
+        92,
+        161,
+        164
+      ],
+      [
+        78,
+        78,
+        178,
+        178
+      ],
+      [
+        58,
+        58,
+        198,
+        198
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        36,
+        36,
+        220,
+        220
+      ],
+      [
+        32,
+        32,
+        224,
+        224
+      ],
+      [
+        30,
+        30,
+        226,
+        226
+      ],
+      [
+        97,
+        92,
+        161,
+        164
+      ]
+    ],
+    "sheet": "AppleFortune/selection-pulse/sheet.png",
+    "preview": "AppleFortune/selection-pulse/preview-strip.png"
+  }
+}

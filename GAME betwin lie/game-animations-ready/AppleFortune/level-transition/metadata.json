@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "applefortune_level_transition",
+  "game": "AppleFortune",
+  "name": "level-transition",
+  "stateFrom": "safe",
+  "stateTo": "next-level",
+  "frameCount": 10,
+  "frameSize": [
+    256,
+    256
+  ],
+  "fps": 12,
+  "durationMs": 830,
+  "timingMs": [
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.53
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "apple/objects/apple-whole.png",
+      "bundledPath": "SourceArt/apple/objects/apple-whole.png",
+      "sha256": "311ddcce44940cb6f20c9430097762680f1bf225e5382c4cb476f511a2565e86"
+    },
+    {
+      "sourceArchivePath": "apple/tiles/closed-wooden-board-tile-reconstruction.png",
+      "bundledPath": "SourceArt/apple/tiles/closed-wooden-board-tile-reconstruction.png",
+      "sha256": "64c3f5375687635cfc74c8b0d3cee73f82ae86e292a30199dec7a94e2c4b0df6"
+    }
+  ],
+  "generatedElements": [
+    "green progression ring"
+  ],
+  "qualityStatus": "review_required",
+  "integrationReady": false,
+  "purpose": "Short transition beat between rows/levels; code should swap the board after completion.",
+  "limitations": [
+    "Board contact/joins and event timing are not calibrated against the responsive game board."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        43,
+        89,
+        213,
+        179
+      ],
+      [
+        43,
+        83,
+        213,
+        179
+      ],
+      [
+        43,
+        66,
+        213,
+        190
+      ],
+      [
+        43,
+        52,
+        213,
+        204
+      ],
+      [
+        43,
+        43,
+        213,
+        213
+      ],
+      [
+        36,
+        36,
+        220,
+        220
+      ],
+      [
+        33,
+        33,
+        223,
+        223
+      ],
+      [
+        31,
+        31,
+        225,
+        225
+      ],
+      [
+        30,
+        30,
+        226,
+        226
+      ],
+      [
+        43,
+        89,
+        213,
+        179
+      ]
+    ],
+    "sheet": "AppleFortune/level-transition/sheet.png",
+    "preview": "AppleFortune/level-transition/preview-strip.png"
+  }
+}

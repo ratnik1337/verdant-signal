@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mines_mine_open",
+  "game": "Mines",
+  "name": "mine-open",
+  "stateFrom": "opening",
+  "stateTo": "mine",
+  "frameCount": 10,
+  "frameSize": [
+    256,
+    256
+  ],
+  "fps": 14,
+  "durationMs": 710,
+  "timingMs": [
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.5
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "tileCenter": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "mineCenter": {
+      "x": 0.5,
+      "y": 0.5
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "gems/references/approved-mines-scene.png",
+      "bundledPath": "SourceArt/gems/references/approved-mines-scene.png",
+      "sha256": "c8751105ff04db4842fb4e83b93c1df92133fb9d262272e47a77b14559c214cc"
+    }
+  ],
+  "generatedElements": [
+    "orange/red mine symbol drawn because no isolated mine export exists",
+    "impact rays"
+  ],
+  "qualityStatus": "placeholder_only",
+  "integrationReady": false,
+  "purpose": "Mine reveal with a compact mobile-safe fail burst.",
+  "limitations": [
+    "Contains generated placeholder symbols and/or a crop from a UI reference; replace with clean source artwork before production."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        42,
+        42,
+        214,
+        214
+      ],
+      [
+        33,
+        33,
+        223,
+        223
+      ],
+      [
+        27,
+        27,
+        229,
+        229
+      ],
+      [
+        24,
+        24,
+        232,
+        232
+      ],
+      [
+        22,
+        22,
+        234,
+        234
+      ],
+      [
+        21,
+        21,
+        235,
+        235
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ]
+    ],
+    "sheet": "Mines/mine-open/sheet.png",
+    "preview": "Mines/mine-open/preview-strip.png"
+  }
+}

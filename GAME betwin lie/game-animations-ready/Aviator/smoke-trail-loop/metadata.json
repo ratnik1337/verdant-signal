@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "aviator_smoke_trail_loop",
+  "game": "Aviator",
+  "name": "smoke-trail-loop",
+  "stateFrom": "flying",
+  "stateTo": "flying",
+  "frameCount": 6,
+  "frameSize": [
+    384,
+    384
+  ],
+  "fps": 12,
+  "durationMs": 498,
+  "timingMs": [
+    83,
+    83,
+    83,
+    83,
+    83,
+    83
+  ],
+  "loop": "loop",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.5
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "aviator/effects-vfx/smoke-trail-atlas.png",
+      "bundledPath": "SourceArt/aviator/effects-vfx/smoke-trail-atlas.png",
+      "sha256": "0f35e63d713750b404811dea0602a9442ebc1aed70e7569af5575e2f377f1877"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "scene_anchor_required",
+  "integrationReady": false,
+  "purpose": "Standalone looping smoke layer from the supplied atlas.",
+  "limitations": [
+    "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+  ],
+  "layerMode": "standalone_layer",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        51,
+        48,
+        333,
+        362
+      ],
+      [
+        52,
+        22,
+        331,
+        339
+      ],
+      [
+        83,
+        134,
+        301,
+        324
+      ],
+      [
+        42,
+        41,
+        341,
+        360
+      ],
+      [
+        41,
+        22,
+        343,
+        362
+      ],
+      [
+        22,
+        24,
+        362,
+        359
+      ]
+    ],
+    "sheet": "Aviator/smoke-trail-loop/sheet.png",
+    "preview": "Aviator/smoke-trail-loop/preview-strip.png"
+  }
+}

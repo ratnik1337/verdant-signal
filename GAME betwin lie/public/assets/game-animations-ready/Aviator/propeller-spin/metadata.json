@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "aviator_propeller_spin",
+  "game": "Aviator",
+  "name": "propeller-spin",
+  "stateFrom": "takeoff",
+  "stateTo": "flying",
+  "frameCount": 8,
+  "frameSize": [
+    384,
+    384
+  ],
+  "fps": 14,
+  "durationMs": 568,
+  "timingMs": [
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71
+  ],
+  "loop": "loop",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.5
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "aviator/animations/propeller-spin-atlas.png",
+      "bundledPath": "SourceArt/aviator/animations/propeller-spin-atlas.png",
+      "sha256": "2ff41d45bbf9977233c7a21fe80528f33b61d7eaba0f44cb80c1e65854eaa551"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "scene_anchor_required",
+  "integrationReady": false,
+  "purpose": "Standalone layer from the supplied propeller atlas for independent plane compositing.",
+  "limitations": [
+    "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+  ],
+  "layerMode": "standalone_layer",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        109,
+        90,
+        278,
+        244
+      ],
+      [
+        103,
+        119,
+        269,
+        285
+      ],
+      [
+        140,
+        109,
+        294,
+        278
+      ],
+      [
+        99,
+        103,
+        265,
+        269
+      ],
+      [
+        106,
+        140,
+        275,
+        294
+      ],
+      [
+        115,
+        99,
+        281,
+        265
+      ],
+      [
+        90,
+        106,
+        244,
+        275
+      ],
+      [
+        119,
+        115,
+        285,
+        281
+      ]
+    ],
+    "sheet": "Aviator/propeller-spin/sheet.png",
+    "preview": "Aviator/propeller-spin/preview-strip.png"
+  }
+}

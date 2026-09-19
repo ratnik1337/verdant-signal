@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "footballpenalties_shot_prep",
+  "game": "FootballPenalties",
+  "name": "shot-prep",
+  "stateFrom": "ready",
+  "stateTo": "shot-ready",
+  "frameCount": 8,
+  "frameSize": [
+    384,
+    384
+  ],
+  "fps": 12,
+  "durationMs": 664,
+  "timingMs": [
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      1
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "football/concepts/goalkeeper-green-unassigned.png",
+      "bundledPath": "SourceArt/football/concepts/goalkeeper-green-unassigned.png",
+      "sha256": "72247a336e65fd3e5d5ebe9a022cb94f796bfa2f410b3a32b57ea7fe7d06355e"
+    }
+  ],
+  "generatedElements": [
+    "neutral shot marker"
+  ],
+  "qualityStatus": "placeholder_only",
+  "integrationReady": false,
+  "purpose": "Neutral preparation beat; no kicker model exists in the source pack.",
+  "limitations": [
+    "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        141,
+        141,
+        250,
+        360
+      ],
+      [
+        130,
+        130,
+        254,
+        360
+      ],
+      [
+        121,
+        121,
+        263,
+        360
+      ],
+      [
+        113,
+        113,
+        271,
+        361
+      ],
+      [
+        107,
+        107,
+        277,
+        362
+      ],
+      [
+        103,
+        103,
+        281,
+        362
+      ],
+      [
+        100,
+        100,
+        284,
+        362
+      ],
+      [
+        97,
+        97,
+        287,
+        363
+      ]
+    ],
+    "sheet": "FootballPenalties/shot-prep/sheet.png",
+    "preview": "FootballPenalties/shot-prep/preview-strip.png"
+  }
+}

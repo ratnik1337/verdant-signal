@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Verdant Signal — Runtime Art Preview</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #061b12; color: #eaf8df; }
+    body { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    h1 { color: #a5ef89; } p { color: #a8c8aa; line-height: 1.5; }
+    a { color: #f2cd72; } .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    figure { min-height: 190px; margin: 0; padding: 14px; border: 1px solid #285d3e; border-radius: 10px; background: #0a2b1b; }
+    figure img { display: block; width: 100%; height: 135px; object-fit: contain; background: #071c13; border-radius: 6px; }
+    figcaption { margin-top: 10px; color: #c2e2ae; font-size: .82rem; }
+    .atlas { object-fit: cover; object-position: left center; }
+  </style>
+</head>
+<body>
+  <h1>Verdant Signal runtime art</h1>
+  <p>Asset-only preview for the isolated runtime files. The interactive scenes and one-layer calibration controls are available at <a href="http://localhost:3000/?art-debug=1">localhost:3000/?art-debug=1</a>.</p>
+  <div class="grid">
+    <figure><img src="../../public/assets/verdant-artpack/aviator/models/plane-body.png" alt="Aviator plane body"><figcaption>Aviator / plane body</figcaption></figure>
+    <figure><img src="../../public/assets/verdant-artpack/aviator/animations/propeller-spin-atlas.png" alt="Propeller atlas" class="atlas"><figcaption>Aviator / propeller atlas</figcaption></figure>
+    <figure><img src="../../public/assets/verdant-artpack/aviator/effects-vfx/smoke-trail-atlas.png" alt="Smoke atlas" class="atlas"><figcaption>Aviator / smoke atlas</figcaption></figure>
+    <figure><img src="../../public/assets/verdant-artpack/chicken/models/chick-idle-reconstruction.png" alt="Chicken"><figcaption>Chicken Road / chick</figcaption></figure>
+    <figure><img src="../../public/assets/verdant-artpack/chicken/obstacles/traffic-van-reconstruction.png" alt="Traffic van"><figcaption>Chicken Road / independent van</figcaption></figure>
+    <figure><img src="../../public/assets/verdant-artpack/apple/objects/apple-whole.png" alt="Whole apple"><figcaption>Apple / safe state</figcaption></figure>
+    <figure><img src="../../public/assets/verdant-artpack/apple/objects/apple-bitten.png" alt="Bitten apple"><figcaption>Apple / danger state</figcaption></figure>
+    <figure><img src="../../public/assets/verdant-artpack/apple/tiles/closed-wooden-board-tile-reconstruction.png" alt="Wood tile"><figcaption>Apple / closed wooden cell</figcaption></figure>
+    <figure><img src="../../public/assets/verdant-artpack/football/concepts/goalkeeper-green-unassigned.png" alt="Generic goalkeeper"><figcaption>Football / generic goalkeeper</figcaption></figure>
+  </div>
+</body>
+</html>

@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "footballpenalties_ball_flight_right",
+  "game": "FootballPenalties",
+  "name": "ball-flight-right",
+  "stateFrom": "shot-ready",
+  "stateTo": "ball-arrived",
+  "frameCount": 12,
+  "frameSize": [
+    384,
+    384
+  ],
+  "fps": 18,
+  "durationMs": 672,
+  "timingMs": [
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56,
+    56
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.5
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [],
+  "generatedElements": [
+    "neutral football marker drawn because the archive has no isolated ball asset",
+    "motion trail"
+  ],
+  "qualityStatus": "placeholder_only",
+  "integrationReady": false,
+  "purpose": "Ball trajectory variant (right); final outcome is chosen by game logic.",
+  "limitations": [
+    "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence.",
+    "Flight is a generated marker/trail over a static keeper concept; no football artwork or verified goal collision."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        0,
+        151,
+        247,
+        361
+      ],
+      [
+        0,
+        151,
+        247,
+        361
+      ],
+      [
+        19,
+        151,
+        247,
+        361
+      ],
+      [
+        65,
+        151,
+        247,
+        361
+      ],
+      [
+        126,
+        151,
+        247,
+        361
+      ],
+      [
+        144,
+        151,
+        275,
+        361
+      ],
+      [
+        144,
+        151,
+        332,
+        361
+      ],
+      [
+        144,
+        151,
+        363,
+        361
+      ],
+      [
+        144,
+        151,
+        378,
+        361
+      ],
+      [
+        144,
+        151,
+        384,
+        361
+      ],
+      [
+        144,
+        151,
+        384,
+        361
+      ],
+      [
+        144,
+        151,
+        384,
+        361
+      ]
+    ],
+    "sheet": "FootballPenalties/ball-flight-right/sheet.png",
+    "preview": "FootballPenalties/ball-flight-right/preview-strip.png"
+  }
+}

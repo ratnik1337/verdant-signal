@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "chicken_vehicle_crossing",
+  "game": "Chicken",
+  "name": "vehicle-crossing",
+  "stateFrom": "road-active",
+  "stateTo": "road-active",
+  "frameCount": 10,
+  "frameSize": [
+    320,
+    320
+  ],
+  "fps": 16,
+  "durationMs": 630,
+  "timingMs": [
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63
+  ],
+  "loop": "loop",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.78
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "vehicleCenter": {
+      "x": 0.5,
+      "y": 0.6
+    },
+    "groundPivot": {
+      "x": 0.5,
+      "y": 0.87
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "chicken/obstacles/traffic-van-reconstruction.png",
+      "bundledPath": "SourceArt/chicken/obstacles/traffic-van-reconstruction.png",
+      "sha256": "580b0cbb96b5cc196c8d064923e2060ef2fa8dc38f57c1ecb8a60602ca799ab1"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "transform_first_pass",
+  "integrationReady": false,
+  "purpose": "Looping obstacle crossing the lane; use collision boxes from code, not alpha bounds.",
+  "limitations": [
+    "Motion is derived from a single still, not hand-drawn poses or a skeletal rig.",
+    "Frames 0 and 9 are fully transparent by design: vehicle enters/exits offscreen. Transparent first/last frames are intentional offscreen entry/exit. The legacy loop is usable when the full fixed-size cell is rendered; the blank gap connects the exit to the next entry."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [
+      0,
+      9
+    ],
+    "alphaBoundsByFrame": [
+      null,
+      [
+        0,
+        189,
+        41,
+        291
+      ],
+      [
+        0,
+        181,
+        97,
+        294
+      ],
+      [
+        0,
+        181,
+        155,
+        293
+      ],
+      [
+        54,
+        181,
+        212,
+        293
+      ],
+      [
+        111,
+        181,
+        269,
+        293
+      ],
+      [
+        168,
+        181,
+        320,
+        293
+      ],
+      [
+        225,
+        182,
+        320,
+        293
+      ],
+      [
+        282,
+        182,
+        320,
+        280
+      ],
+      null
+    ],
+    "sheet": "Chicken/vehicle-crossing/sheet.png",
+    "preview": "Chicken/vehicle-crossing/preview-strip.png",
+    "emptyFrameReason": "Offscreen vehicle entry and exit; the transparent gap is intentional for looping traffic."
+  }
+}

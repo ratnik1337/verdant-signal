@@ -9,16 +9,16 @@ const helmet = require('helmet');
 const { openDatabase } = require('./db');
 const { COUNTRIES } = require('./catalogs/countries');
 const { CURRENCIES } = require('./catalogs/currencies');
-const { createServices, GAME_LABELS } = require('./services');
+const { createServices, GAME_LABELS, ACCURACY_TIERS } = require('./services');
 
 const PUBLIC_DIR = path.resolve(__dirname, '../public');
 const DEFAULT_MIN_WITHDRAWAL = 10000;
 
-function createApp(options = {}) {
+async function createApp(options = {}) {
   const dataDir = options.dataDir || process.env.DATA_DIR || path.resolve(__dirname, '../data');
   const dbPath = options.dbPath || path.join(dataDir, 'verdant-signal.sqlite');
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-  const db = openDatabase(dbPath);
+  const db = await openDatabase(dbPath);
   const sessionSecret = options.sessionSecret || process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
   const adminPassword = options.adminPassword || process.env.ADMIN_PASSWORD || 'change-this-development-password';
   const minWithdrawalMinor = Number.isSafeInteger(Number(options.minWithdrawalMinor || process.env.MIN_WITHDRAWAL_UNITS))
@@ -56,7 +56,6 @@ function createApp(options = {}) {
     handler: (_req, res) => sendError(res, 429, 'RATE_LIMITED', 'Too many requests. Please try again later.'),
   });
   app.use('/api', apiLimiter);
-
   function identifierDigest(value) {
     return crypto.createHmac('sha256', sessionSecret).update(value.trim().toLowerCase()).digest('hex');
   }
@@ -98,7 +97,7 @@ function createApp(options = {}) {
 
   app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'verdant-signal' }));
   app.get('/api/catalogs', (_req, res) => res.json({ countries: COUNTRIES, currencies: CURRENCIES }));
-  app.get('/api/config', (_req, res) => res.json({ minWithdrawalMinor, games: Object.entries(GAME_LABELS).map(([id, label]) => ({ id, label })) }));
+  app.get('/api/config', (_req, res) => res.json({ minWithdrawalMinor, games: Object.entries(GAME_LABELS).map(([id, label]) => ({ id, label })), accuracyTiers: ACCURACY_TIERS }));
 
   app.post('/api/auth/login', loginLimiter, (req, res) => {
     const credentials = validateLogin(req.body);
@@ -145,6 +144,19 @@ function createApp(options = {}) {
       currency_fraction_digits = ?, profile_completed_at = COALESCE(profile_completed_at, ?), accepted_terms_at = COALESCE(accepted_terms_at, ?),
       accepted_disclaimer_at = COALESCE(accepted_disclaimer_at, ?), show_in_activity = ?, updated_at = ? WHERE id = ?`)
       .run(nickname, country.code, country.name, currency.code, currency.name, currency.fractionDigits, stamp, stamp, stamp, showInActivity === false ? 0 : current.show_in_activity, stamp, req.player.id);
+    return res.json({ ok: true, player: services.safePlayer(services.getPlayer(req.player.id)) });
+  });
+
+  app.patch('/api/player/bookmaker-balance', requirePlayer, (req, res) => {
+    const balance = Number(req.body?.balance);
+    if (!Number.isFinite(balance) || balance < 0 || balance > 100000000) {
+      return sendError(res, 400, 'INVALID_INPUT', 'Balance must be a valid positive number.');
+    }
+    const stamp = new Date().toISOString();
+    const fractionDigits = req.player.currency_fraction_digits || 2;
+    const balanceMinor = Math.round(balance * Math.pow(10, fractionDigits));
+    db.prepare('UPDATE players SET bookmaker_balance_minor = ?, updated_at = ? WHERE id = ?')
+      .run(balanceMinor, stamp, req.player.id);
     return res.json({ ok: true, player: services.safePlayer(services.getPlayer(req.player.id)) });
   });
 

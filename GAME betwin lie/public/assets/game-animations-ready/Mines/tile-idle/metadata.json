@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mines_tile_idle",
+  "game": "Mines",
+  "name": "tile-idle",
+  "stateFrom": "closed",
+  "stateTo": "closed",
+  "frameCount": 8,
+  "frameSize": [
+    256,
+    256
+  ],
+  "fps": 10,
+  "durationMs": 800,
+  "timingMs": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+  ],
+  "loop": "loop",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.5
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "tileCenter": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "gemCenter": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "mineCenter": {
+      "x": 0.5,
+      "y": 0.5
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "gems/references/approved-mines-scene.png",
+      "bundledPath": "SourceArt/gems/references/approved-mines-scene.png",
+      "sha256": "c8751105ff04db4842fb4e83b93c1df92133fb9d262272e47a77b14559c214cc"
+    }
+  ],
+  "generatedElements": [
+    "cropped closed tile from approved board reference"
+  ],
+  "qualityStatus": "placeholder_only",
+  "integrationReady": false,
+  "purpose": "Closed-cell idle based on the supplied approved board reference.",
+  "limitations": [
+    "Contains generated placeholder symbols and/or a crop from a UI reference; replace with clean source artwork before production."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        43,
+        43,
+        213,
+        213
+      ],
+      [
+        43,
+        43,
+        214,
+        214
+      ],
+      [
+        43,
+        43,
+        213,
+        213
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        45,
+        45,
+        211,
+        211
+      ],
+      [
+        46,
+        46,
+        211,
+        211
+      ],
+      [
+        45,
+        45,
+        211,
+        211
+      ]
+    ],
+    "sheet": "Mines/tile-idle/sheet.png",
+    "preview": "Mines/tile-idle/preview-strip.png"
+  }
+}

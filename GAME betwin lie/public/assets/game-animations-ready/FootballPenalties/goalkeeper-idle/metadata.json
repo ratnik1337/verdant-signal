@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "footballpenalties_goalkeeper_idle",
+  "game": "FootballPenalties",
+  "name": "goalkeeper-idle",
+  "stateFrom": "ready",
+  "stateTo": "ready",
+  "frameCount": 8,
+  "frameSize": [
+    384,
+    384
+  ],
+  "fps": 10,
+  "durationMs": 800,
+  "timingMs": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+  ],
+  "loop": "loop",
+  "pivot": {
+    "normalized": [
+      0.5,
+      1
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "feetPivot": {
+      "x": 0.5,
+      "y": 0.98
+    },
+    "leftHandReach": {
+      "x": 0.28,
+      "y": 0.62
+    },
+    "rightHandReach": {
+      "x": 0.72,
+      "y": 0.62
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "football/concepts/goalkeeper-green-unassigned.png",
+      "bundledPath": "SourceArt/football/concepts/goalkeeper-green-unassigned.png",
+      "sha256": "72247a336e65fd3e5d5ebe9a022cb94f796bfa2f410b3a32b57ea7fe7d06355e"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "concept_only",
+  "integrationReady": false,
+  "purpose": "Keeper breathing stance based on the only supplied football character asset.",
+  "limitations": [
+    "Does not prove real ball contact, hand reach, goal collision or a playable shot sequence."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        144,
+        151,
+        247,
+        361
+      ],
+      [
+        143,
+        153,
+        246,
+        363
+      ],
+      [
+        142,
+        155,
+        245,
+        365
+      ],
+      [
+        143,
+        153,
+        246,
+        363
+      ],
+      [
+        144,
+        151,
+        247,
+        361
+      ],
+      [
+        144,
+        149,
+        249,
+        358
+      ],
+      [
+        144,
+        149,
+        249,
+        358
+      ],
+      [
+        144,
+        149,
+        249,
+        358
+      ]
+    ],
+    "sheet": "FootballPenalties/goalkeeper-idle/sheet.png",
+    "preview": "FootballPenalties/goalkeeper-idle/preview-strip.png"
+  }
+}

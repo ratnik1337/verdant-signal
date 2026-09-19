@@ -1,0 +1,100 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "chicken_chick_danger_reaction",
+  "game": "Chicken",
+  "name": "chick-danger-reaction",
+  "stateFrom": "approach",
+  "stateTo": "danger",
+  "frameCount": 6,
+  "frameSize": [
+    320,
+    320
+  ],
+  "fps": 14,
+  "durationMs": 426,
+  "timingMs": [
+    71,
+    71,
+    71,
+    71,
+    71,
+    71
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.93
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "chicken/models/chick-idle-reconstruction.png",
+      "bundledPath": "SourceArt/chicken/models/chick-idle-reconstruction.png",
+      "sha256": "f3057032f1995e7c610e849e9d00d96220152f76c8fb3f15a97ffb330e10beb4"
+    },
+    {
+      "sourceArchivePath": "chicken/obstacles/traffic-van-reconstruction.png",
+      "bundledPath": "SourceArt/chicken/obstacles/traffic-van-reconstruction.png",
+      "sha256": "580b0cbb96b5cc196c8d064923e2060ef2fa8dc38f57c1ecb8a60602ca799ab1"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "transform_first_pass",
+  "integrationReady": false,
+  "purpose": "Alert recoil and small shake before a traffic collision decision.",
+  "limitations": [
+    "Motion is derived from a single still, not hand-drawn poses or a skeletal rig."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        56,
+        127,
+        307,
+        282
+      ],
+      [
+        60,
+        126,
+        302,
+        282
+      ],
+      [
+        48,
+        126,
+        298,
+        283
+      ],
+      [
+        62,
+        127,
+        293,
+        283
+      ],
+      [
+        52,
+        127,
+        288,
+        283
+      ],
+      [
+        58,
+        129,
+        284,
+        283
+      ]
+    ],
+    "sheet": "Chicken/chick-danger-reaction/sheet.png",
+    "preview": "Chicken/chick-danger-reaction/preview-strip.png"
+  }
+}

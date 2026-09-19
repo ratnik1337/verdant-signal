@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "chicken_chick_success_bounce",
+  "game": "Chicken",
+  "name": "chick-success-bounce",
+  "stateFrom": "landed",
+  "stateTo": "success",
+  "frameCount": 8,
+  "frameSize": [
+    320,
+    320
+  ],
+  "fps": 12,
+  "durationMs": 664,
+  "timingMs": [
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.93
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "chicken/models/chick-idle-reconstruction.png",
+      "bundledPath": "SourceArt/chicken/models/chick-idle-reconstruction.png",
+      "sha256": "f3057032f1995e7c610e849e9d00d96220152f76c8fb3f15a97ffb330e10beb4"
+    }
+  ],
+  "generatedElements": [
+    "green success ring"
+  ],
+  "qualityStatus": "transform_first_pass",
+  "integrationReady": false,
+  "purpose": "Small celebratory bounce with a restrained signal ring.",
+  "limitations": [
+    "Motion is derived from a single still, not hand-drawn poses or a skeletal rig."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        107,
+        125,
+        214,
+        269
+      ],
+      [
+        107,
+        110,
+        213,
+        257
+      ],
+      [
+        90,
+        90,
+        230,
+        249
+      ],
+      [
+        76,
+        76,
+        244,
+        245
+      ],
+      [
+        68,
+        68,
+        252,
+        252
+      ],
+      [
+        64,
+        64,
+        256,
+        256
+      ],
+      [
+        62,
+        62,
+        258,
+        259
+      ],
+      [
+        107,
+        125,
+        214,
+        269
+      ]
+    ],
+    "sheet": "Chicken/chick-success-bounce/sheet.png",
+    "preview": "Chicken/chick-success-bounce/preview-strip.png"
+  }
+}

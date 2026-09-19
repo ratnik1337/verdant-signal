@@ -132,3 +132,60 @@ Full audit against the extracted art pack, all 8 usable style/reference screensh
 - Changed the aircraft trajectory to monotonic eased travel with a smooth lift curve; there is no circular/orbiting motion or second position owner.
 - Moved the countdown to the lower-right corner as a compact visible semicircle. The eight markers remain in order with the eighth orange, and the white ball interpolates from one marker to the next once per second.
 - Final browser QA at 390×844 confirmed no aircraft in the countdown frame, visible corner ball/semicircle, `7,6,5,4,3,2,1,0`, phases `countdown → takeoff → flying → crash → ended`, no page errors, and clean flight/ended frames.
+
+## 2026-09-19 (signal-only mechanics repair)
+
+- Replaced the current remote game iframe mounts with the existing local art/animation scenes. The remote surfaces had been made non-interactive with `pointer-events: none`, so their controls could not satisfy the local signal-only contract.
+- Aviator now has a local instruction overlay with a working close button and reopen button. Its existing canvas countdown and flight animation remain the runtime owner.
+- Chicken Road no longer exposes a manual jump action as the primary flow. `Get signal` requests the model result, picks a random available signal step, and starts the chicken jump automatically.
+- Mines now uses the existing approved scene and clickable overlay cells. The right-side field-size and mine-count selectors remain the only setup controls; requesting a signal starts the local round without any bet UI.
+- Football Penalties now uses the local goal-zone controls and the existing role selector. Striker and goalkeeper paths both remain playable through the same local animation loop.
+- Apple of Fortune was not changed.
+- Next: run syntax/tests, launch localhost, and browser-check the Aviator close button, Chicken auto-jump, Mines cell opening after signal and Football role/zone flows at desktop and narrow mobile sizes.
+
+## 2026-09-19 (temporary external embed experiment, reverted)
+
+- A short-lived attempt reinstated third-party visual embeds to mirror the supplied screenshots. In the local browser those embeds produced black screens, so this path was reverted and is not part of the current runtime.
+- The iframe preservation and visual overlay approach was also removed; the browser checks below the current section are the authoritative checks for the local scenes.
+
+## 2026-09-19 (local game scenes restored)
+
+- Removed the temporary third-party iframe layer. It was the source of the black game screens and could not be relied on for the supplied local game experience.
+- Restored the existing local Aviator, Chicken Road, Mines, and Football scenes so the supplied art, models, and animations remain the rendered runtime.
+- Removed the stale iframe/overlay CSS and iframe-preservation path. Signal-only controls now operate against the local scenes: Chicken signal animates the chicken jump, Mines uses the local grid and mine-count control, and Football uses the local role/zone flow.
+- Apple of Fortune remains untouched.
+- Added a cache-busting version to the app stylesheet and script tags so an already-open localhost tab loads this visual/mechanics build after a normal refresh.
+
+## 2026-09-19 (reference skins and final signal QA)
+
+- Replaced the obsolete green/local presentation behind Aviator, Chicken Road, Mines, and Football with local copies of the supplied Betwinner reference compositions in `public/assets/reference-games/`; no third-party game iframe or betting control is used.
+- Aviator now keeps the dark AviaShow-style chart layer while the new atlas aircraft remains the only animated flight layer; the instruction `×` closes correctly and `Get signal` starts countdown/flight.
+- Chicken Road keeps the dark road composition and moves the new chick animation to the randomly selected signal step; Mines keeps the blue-metal board with the right-side field-size/mine-count controls and signal-highlighted cells.
+- Football now shows the supplied player/role reference composition, keeps the generic keeper animation, preserves the selected Striker/Goalkeeper role through analysis, and starts kick/save/goal animation from `Get signal`.
+- Browser QA confirmed the four active games render, signals change runtime state, and the visible game copy is signal-only with no stake controls. Apple of Fortune remains untouched.
+
+## 2026-09-19 (signal-driven round flow)
+
+- Kept the local reference scenes as the active render path; the browser now reports zero game iframes and renders the Aviator, Chicken Road, Mines, and Football stages locally with their existing art and animation layers.
+- Added a real 2.3-second signal wait before every active game starts its animation. Chicken now follows the server-selected safe route one jump at a time, Mines opens the recommended safe cells sequentially, Football starts the selected striker/goalkeeper flow automatically, and Aviator flies to the generated target multiplier.
+- Added weighted server sampling so ordinary low coefficients and short safe routes are common while high Aviator multipliers, long Chicken routes, and rare football zones are less frequent. Apple of Fortune remains untouched.
+- Browser QA after restarting the local server confirmed the new Chicken scale (`1.12x`, `1.28x`, `1.48x`, `1.78x`, `2.25x`), sequential completion through the target step, three safe Mines cells opening, goalkeeper role execution in Football, Aviator instruction close behavior, and zero active iframes.
+
+## 2026-09-19 (active renderer correction)
+
+- The served root build had drifted back to `renderChickenStageLegacy()` plus reference-only wrappers. Those wrappers did not represent the saved local production scenes and were the reason the browser showed the stale/simple game composition again.
+- Restored the active Aviator, Chicken Road, Mines and Football stage functions to the local production art/animation pipeline from the repository baseline while retaining the signal-only controls, automatic signal flow, mine setup selectors, Football role selector and Aviator instruction close action. Apple of Fortune was not changed.
+- Restarted the root server and verified the served `app.js?v=20260919-signal-7` contains no legacy Chicken renderer and no external game iframe. Browser checks showed the local chick scene, canonical blue-metal Mines board, Football zones with striker/keeper switching, signal-triggered animation states and working Aviator close button.
+- `node --check public/app.js`, `node --check server/app.js`, `node --check server/services.js`, `npm test` (11/11), `git diff --check` and `/api/health` all pass.
+
+## 2026-09-19 (reference composition reactivated)
+
+- The green local baseline was still the stale visual surface the current review was rejecting, so the active root renderer was switched back to the supplied local Betwinner reference compositions rather than the old embedded games or the legacy simple renderer.
+- Aviator, Chicken Road and Football now use their reference composition with the current local `game-animations-ready` canvases layered as the animation owner; Mines keeps the canonical blue-metal scene. No external iframe or betting UI was reintroduced, and Apple of Fortune remains untouched.
+- Cache-bust is `20260919-signal-8`; the live browser tab was refreshed onto this build and Chicken Road signal flow was rechecked: after the signal wait, the local chick moved to the generated safe step and the result panel updated.
+
+## 2026-09-19 (reference layers restored from GAME betwin lie)
+
+- Rechecked the actual `GAME betwin lie` source before changing the root: its four non-Apple stage functions are external iframe URLs, not local game components. The Chicken URL still stops on its external loading screen in the connected browser, so restoring those iframe functions would reproduce the black/loading failure and would keep their betting controls outside the signal runtime.
+- Kept the working local signal renderer, but corrected the reference layer instead of the custom green surface: Aviator is now explicitly marked as the reference skin so its local animation canvas is painted over `references/e618...png`; Mines adds a signal-only mask over the source betting panel while retaining the supplied blue-metal board; Football continues to use the supplied player-selection reference background with the local role/zone animation.
+- Added the final shell override and cache-bust `20260919-signal-10`. Browser QA confirmed Aviator reference background, working instruction close and signal flight; Mines reference board, right-side size/mine selectors and sequential safe-cell opening; Football reference player panel and role selector. No active game iframe is served.

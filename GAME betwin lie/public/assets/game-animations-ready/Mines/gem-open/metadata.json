@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mines_gem_open",
+  "game": "Mines",
+  "name": "gem-open",
+  "stateFrom": "opening",
+  "stateTo": "safe",
+  "frameCount": 10,
+  "frameSize": [
+    256,
+    256
+  ],
+  "fps": 16,
+  "durationMs": 630,
+  "timingMs": [
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63,
+    63
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.5
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "tileCenter": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "gemCenter": {
+      "x": 0.5,
+      "y": 0.5
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "gems/references/approved-mines-scene.png",
+      "bundledPath": "SourceArt/gems/references/approved-mines-scene.png",
+      "sha256": "c8751105ff04db4842fb4e83b93c1df92133fb9d262272e47a77b14559c214cc"
+    }
+  ],
+  "generatedElements": [
+    "cyan gem drawn as continuation of the supplied blue-crystal palette",
+    "green/cyan ring"
+  ],
+  "qualityStatus": "placeholder_only",
+  "integrationReady": false,
+  "purpose": "Safe reveal; the source pack has no isolated crystal export, so the gem is a documented generated element.",
+  "limitations": [
+    "Contains generated placeholder symbols and/or a crop from a UI reference; replace with clean source artwork before production."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ]
+    ],
+    "sheet": "Mines/gem-open/sheet.png",
+    "preview": "Mines/gem-open/preview-strip.png"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "players": [
+    {
+      "player_id": "messi",
+      "display_name": "Messi",
+      "role": "attacker",
+      "portrait": null,
+      "full_body": null,
+      "animations": {},
+      "status": "not-created"
+    },
+    {
+      "player_id": "ronaldo",
+      "display_name": "Ronaldo",
+      "role": "attacker",
+      "portrait": null,
+      "full_body": null,
+      "animations": {},
+      "status": "not-created"
+    },
+    {
+      "player_id": "neymar",
+      "display_name": "Neymar",
+      "role": "attacker",
+      "portrait": null,
+      "full_body": null,
+      "animations": {},
+      "status": "not-created"
+    },
+    {
+      "player_id": "ramos",
+      "display_name": "Ramos",
+      "role": "attacker",
+      "portrait": null,
+      "full_body": null,
+      "animations": {},
+      "status": "not-created"
+    },
+    {
+      "player_id": "aguero",
+      "display_name": "Agüero",
+      "role": "attacker",
+      "portrait": null,
+      "full_body": null,
+      "animations": {},
+      "status": "not-created"
+    },
+    {
+      "player_id": "de_gea",
+      "display_name": "De Gea",
+      "role": "goalkeeper",
+      "portrait": null,
+      "full_body": null,
+      "animations": {},
+      "status": "not-created"
+    },
+    {
+      "player_id": "courtois",
+      "display_name": "Courtois",
+      "role": "goalkeeper",
+      "portrait": null,
+      "full_body": null,
+      "animations": {},
+      "status": "not-created"
+    },
+    {
+      "player_id": "oblak",
+      "display_name": "Oblak",
+      "role": "goalkeeper",
+      "portrait": null,
+      "full_body": null,
+      "animations": {},
+      "status": "not-created"
+    }
+  ]
+}

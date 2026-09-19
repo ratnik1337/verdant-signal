@@ -1,0 +1,60 @@
+{
+  "pack": "Verdant Signal runtime art pack",
+  "version": "0.3.0",
+  "manifestType": "runtime",
+  "assetRoot": "/assets/verdant-artpack",
+  "runtimeAssets": {
+    "aviator": {
+      "plane": "aviator/models/plane-body.png",
+      "mountain": "aviator/backgrounds/mountain-ridge-layer-reconstruction.png",
+      "trail": "aviator/effects-vfx/trail-segment.png",
+      "propellerAtlas": "aviator/animations/propeller-spin-atlas.png",
+      "engineGlowAtlas": "aviator/effects-vfx/engine-glow-atlas.png",
+      "smokeAtlas": "aviator/effects-vfx/smoke-trail-atlas.png",
+      "sparksAtlas": "aviator/effects-vfx/crash-sparks-atlas.png",
+      "crashAtlas": "aviator/effects-vfx/plane-crash-explosion-atlas.png",
+      "afterCrashSmoke": "aviator/effects-vfx/after-crash-smoke.png"
+    },
+    "chickenRoad": {
+      "chick": "chicken/models/chick-idle-reconstruction.png",
+      "vehicle": "chicken/obstacles/traffic-van-reconstruction.png"
+    },
+    "appleOfFortune": {
+      "wholeApple": "apple/objects/apple-whole.png",
+      "bittenApple": "apple/objects/apple-bitten.png",
+      "closedTile": "apple/tiles/closed-wooden-board-tile-reconstruction.png"
+    },
+    "footballPenalties": {
+      "genericGoalkeeper": "football/concepts/goalkeeper-green-unassigned.png"
+    },
+    "mines": {
+      "approvedScene": "gems/approved-mines-scene.png"
+    }
+  },
+  "atlases": {
+    "propeller": { "path": "aviator/animations/propeller-spin-atlas.png", "size": [3072, 384], "frames": 8, "frameSize": [384, 384], "timingMs": [60, 60, 60, 60, 60, 60, 60, 60], "loop": "loop", "pivot": [0.5, 0.5], "anchor": "plane.propeller", "displaySize": [64, 64], "zIndex": 8, "purpose": "detached propeller at the nose, centered pivot" },
+    "engineGlow": { "path": "aviator/effects-vfx/engine-glow-atlas.png", "size": [2304, 384], "frames": 6, "frameSize": [384, 384], "timingMs": [80, 80, 80, 80, 80, 80], "loop": "loop", "pivot": [0.5, 0.5], "anchor": "plane.engineGlow", "displaySize": [86, 86], "zIndex": 6, "purpose": "warm exhaust pulse behind the body" },
+    "smoke": { "path": "aviator/effects-vfx/smoke-trail-atlas.png", "size": [2304, 384], "frames": 6, "frameSize": [384, 384], "timingMs": [80, 80, 80, 80, 100, 120], "loop": "loop", "pivot": [0.5, 0.5], "anchor": "plane.smoke", "displaySize": [132, 132], "zIndex": 5, "purpose": "looping exhaust smoke behind the aircraft" },
+    "sparks": { "path": "aviator/effects-vfx/crash-sparks-atlas.png", "size": [2304, 384], "frames": 6, "frameSize": [384, 384], "timingMs": [50, 50, 60, 80, 100, 120], "loop": "once", "pivot": [0.5, 0.5], "anchor": "plane.crash", "displaySize": [190, 190], "zIndex": 10, "purpose": "one-shot impact sparks at the final plane position" },
+    "crash": { "path": "aviator/effects-vfx/plane-crash-explosion-atlas.png", "size": [3072, 384], "frames": 8, "frameSize": [384, 384], "timingMs": [50, 50, 60, 70, 80, 100, 120, 160], "loop": "once", "pivot": [0.5, 0.5], "anchor": "plane.crash", "displaySize": [220, 220], "zIndex": 9, "purpose": "one-shot crash fireball and smoke" }
+  },
+  "assets": [
+    { "path": "aviator/models/plane-body.png", "size": [955, 650], "frames": 1, "timingMs": null, "loop": "still", "pivot": [0.5, 0.51], "anchor": "scene.plane", "displaySize": [178, 121], "zIndex": 7, "purpose": "aircraft body; standalone transparent PNG" },
+    { "path": "aviator/backgrounds/mountain-ridge-layer-reconstruction.png", "size": [2126, 740], "frames": 1, "timingMs": null, "loop": "still", "pivot": [0.5, 1], "anchor": "scene.bottom", "displaySize": [640, 220], "zIndex": 2, "purpose": "background mountain layer" },
+    { "path": "aviator/effects-vfx/trail-segment.png", "size": [1024, 256], "frames": 1, "timingMs": null, "loop": "stretch", "pivot": [0.5, 0.5], "anchor": "plane.trail", "displaySize": [228, 57], "zIndex": 4, "purpose": "horizontal exhaust ribbon" },
+    { "path": "chicken/models/chick-idle-reconstruction.png", "size": [1241, 1268], "frames": 1, "timingMs": null, "loop": "still", "pivot": [0.5, 0.93], "anchor": "road.step", "displaySize": [72, 74], "zIndex": 4, "purpose": "single idle chick; jump/fall uses transform only" },
+    { "path": "chicken/obstacles/traffic-van-reconstruction.png", "size": [1426, 1103], "frames": 1, "timingMs": null, "loop": "still", "pivot": [0.5, 0.78], "anchor": "road.obstacle", "displaySize": [104, 81], "zIndex": 3, "purpose": "separate traffic obstacle" },
+    { "path": "apple/objects/apple-whole.png", "size": [1335, 1178], "frames": 1, "timingMs": null, "loop": "still", "pivot": [0.5, 0.53], "anchor": "apple.cell", "displaySize": [46, 42], "zIndex": 3, "purpose": "safe/recommended apple" },
+    { "path": "apple/objects/apple-bitten.png", "size": [1335, 1178], "frames": 1, "timingMs": null, "loop": "still", "pivot": [0.5, 0.53], "anchor": "apple.cell", "displaySize": [46, 42], "zIndex": 3, "purpose": "revealed danger apple" },
+    { "path": "apple/tiles/closed-wooden-board-tile-reconstruction.png", "size": [1774, 887], "frames": 1, "timingMs": null, "loop": "still", "pivot": [0.5, 0.5], "anchor": "apple.cell", "displaySize": [78, 58], "zIndex": 1, "purpose": "closed cell wood texture" },
+    { "path": "football/concepts/goalkeeper-green-unassigned.png", "size": [1024, 1536], "frames": 1, "timingMs": null, "loop": "still", "pivot": [0.5, 1], "anchor": "goal.bottom-center", "displaySize": [112, 190], "zIndex": 5, "purpose": "generic keeper; dive uses transform only" },
+    { "path": "gems/approved-mines-scene.png", "size": [1153, 693], "frames": 1, "timingMs": null, "loop": "still", "pivot": [1, 0.5], "anchor": "mines.reference-board", "displaySize": [430, 258], "zIndex": 1, "purpose": "approved Mines visual scene reference used until isolated tile/crystal exports exist" }
+  ],
+  "limitations": [
+    "Chicken chick, traffic van, mountain layer and goalkeeper are standalone/reconstructed art, not verified exact matches to named references.",
+    "The football goalkeeper is intentionally generic and is not mapped to a named player.",
+    "Only the five Aviator sequences in the pack are true atlas animations; Chicken, Apple and Football use isolated stills with calibrated transform motion.",
+    "Mines uses the approved scene reference as a responsive board backdrop because isolated tile/crystal/mine exports are not present in the pack.",
+    "Reference sheets, contact sheets and GIF previews are excluded from runtime."
+  ]
+}

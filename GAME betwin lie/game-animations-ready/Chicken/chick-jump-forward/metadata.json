@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "chicken_chick_jump_forward",
+  "game": "Chicken",
+  "name": "chick-jump-forward",
+  "stateFrom": "ready",
+  "stateTo": "landed",
+  "frameCount": 10,
+  "frameSize": [
+    320,
+    320
+  ],
+  "fps": 14,
+  "durationMs": 710,
+  "timingMs": [
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71,
+    71
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.93
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "groundPivot": {
+      "x": 0.5,
+      "y": 0.87
+    },
+    "leftFootContact": {
+      "x": 0.34,
+      "y": 0.87
+    },
+    "rightFootContact": {
+      "x": 0.68,
+      "y": 0.87
+    },
+    "bodyCenter": {
+      "x": 0.5,
+      "y": 0.55
+    },
+    "headCenter": {
+      "x": 0.5,
+      "y": 0.28
+    },
+    "landingPoint": {
+      "x": 0.5,
+      "y": 0.87
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "chicken/models/chick-idle-reconstruction.png",
+      "bundledPath": "SourceArt/chicken/models/chick-idle-reconstruction.png",
+      "sha256": "f3057032f1995e7c610e849e9d00d96220152f76c8fb3f15a97ffb330e10beb4"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "transform_first_pass",
+  "integrationReady": false,
+  "purpose": "Readably staged hop to the next tile; the ground pivot remains stable.",
+  "limitations": [
+    "Motion is derived from a single still, not hand-drawn poses or a skeletal rig."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        45,
+        138,
+        158,
+        281
+      ],
+      [
+        48,
+        132,
+        161,
+        275
+      ],
+      [
+        58,
+        114,
+        168,
+        259
+      ],
+      [
+        71,
+        88,
+        184,
+        235
+      ],
+      [
+        92,
+        64,
+        203,
+        213
+      ],
+      [
+        119,
+        65,
+        228,
+        212
+      ],
+      [
+        141,
+        89,
+        249,
+        232
+      ],
+      [
+        158,
+        116,
+        261,
+        256
+      ],
+      [
+        167,
+        133,
+        271,
+        272
+      ],
+      [
+        171,
+        140,
+        273,
+        277
+      ]
+    ],
+    "sheet": "Chicken/chick-jump-forward/sheet.png",
+    "preview": "Chicken/chick-jump-forward/preview-strip.png"
+  }
+}

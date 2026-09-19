@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "aviator_plane_idle",
+  "game": "Aviator",
+  "name": "plane-idle",
+  "stateFrom": "idle",
+  "stateTo": "idle",
+  "frameCount": 8,
+  "frameSize": [
+    384,
+    384
+  ],
+  "fps": 12,
+  "durationMs": 664,
+  "timingMs": [
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83,
+    83
+  ],
+  "loop": "loop",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.55
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {
+    "planeCenter": {
+      "x": 0.5,
+      "y": 0.53
+    },
+    "nose": {
+      "x": 0.94,
+      "y": 0.31
+    },
+    "propellerMount": {
+      "x": 0.98,
+      "y": 0.31
+    },
+    "engineMount": {
+      "x": 0.8,
+      "y": 0.43
+    },
+    "tail": {
+      "x": 0.08,
+      "y": 0.55
+    },
+    "smokeOrigin": {
+      "x": 0.08,
+      "y": 0.55
+    },
+    "trailOrigin": {
+      "x": 0.06,
+      "y": 0.55
+    },
+    "crashCenter": {
+      "x": 0.5,
+      "y": 0.5
+    }
+  },
+  "anchorConfidence": "visual estimate; not calibrated in project scene",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "aviator/models/plane-body.png",
+      "bundledPath": "SourceArt/aviator/models/plane-body.png",
+      "sha256": "13c9358df40a0e91ab851091ef495c53fc24212dd56f5fbeabb0c94867dd6ffe"
+    }
+  ],
+  "generatedElements": [],
+  "qualityStatus": "review_required",
+  "integrationReady": false,
+  "purpose": "Subtle breathing hover; the aircraft remains centered and readable on mobile.",
+  "limitations": [
+    "Aircraft attachment coordinates and world-space flight path are estimates; validate in the intended game scene."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        86,
+        132,
+        298,
+        266
+      ],
+      [
+        85,
+        156,
+        296,
+        257
+      ],
+      [
+        86,
+        158,
+        297,
+        258
+      ],
+      [
+        85,
+        156,
+        296,
+        257
+      ],
+      [
+        86,
+        132,
+        298,
+        266
+      ],
+      [
+        87,
+        148,
+        299,
+        252
+      ],
+      [
+        88,
+        146,
+        299,
+        251
+      ],
+      [
+        87,
+        148,
+        299,
+        252
+      ]
+    ],
+    "sheet": "Aviator/plane-idle/sheet.png",
+    "preview": "Aviator/plane-idle/preview-strip.png"
+  }
+}

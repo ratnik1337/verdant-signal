@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "mines_tile_press",
+  "game": "Mines",
+  "name": "tile-press",
+  "stateFrom": "closed",
+  "stateTo": "opening",
+  "frameCount": 6,
+  "frameSize": [
+    256,
+    256
+  ],
+  "fps": 16,
+  "durationMs": 378,
+  "timingMs": [
+    63,
+    63,
+    63,
+    63,
+    63,
+    63
+  ],
+  "loop": "once",
+  "pivot": {
+    "normalized": [
+      0.5,
+      0.5
+    ],
+    "origin": "top-left",
+    "confidence": "legacy estimate; not validated against scene"
+  },
+  "anchors": {},
+  "anchorConfidence": "not supplied / not measured",
+  "sourceAssets": [
+    {
+      "sourceArchivePath": "gems/references/approved-mines-scene.png",
+      "bundledPath": "SourceArt/gems/references/approved-mines-scene.png",
+      "sha256": "c8751105ff04db4842fb4e83b93c1df92133fb9d262272e47a77b14559c214cc"
+    }
+  ],
+  "generatedElements": [
+    "cropped closed tile from approved board reference"
+  ],
+  "qualityStatus": "placeholder_only",
+  "integrationReady": false,
+  "purpose": "Tactile press compression and release.",
+  "limitations": [
+    "Contains generated placeholder symbols and/or a crop from a UI reference; replace with clean source artwork before production."
+  ],
+  "layerMode": "flattened_frame_composite",
+  "validation": {
+    "allFramesExist": true,
+    "sameDimensions": true,
+    "allFramesRGBA": true,
+    "emptyFrameIndexes": [],
+    "alphaBoundsByFrame": [
+      [
+        44,
+        44,
+        212,
+        212
+      ],
+      [
+        48,
+        50,
+        209,
+        211
+      ],
+      [
+        50,
+        53,
+        207,
+        210
+      ],
+      [
+        50,
+        53,
+        207,
+        210
+      ],
+      [
+        48,
+        50,
+        209,
+        211
+      ],
+      [
+        44,
+        44,
+        212,
+        212
+      ]
+    ],
+    "sheet": "Mines/tile-press/sheet.png",
+    "preview": "Mines/tile-press/preview-strip.png"
+  }
+}
