@@ -1290,3 +1290,32 @@ h1, h2, h3 { text-wrap: balance; }
 @media (prefers-reduced-motion: reduce) {
   .reference-game * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+/* Authored local outcome recordings. The waiting scene stays DOM-rendered until
+   the supplied main.mp4 loops arrive; outcome footage is never cropped. */
+.game-outcome-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #000 !important;
+  border: 1px solid rgba(163, 237, 140, 0.18);
+}
+
+.game-outcome-stage::before,
+.game-outcome-stage::after { display: none; }
+
+.game-outcome-aviator { aspect-ratio: 792 / 440; }
+.game-outcome-chicken-road { aspect-ratio: 816 / 304; }
+.game-outcome-mines { aspect-ratio: 792 / 492; }
+.game-outcome-football-penalties { aspect-ratio: 792 / 600; }
+
+.game-outcome-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  background: #000;
+}

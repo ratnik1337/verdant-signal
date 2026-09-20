@@ -170,6 +170,7 @@ test('signal analysis records the entered amount and returns playable local-game
   assert.ok(chicken.body.analysis.accuracy >= 82 && chicken.body.analysis.accuracy <= 98);
   assert.ok(chicken.body.analysis.targetStep >= 1 && chicken.body.analysis.targetStep <= 6);
   assert.equal(chicken.body.analysis.safeSteps.length, chicken.body.analysis.targetStep);
+  assert.match(chicken.body.analysis.video.src, /^\/assets\/game-videos\/chicken-road\/x[\d.]+\.mp4$/);
 
   const apple = await agent.post('/api/games/apple-of-fortune/analyze').send({ amount: 250 });
   assert.equal(apple.status, 200);
@@ -184,11 +185,32 @@ test('signal analysis records the entered amount and returns playable local-game
     assert.equal(mines.body.analysis.size, size);
     assert.equal(mines.body.analysis.mines, 4);
     assert.ok(mines.body.analysis.recommendedCells.every((cell) => !mines.body.analysis.minePositions.includes(cell)));
+    assert.match(mines.body.analysis.video.src, /^\/assets\/game-videos\/mines\/(?:Lose|x[\d.]+)\.mp4$/);
   }
 
   const football = await agent.post('/api/games/football-penalties/analyze').send({ amount: 100 });
   assert.equal(football.body.analysis.role, 'striker');
   assert.ok(['goal', 'save', 'miss'].includes(football.body.analysis.result));
+  assert.match(football.body.analysis.video.src, /^\/assets\/game-videos\/football-penalties\/(?:x)?[\d.]+\.mp4$/);
+
+  const aviator = await agent.post('/api/games/aviator/analyze').send({ amount: 100 });
+  assert.match(aviator.body.analysis.video.src, /^\/assets\/game-videos\/aviator\/x[\d.]+\.mp4$/);
+  assert.equal(aviator.body.analysis.multiplier, `${aviator.body.analysis.video.multiplier.toFixed(2)}x`);
+});
+
+test('authored outcome videos are served locally as MP4 files', async () => {
+  const app = makeApp();
+  for (const source of [
+    '/assets/game-videos/aviator/x1.11.mp4',
+    '/assets/game-videos/chicken-road/x1.28.mp4',
+    '/assets/game-videos/mines/Lose.mp4',
+    '/assets/game-videos/football-penalties/x1.02.mp4',
+  ]) {
+    const response = await request(app).get(source);
+    assert.equal(response.status, 200);
+    assert.match(response.headers['content-type'], /video\/mp4/);
+    assert.ok(response.body.length > 100000);
+  }
 });
 
 test('admin auth and player detail never reveal access codes', async () => {

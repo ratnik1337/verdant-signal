@@ -10,6 +10,50 @@ const GAME_LABELS = {
   'football-penalties': 'Football Penalties',
 };
 
+// These are the authored outcome recordings supplied with the project. The
+// weights deliberately favour short/low outcomes so rare, high multipliers do
+// not appear with the same frequency as ordinary rounds.
+const GAME_VIDEO_OUTCOMES = {
+  aviator: [
+    { file: 'x1.11.mp4', multiplier: 1.11, weight: 180 },
+    { file: 'x1.36.mp4', multiplier: 1.36, weight: 170 },
+    { file: 'x1.43.mp4', multiplier: 1.43, weight: 145 },
+    { file: 'x1.65.mp4', multiplier: 1.65, weight: 125 },
+    { file: 'x1.89.mp4', multiplier: 1.89, weight: 105 },
+    { file: 'x1.99.mp4', multiplier: 1.99, weight: 90 },
+    { file: 'x2.18.mp4', multiplier: 2.18, weight: 75 },
+    { file: 'x2.23.mp4', multiplier: 2.23, weight: 60 },
+    { file: 'x2.56.mp4', multiplier: 2.56, weight: 45 },
+    { file: 'x2.96.mp4', multiplier: 2.96, weight: 30 },
+    { file: 'x3.63.mp4', multiplier: 3.63, weight: 18 },
+    { file: 'x4.98.mp4', multiplier: 4.98, weight: 9 },
+    { file: 'x10.53.mp4', multiplier: 10.53, weight: 2 },
+  ],
+  'chicken-road': [
+    { file: 'x1.28.mp4', multiplier: 1.28, step: 2, weight: 36 },
+    { file: 'x1.47.mp4', multiplier: 1.47, step: 3, weight: 30 },
+    { file: 'x2.76.mp4', multiplier: 2.76, step: 4, weight: 19 },
+    { file: 'x4.03.mp4', multiplier: 4.03, step: 5, weight: 10 },
+    { file: 'x6.91.mp4', multiplier: 6.91, step: 6, weight: 5 },
+  ],
+  mines: [
+    { file: 'Lose.mp4', outcome: 'lose', label: 'LOSE', weight: 28 },
+    { file: 'x1.14.mp4', outcome: 'win', multiplier: 1.14, weight: 28 },
+    { file: 'x1.33.mp4', outcome: 'win', multiplier: 1.33, weight: 21 },
+    { file: 'x1.71.mp4', outcome: 'win', multiplier: 1.71, weight: 14 },
+    { file: 'x4.8.mp4', outcome: 'win', multiplier: 4.8, weight: 7 },
+    { file: 'x8.mp4', outcome: 'win', multiplier: 8, weight: 2 },
+  ],
+  'football-penalties': [
+    { file: 'x1.02.mp4', multiplier: 1.02, weight: 32 },
+    { file: 'x1.38.mp4', multiplier: 1.38, weight: 26 },
+    { file: '1.68.mp4', multiplier: 1.68, weight: 18 },
+    { file: 'x1.81.mp4', multiplier: 1.81, weight: 12 },
+    { file: 'x2.6.mp4', multiplier: 2.6, weight: 8 },
+    { file: 'x3.36.mp4', multiplier: 3.36, weight: 4 },
+  ],
+};
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -71,6 +115,26 @@ function weightedChoice(entries) {
     if (roll <= cursor) return value;
   }
   return entries.at(-1)[0];
+}
+
+function chooseVideoOutcome(game) {
+  const outcomes = GAME_VIDEO_OUTCOMES[game];
+  if (!outcomes?.length) return null;
+  const total = outcomes.reduce((sum, outcome) => sum + outcome.weight, 0);
+  let roll = secureRandom() * total;
+  const selected = outcomes.find((outcome) => {
+    roll -= outcome.weight;
+    return roll <= 0;
+  }) || outcomes.at(-1);
+  const label = selected.label || (Number.isFinite(selected.multiplier) ? `${selected.multiplier}x` : selected.file.replace(/\.mp4$/i, ''));
+  return {
+    src: `/assets/game-videos/${game}/${selected.file}`,
+    file: selected.file,
+    label,
+    multiplier: selected.multiplier || null,
+    outcome: selected.outcome || 'win',
+    step: selected.step || null,
+  };
 }
 
 function calculateSignalAccuracy(amount) {
@@ -248,27 +312,29 @@ function createServices({ db, countries, currencies, minWithdrawalMinor }) {
     };
     let analysis;
     if (game === 'aviator') {
-      const multiplier = weightedAviatorMultiplier();
-      analysis = { ...base, multiplier: `${multiplier.toFixed(2)}x`, countdown: 2 + crypto.randomInt(0, 2), series: Array.from({ length: 5 }, () => `${weightedAviatorMultiplier().toFixed(2)}x`), note: 'The next round remains unknown.' };
+      const video = chooseVideoOutcome(game);
+      const multiplier = video.multiplier;
+      analysis = { ...base, video, multiplier: `${multiplier.toFixed(2)}x`, countdown: 2 + crypto.randomInt(0, 2), series: Array.from({ length: 5 }, () => `${weightedAviatorMultiplier().toFixed(2)}x`), note: 'The generated outcome video plays automatically.' };
     } else if (game === 'chicken-road') {
-      const multipliers = ['1.12x', '1.28x', '1.47x', '1.70x', '1.98x', '2.33x'];
-      const targetStep = weightedChoice([[1, 0.2], [2, 0.28], [3, 0.25], [4, 0.15], [5, 0.08], [6, 0.04]]);
-      analysis = { ...base, targetStep, safeSteps: Array.from({ length: targetStep }, (_, index) => index + 1), currentStep: targetStep, multiplier: multipliers[targetStep - 1], multipliers, note: 'The chicken follows the generated signal automatically.' };
+      const video = chooseVideoOutcome(game);
+      const multipliers = GAME_VIDEO_OUTCOMES[game].map((outcome) => `${outcome.multiplier}x`);
+      const targetStep = video.step;
+      analysis = { ...base, video, targetStep, safeSteps: Array.from({ length: targetStep }, (_, index) => index + 1), currentStep: targetStep, multiplier: `${video.multiplier}x`, multipliers, note: 'The chicken follows the generated video signal automatically.' };
     } else if (game === 'apple-of-fortune') {
       const APPLE_MULTIPLIERS = ['1.23', '1.54', '1.93', '2.41', '4.02', '6.71', '11.18', '27.97', '69.93', '349.68'];
       const targetRow = weightedChoice([[1, 0.2], [2, 0.22], [3, 0.2], [4, 0.15], [5, 0.1], [6, 0.06], [7, 0.04], [8, 0.02], [9, 0.008], [10, 0.002]]);
       analysis = { ...base, targetRow, rows: APPLE_MULTIPLIERS.map((multiplier, index) => ({ level: index + 1, recommendedCell: ((zone + index) % 5) + 1, cells: [1, 2, 3, 4, 5], multiplier: `x${multiplier}` })), note: 'The generated signal opens the recommended path automatically.' };
     } else if (game === 'mines') {
+      const video = chooseVideoOutcome(game);
       const size = [16, 25, 36].includes(Number(input.size)) ? Number(input.size) : 25;
       const mines = Math.min(Math.max(Number(input.mines) || 4, 1), Math.floor(size / 2));
       const minePositions = sampleUnique(size, mines);
       const recommendedCells = sampleUnique(size, Math.min(5, size - mines), new Set(minePositions));
-      analysis = { ...base, size, mines, recommendedCells, minePositions, note: 'Highlighted cells are a simulation aid, not a guaranteed route.' };
+      analysis = { ...base, video, size, mines, recommendedCells, minePositions, result: video.outcome, multiplier: video.multiplier ? `${video.multiplier}x` : null, note: 'The generated Mines outcome video plays automatically.' };
     } else {
+      const video = chooseVideoOutcome(game);
       const recommendedZone = crypto.randomInt(1, 6);
-      const outcomeRoll = secureRandom();
-      const result = outcomeRoll < 0.76 ? 'goal' : outcomeRoll < 0.95 ? 'save' : 'miss';
-      analysis = { ...base, zones: 5, role: 'striker', recommendedZone, direction: ['left', 'left-center', 'center', 'right-center', 'right'][recommendedZone - 1], goalkeeper: 'visualized', outcome: result.toUpperCase(), result, note: 'The striker follows the generated shot signal automatically.' };
+      analysis = { ...base, video, zones: 5, role: 'striker', recommendedZone, direction: ['left', 'left-center', 'center', 'right-center', 'right'][recommendedZone - 1], goalkeeper: 'visualized', outcome: 'GOAL', result: 'goal', multiplier: `${video.multiplier}x`, note: 'The striker follows the generated video signal automatically.' };
     }
     const stamp = nowIso();
     const cleanInput = Object.fromEntries(Object.entries(input || {}).filter(([key, value]) => ['difficulty', 'size', 'mines', 'amount'].includes(key) && ['string', 'number'].includes(typeof value)));
@@ -317,4 +383,4 @@ function createServices({ db, countries, currencies, minWithdrawalMinor }) {
   };
 }
 
-module.exports = { createServices, SUPPORTED_GAMES, GAME_LABELS, utcDate, safePlayer };
+module.exports = { createServices, SUPPORTED_GAMES, GAME_LABELS, GAME_VIDEO_OUTCOMES, utcDate, safePlayer };

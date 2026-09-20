@@ -152,3 +152,11 @@ Full audit against the extracted art pack, all 8 usable style/reference screensh
 - Converted the existing full Apple of Fortune fairy-tale scene to signal-only play: removed stake chips, stake input, Play, Auto, Cashout and balance/potential widgets; `Get signal` now opens a weighted automatic path row by row.
 - Fixed the Apple stage container to remain full width on desktop and mobile after adding the shared signal header. Football was intentionally not changed pending the requested references.
 - Browser QA verified the four requested scenes, automatic Apple progression, centered Mines gems, 16/25/36-cell boards, synchronized Aviator statuses, no horizontal overflow at 390×844, and zero browser console errors/warnings. `node --check`, `git diff --check`, and the complete Node test suite pass.
+## 2026-09-20 (authored MP4 outcome playback)
+
+- Mapped the newly supplied outcome folders without altering their footage: `GAMES` → Aviator, `GAMES (2)` → Chicken Road, `GAMES (3)` → Mines, and `GAMES (4)` → Football Penalties.
+- Copied all 30 supplied MP4 outcomes into `public/assets/game-videos/<game>/`; no synthetic `main.mp4` was generated because the user confirmed the idle loops will be supplied later.
+- Added weighted video selection on both authenticated server analysis and guest fallback paths. Common low outcomes have the largest weights; rare/high coefficients have progressively smaller weights.
+- During the 2–3 second analysis delay the existing waiting scene remains visible. The selected MP4 then replaces it, plays once muted/inline without crop or controls, disables duplicate signal requests, and returns to the waiting scene when playback ends.
+- Apple of Fortune remains on its existing signal-only animation because no Apple MP4 outcome folder was supplied.
+- Verification: `node --check public/app.js`, `node --check server/services.js`, `git diff --check`, and `npm test` pass (35/35). Live Chrome QA confirmed actual playback for Aviator (792×440), Chicken Road (816×304), Mines (792×492), and Football (792×600), no horizontal overflow, automatic return to ready after `ended`, and zero browser console messages.

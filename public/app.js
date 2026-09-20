@@ -10,6 +10,29 @@
   const ART_ROOT = '/assets/verdant-artpack';
   const PACKAGE_ART_ROOT = '/assets/game-animations-ready/SourceArt';
   const LOCAL_GAME_ROOT = '/assets/local-games';
+  const GAME_VIDEO_ROOT = '/assets/game-videos';
+  const GAME_VIDEO_OUTCOMES = {
+    aviator: [
+      ['x1.11.mp4', 1.11, 180], ['x1.36.mp4', 1.36, 170], ['x1.43.mp4', 1.43, 145],
+      ['x1.65.mp4', 1.65, 125], ['x1.89.mp4', 1.89, 105], ['x1.99.mp4', 1.99, 90],
+      ['x2.18.mp4', 2.18, 75], ['x2.23.mp4', 2.23, 60], ['x2.56.mp4', 2.56, 45],
+      ['x2.96.mp4', 2.96, 30], ['x3.63.mp4', 3.63, 18], ['x4.98.mp4', 4.98, 9],
+      ['x10.53.mp4', 10.53, 2],
+    ],
+    'chicken-road': [
+      ['x1.28.mp4', 1.28, 36, 2], ['x1.47.mp4', 1.47, 30, 3], ['x2.76.mp4', 2.76, 19, 4],
+      ['x4.03.mp4', 4.03, 10, 5], ['x6.91.mp4', 6.91, 5, 6],
+    ],
+    mines: [
+      ['Lose.mp4', null, 28, 'lose'], ['x1.14.mp4', 1.14, 28, 'win'], ['x1.33.mp4', 1.33, 21, 'win'],
+      ['x1.71.mp4', 1.71, 14, 'win'], ['x4.8.mp4', 4.8, 7, 'win'], ['x8.mp4', 8, 2, 'win'],
+    ],
+    'football-penalties': [
+      ['x1.02.mp4', 1.02, 32], ['x1.38.mp4', 1.38, 26], ['1.68.mp4', 1.68, 18],
+      ['x1.81.mp4', 1.81, 12], ['x2.6.mp4', 2.6, 8], ['x3.36.mp4', 3.36, 4],
+    ],
+  };
+  const VIDEO_GAMES = new Set(Object.keys(GAME_VIDEO_OUTCOMES));
   const LOCAL_GAME_ART = {
     aviator: {
       background: `${LOCAL_GAME_ROOT}/aviator/background.webp`,
@@ -674,7 +697,24 @@
     </div>`;
   }
 
-  function renderGameStage(game) { if (game === 'aviator') return renderAviatorStage(); if (game === 'chicken-road') return renderChickenStage(); if (game === 'apple-of-fortune') return renderAppleStage(); if (game === 'mines') return renderMinesStage(); return renderFootballStage(); }
+  function renderOutcomeVideoStage(game, runtime) {
+    const label = runtime.videoLabel || state.analysis?.video?.label || '';
+    return `<div class="visual-stage reference-game game-outcome-stage game-outcome-${game}" data-runtime-game="${game}" data-phase="video">
+      <video class="game-outcome-video" data-game-outcome-video data-runtime-token="${runtime.token}" autoplay muted playsinline preload="auto" aria-label="${escapeHTML(`${gameLabel(game)} · ${label}`)}">
+        <source src="${escapeHTML(runtime.videoSrc)}" type="video/mp4">
+      </video>
+    </div>`;
+  }
+
+  function renderGameStage(game) {
+    const runtime = runtimeFor(game);
+    if (VIDEO_GAMES.has(game) && runtime?.phase === 'video' && runtime.videoSrc) return renderOutcomeVideoStage(game, runtime);
+    if (game === 'aviator') return renderAviatorStage();
+    if (game === 'chicken-road') return renderChickenStage();
+    if (game === 'apple-of-fortune') return renderAppleStage();
+    if (game === 'mines') return renderMinesStage();
+    return renderFootballStage();
+  }
 
   function renderResult(analysis) {
     if (!analysis) return `<div class="result-empty"><span class="empty-mark">◎</span><p>${t('noHistory')}</p><small>${t('resultAppearsHere')}</small></div>`;
@@ -711,8 +751,8 @@
 
   function renderGameView(game) {
     if (game === 'apple-of-fortune') return renderAppleGameView();
-    const runtime = runtimeFor(game); const terminalFootball = game === 'football-penalties' && ['goal', 'save', 'miss'].includes(runtime?.phase);
-    return `<header class="workspace-header game-header"><div><p class="eyebrow">${t('games')} / ${String(games.indexOf(game) + 1).padStart(2, '0')}</p><h1>${gameLabel(game)}</h1><p class="lede">${t('gameIntro')}</p></div><div class="header-actions"><button class="game-exit-button" data-view="overview" type="button"><span class="game-exit-icon" aria-hidden="true">&#8592;</span>${t('backToHome')}</button></div></header><div class="content-width game-view"><div class="game-layout"><section class="game-stage"><div class="stage-topline"><div><span class="stage-index">0${games.indexOf(game) + 1}</span><span class="status-badge muted">РАУНД</span></div><span class="round-state" data-game-live-state aria-live="polite">${phaseLabel(runtime?.phase || 'ready')}</span></div>${renderGameStage(game)}${renderArtDebug()}</section><aside class="game-side"><section class="panel control-panel"><div class="panel-head"><div><p class="panel-kicker">${t('controlStack')}</p><h2>${t('gameStatus')}</h2></div><span class="status-dot"></span></div><div class="panel-body control-fields">${gameControls(game)}<button class="button button-primary button-full" data-analyze="${game}" type="button" ${state.busy ? 'disabled' : ''}>${state.busy ? t('analysisLoading') : t('getSignal')}</button><button class="button button-ghost button-full" data-copy="${game}" type="button" ${state.analysis?.game === game ? '' : 'disabled'}>${t('copyResult')}</button><p class="form-message" role="alert" aria-live="polite">${escapeHTML(state.message)}</p></div></section><section class="panel result-panel"><div class="panel-head"><div><p class="panel-kicker">${t('result')}</p><h2>${t('latestSignal')}</h2></div></div><div class="panel-body">${renderResult(state.analysis?.game === game ? state.analysis : null)}</div></section><section class="panel history-panel"><div class="panel-head"><div><p class="panel-kicker">${t('history')}</p><h3>${t('attempts')}</h3></div></div><div class="panel-body">${renderHistory()}</div></section></aside></div>${renderFooter()}</div>`;
+    const runtime = runtimeFor(game); const signalPlaying = runtime?.phase === 'video';
+    return `<header class="workspace-header game-header"><div><p class="eyebrow">${t('games')} / ${String(games.indexOf(game) + 1).padStart(2, '0')}</p><h1>${gameLabel(game)}</h1><p class="lede">${t('gameIntro')}</p></div><div class="header-actions"><button class="game-exit-button" data-view="overview" type="button"><span class="game-exit-icon" aria-hidden="true">&#8592;</span>${t('backToHome')}</button></div></header><div class="content-width game-view"><div class="game-layout"><section class="game-stage"><div class="stage-topline"><div><span class="stage-index">0${games.indexOf(game) + 1}</span><span class="status-badge muted">РАУНД</span></div><span class="round-state" data-game-live-state aria-live="polite">${signalPlaying ? 'СИГНАЛ' : phaseLabel(runtime?.phase || 'ready')}</span></div>${renderGameStage(game)}${renderArtDebug()}</section><aside class="game-side"><section class="panel control-panel"><div class="panel-head"><div><p class="panel-kicker">${t('controlStack')}</p><h2>${t('gameStatus')}</h2></div><span class="status-dot"></span></div><div class="panel-body control-fields">${gameControls(game)}<button class="button button-primary button-full" data-analyze="${game}" type="button" ${state.busy || signalPlaying ? 'disabled' : ''}>${state.busy || signalPlaying ? t('analysisLoading') : t('getSignal')}</button><button class="button button-ghost button-full" data-copy="${game}" type="button" ${state.analysis?.game === game ? '' : 'disabled'}>${t('copyResult')}</button><p class="form-message" role="alert" aria-live="polite">${escapeHTML(state.message)}</p></div></section><section class="panel result-panel"><div class="panel-head"><div><p class="panel-kicker">${t('result')}</p><h2>${t('latestSignal')}</h2></div></div><div class="panel-body">${renderResult(state.analysis?.game === game ? state.analysis : null)}</div></section><section class="panel history-panel"><div class="panel-head"><div><p class="panel-kicker">${t('history')}</p><h3>${t('attempts')}</h3></div></div><div class="panel-body">${renderHistory()}</div></section></aside></div>${renderFooter()}</div>`;
   }
 
   function renderActivityView() {
@@ -786,7 +826,7 @@
         result = { analysis: createGuestSignal(game, payload), activity: { player: state.player } };
       }
       state.analysis = result.analysis; state.player = result.activity?.player || state.player; state.busy = false; state.runtime = createSignalRuntime(game, result.analysis); render(); startSignalPlayback(game);
-      if (!state.guestMode) api(`/api/games/${game}/history`).then((history) => { state.history = history.history || []; if (state.view === 'game' && state.activeGame === game) render(); }).catch(() => {});
+      if (!state.guestMode) api(`/api/games/${game}/history`).then((history) => { state.history = history.history || []; if (state.view === 'game' && state.activeGame === game && runtimeFor(game)?.phase !== 'video') render(); }).catch(() => {});
     }
     catch (error) { state.busy = false; state.message = error.message; render(); }
   }
@@ -795,6 +835,23 @@
     const roll = Math.random(); let cursor = 0;
     for (const [value, weight] of entries) { cursor += weight; if (roll <= cursor) return value; }
     return entries[entries.length - 1][0];
+  }
+
+  function localVideoOutcome(game) {
+    const outcomes = GAME_VIDEO_OUTCOMES[game] || [];
+    const total = outcomes.reduce((sum, outcome) => sum + outcome[2], 0);
+    let roll = Math.random() * total;
+    const selected = outcomes.find((outcome) => { roll -= outcome[2]; return roll <= 0; }) || outcomes[outcomes.length - 1];
+    if (!selected) return null;
+    const [file, multiplier, , extra] = selected;
+    return {
+      src: `${GAME_VIDEO_ROOT}/${game}/${file}`,
+      file,
+      label: Number.isFinite(multiplier) ? `${multiplier}x` : 'LOSE',
+      multiplier,
+      outcome: game === 'mines' ? extra : 'win',
+      step: game === 'chicken-road' ? extra : null,
+    };
   }
 
   function localAccuracy(amount) {
@@ -818,11 +875,11 @@
   function createGuestSignal(game, payload) {
     const amount = Number(payload.amount) || 100;
     const base = { game, gameLabel: gameLabel(game), demo: true, mode: 'SIMULATED DATA', status: 'AI ANALYSIS', generatedAt: new Date().toISOString(), signalAmount: amount, accuracy: localAccuracy(amount), disclaimer: t('disclaimerText') };
-    if (game === 'aviator') { const multiplier = localAviatorMultiplier(); return { ...base, multiplier: `${multiplier.toFixed(2)}x`, countdown: 2 + Math.floor(Math.random() * 2), note: 'The generated signal is played locally.' }; }
-    if (game === 'chicken-road') { const multipliers = ['1.12x', '1.28x', '1.47x', '1.70x', '1.98x', '2.33x']; const targetStep = localWeighted([[1,.2],[2,.28],[3,.25],[4,.15],[5,.08],[6,.04]]); return { ...base, targetStep, safeSteps: Array.from({ length: targetStep }, (_, index) => index + 1), multiplier: multipliers[targetStep - 1], multipliers, note: 'The chicken follows the generated signal automatically.' }; }
+    if (game === 'aviator') { const video = localVideoOutcome(game); return { ...base, video, multiplier: `${Number(video.multiplier).toFixed(2)}x`, countdown: 2 + Math.floor(Math.random() * 2), note: 'The generated outcome video plays automatically.' }; }
+    if (game === 'chicken-road') { const video = localVideoOutcome(game); const targetStep = video.step; const multipliers = GAME_VIDEO_OUTCOMES[game].map((outcome) => `${outcome[1]}x`); return { ...base, video, targetStep, safeSteps: Array.from({ length: targetStep }, (_, index) => index + 1), multiplier: `${video.multiplier}x`, multipliers, note: 'The chicken follows the generated video signal automatically.' }; }
     if (game === 'apple-of-fortune') { const targetRow = localWeighted([[1,.2],[2,.22],[3,.2],[4,.15],[5,.1],[6,.06],[7,.04],[8,.02],[9,.008],[10,.002]]); return { ...base, targetRow, rows: APPLE_MULTIPLIERS.map((multiplier, index) => ({ level: index + 1, recommendedCell: 1 + Math.floor(Math.random() * 5), cells: [1,2,3,4,5], multiplier: `x${multiplier}` })), note: 'The generated signal opens the recommended path automatically.' }; }
-    if (game === 'mines') { const size = [16,25,36].includes(Number(payload.size)) ? Number(payload.size) : 25; const mines = Math.min(Math.max(Number(payload.mines) || 4, 1), Math.floor(size / 2)); const minePositions = localSample(size, mines); return { ...base, size, mines, minePositions, recommendedCells: localSample(size, Math.min(5, size - mines), new Set(minePositions)), note: 'Highlighted cells are a simulation aid, not a guaranteed route.' }; }
-    const recommendedZone = 1 + Math.floor(Math.random() * 5); const roll = Math.random(); const result = roll < .76 ? 'goal' : roll < .95 ? 'save' : 'miss'; return { ...base, zones: 5, role: 'striker', recommendedZone, direction: ['left','left-center','center','right-center','right'][recommendedZone - 1], result, outcome: result.toUpperCase(), note: 'The striker follows the generated shot signal automatically.' };
+    if (game === 'mines') { const video = localVideoOutcome(game); const size = [16,25,36].includes(Number(payload.size)) ? Number(payload.size) : 25; const mines = Math.min(Math.max(Number(payload.mines) || 4, 1), Math.floor(size / 2)); const minePositions = localSample(size, mines); return { ...base, video, size, mines, minePositions, recommendedCells: localSample(size, Math.min(5, size - mines), new Set(minePositions)), result: video.outcome, multiplier: video.multiplier ? `${video.multiplier}x` : null, note: 'The generated Mines outcome video plays automatically.' }; }
+    const video = localVideoOutcome(game); const recommendedZone = 1 + Math.floor(Math.random() * 5); return { ...base, video, zones: 5, role: 'striker', recommendedZone, direction: ['left','left-center','center','right-center','right'][recommendedZone - 1], result: 'goal', outcome: 'GOAL', multiplier: `${video.multiplier}x`, note: 'The striker follows the generated video signal automatically.' };
   }
 
   async function copyResult(game) {
@@ -872,6 +929,9 @@
   }
 
   function createSignalRuntime(game, analysis) {
+    if (VIDEO_GAMES.has(game) && analysis.video?.src) {
+      return { ...createReadyRuntime(game), token: Date.now(), phase: 'ready', videoSrc: analysis.video.src, videoLabel: analysis.video.label || '', videoOutcome: analysis.video.outcome || 'win' };
+    }
     if (game === 'aviator') return { game, token: Date.now(), phase: 'ready', multiplier: 1, targetMultiplier: Number.parseFloat(analysis.multiplier) || 1.25, progress: 0, takeoffProgress: 0, cruiseProgress: 0, startedAt: 0, timers: new Set() };
     if (game === 'chicken-road') return { ...createChickenRuntime(), targetStep: Number(analysis.targetStep || analysis.safeSteps?.length || 1), multiplier: 1 };
     if (game === 'apple-of-fortune') return createAppleSignalRuntime(analysis);
@@ -882,6 +942,12 @@
   function startSignalPlayback(game) {
     const runtime = runtimeFor(game);
     if (!runtime) return;
+    if (VIDEO_GAMES.has(game) && runtime.videoSrc) {
+      runtime.phase = 'video';
+      state.runtime = runtime;
+      render();
+      return;
+    }
     if (game === 'aviator') {
       runtime.phase = 'takeoff'; runtime.startedAt = performance.now(); render();
       state.sceneLoop.start((now) => tickSignalAviator(runtime.token, now));
@@ -1257,7 +1323,25 @@
   }
 
   function startDebugEffect(effect) { stopGameAnimation(); const sprites = createAtlasSet(); Object.values(sprites).forEach((player) => player.play()); state.debugRuntime = { token: Date.now(), effect, startedAt: performance.now(), sprites }; render(); state.sceneLoop.start((now) => tickDebug(state.debugRuntime?.token, now)); }
-  function hydrateSceneArt() { const now = performance.now(); drawAviatorScene(now); const runtime = runtimeFor('chicken-road'); if (runtime) { const chickenProgress = runtime.phase === 'jumping' ? Math.min(1, Math.max(0, (now - (runtime.motionStarted || now)) / 620)) : runtime.phase === 'fallen' ? Math.min(1, Math.max(0, (now - (runtime.motionStarted || now)) / 520)) : 1; hydrateChickenPose(runtime, chickenProgress); hydrateChickenAnimation(runtime, now); } const apple = runtimeFor('apple-of-fortune'); if (apple) { hydrateAppleAnimation(apple, now); hydrateAppleWinCelebration(); } const mines = runtimeFor('mines'); if (mines) hydrateMinesAnimation(mines, now); const football = runtimeFor('football-penalties'); if (football) { const footballProgress = football.phase === 'kick' ? Math.min(1, Math.max(0, (now - (football.motionStarted || now)) / 650)) : football.phase === 'reaction' ? Math.min(1, Math.max(0, (now - (football.resultStartedAt || now)) / 420)) : 1; hydrateFootballPose(football, footballProgress); } if (state.debugRuntime) drawDebugCanvas(now); }
+  function hydrateOutcomeVideo() {
+    const video = document.querySelector('[data-game-outcome-video]');
+    if (!video || video.dataset.bound === 'true') return;
+    const token = Number(video.dataset.runtimeToken);
+    video.dataset.bound = 'true';
+    const finish = (failed = false) => {
+      const runtime = runtimeFor(state.activeGame);
+      if (!runtime || runtime.token !== token || runtime.phase !== 'video') return;
+      runtime.phase = 'ready';
+      state.runtime = runtime;
+      if (failed) state.message = 'Не удалось загрузить видео сигнала.';
+      render();
+    };
+    video.addEventListener('ended', () => finish(false), { once: true });
+    video.addEventListener('error', () => finish(true), { once: true });
+    const playback = video.play();
+    if (playback?.catch) playback.catch(() => finish(true));
+  }
+  function hydrateSceneArt() { hydrateOutcomeVideo(); const now = performance.now(); drawAviatorScene(now); const runtime = runtimeFor('chicken-road'); if (runtime) { const chickenProgress = runtime.phase === 'jumping' ? Math.min(1, Math.max(0, (now - (runtime.motionStarted || now)) / 620)) : runtime.phase === 'fallen' ? Math.min(1, Math.max(0, (now - (runtime.motionStarted || now)) / 520)) : 1; hydrateChickenPose(runtime, chickenProgress); hydrateChickenAnimation(runtime, now); } const apple = runtimeFor('apple-of-fortune'); if (apple) { hydrateAppleAnimation(apple, now); hydrateAppleWinCelebration(); } const mines = runtimeFor('mines'); if (mines) hydrateMinesAnimation(mines, now); const football = runtimeFor('football-penalties'); if (football) { const footballProgress = football.phase === 'kick' ? Math.min(1, Math.max(0, (now - (football.motionStarted || now)) / 650)) : football.phase === 'reaction' ? Math.min(1, Math.max(0, (now - (football.resultStartedAt || now)) / 420)) : 1; hydrateFootballPose(football, footballProgress); } if (state.debugRuntime) drawDebugCanvas(now); }
   function drawCharts() { drawAviatorScene(); }
 
   function guestPlayer() {
