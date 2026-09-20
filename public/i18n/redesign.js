@@ -104,3 +104,18 @@ Object.assign(window.VERDANT_TRANSLATIONS.fr, { appleCashOut: 'Encaisser', apple
 Object.assign(window.VERDANT_TRANSLATIONS.it, { appleCashOut: 'Ritira', appleInsufficientBalance: 'Saldo insufficiente per questa puntata' });
 Object.assign(window.VERDANT_TRANSLATIONS.tr, { appleCashOut: 'Bakiyeyi al', appleInsufficientBalance: 'Bu bahis için yetersiz bakiye' });
 Object.assign(window.VERDANT_TRANSLATIONS.ar, { appleCashOut: 'سحب الرصيد', appleInsufficientBalance: 'الرصيد غير كافٍ لهذه الرهان' });
+
+Object.assign(window.VERDANT_TRANSLATIONS.en, {
+  getSignal: 'Get signal',
+  signalAmount: 'Amount for signal calculation',
+  signalAmountNote: 'Used only to calculate the displayed signal confidence. No bet is placed or charged.',
+  signalAccuracy: 'Signal confidence',
+  strikerOnlyNote: 'Striker mode only. The generated signal selects the shot automatically.',
+});
+Object.assign(window.VERDANT_TRANSLATIONS.ru, {
+  getSignal: 'Получить сигнал',
+  signalAmount: 'Сумма для расчёта сигнала',
+  signalAmountNote: 'Сумма влияет только на расчёт отображаемой точности. Ставка не размещается и не списывается.',
+  signalAccuracy: 'Точность сигнала',
+  strikerOnlyNote: 'Только режим нападающего. Зону удара выбирает и проигрывает сгенерированный сигнал.',
+});

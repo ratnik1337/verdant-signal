@@ -55,6 +55,46 @@ function parseGames(value) {
   }
 }
 
+function secureRandom() {
+  return crypto.randomInt(0, 1_000_000) / 1_000_000;
+}
+
+function randomBetween(min, max) {
+  return min + secureRandom() * (max - min);
+}
+
+function weightedChoice(entries) {
+  const roll = secureRandom();
+  let cursor = 0;
+  for (const [value, weight] of entries) {
+    cursor += weight;
+    if (roll <= cursor) return value;
+  }
+  return entries.at(-1)[0];
+}
+
+function calculateSignalAccuracy(amount) {
+  const normalized = Math.max(1, Math.min(1_000_000, Number(amount) || 100));
+  const curve = 82 + 15 * (1 - Math.exp(-normalized / 250));
+  return Math.max(82, Math.min(98, Math.round(curve + randomBetween(-1.6, 1.6))));
+}
+
+function weightedAviatorMultiplier() {
+  const band = weightedChoice([['low', 0.7], ['medium', 0.22], ['high', 0.07], ['rare', 0.01]]);
+  const ranges = { low: [1.05, 1.99], medium: [2, 4.99], high: [5, 9.99], rare: [10, 25] };
+  const [min, max] = ranges[band];
+  return Number(randomBetween(min, max).toFixed(2));
+}
+
+function sampleUnique(total, count, excluded = new Set()) {
+  const available = Array.from({ length: total }, (_, index) => index).filter((index) => !excluded.has(index));
+  for (let index = available.length - 1; index > 0; index -= 1) {
+    const swapIndex = crypto.randomInt(0, index + 1);
+    [available[index], available[swapIndex]] = [available[swapIndex], available[index]];
+  }
+  return available.slice(0, Math.max(0, Math.min(count, available.length)));
+}
+
 function safePlayer(row) {
   if (!row) return null;
   return {
@@ -193,32 +233,44 @@ function createServices({ db, countries, currencies, minWithdrawalMinor }) {
     const seed = crypto.createHash('sha256').update(`${playerId}:${game}:${utcDate()}`).digest('hex');
     const numericSeed = Number.parseInt(seed.slice(0, 8), 16);
     const zone = (numericSeed % 5) + 1;
+    const signalAmount = Math.max(1, Math.min(1_000_000, Number(input.amount) || 100));
+    const accuracy = calculateSignalAccuracy(signalAmount);
     const base = {
       game,
       gameLabel: GAME_LABELS[game],
+      demo: true,
       mode: 'SIMULATED DATA',
       status: 'AI ANALYSIS',
       generatedAt: nowIso(),
+      signalAmount,
+      accuracy,
       disclaimer: 'Pattern-based review only. No outcome is guaranteed.',
     };
     let analysis;
     if (game === 'aviator') {
-      analysis = { ...base, multiplier: `${(1.15 + (numericSeed % 75) / 100).toFixed(2)}x`, countdown: 8 + (numericSeed % 7), series: [1.18, 1.27, 1.45, 1.62, 1.33].map((value, index) => `${(value + ((numericSeed >> index) % 8) / 100).toFixed(2)}x`), note: 'The next round remains unknown.' };
+      const multiplier = weightedAviatorMultiplier();
+      analysis = { ...base, multiplier: `${multiplier.toFixed(2)}x`, countdown: 2 + crypto.randomInt(0, 2), series: Array.from({ length: 5 }, () => `${weightedAviatorMultiplier().toFixed(2)}x`), note: 'The next round remains unknown.' };
     } else if (game === 'chicken-road') {
-      const difficulty = ['calm', 'balanced', 'sharp'].includes(input.difficulty) ? input.difficulty : 'balanced';
-      analysis = { ...base, difficulty, safeSteps: [1, 2, 3], currentStep: 3, multiplier: difficulty === 'sharp' ? '1.62x' : difficulty === 'calm' ? '1.24x' : '1.38x', note: 'Each step is probabilistic. A suggested path is not a promise.' };
+      const multipliers = ['1.12x', '1.28x', '1.47x', '1.70x', '1.98x', '2.33x'];
+      const targetStep = weightedChoice([[1, 0.2], [2, 0.28], [3, 0.25], [4, 0.15], [5, 0.08], [6, 0.04]]);
+      analysis = { ...base, targetStep, safeSteps: Array.from({ length: targetStep }, (_, index) => index + 1), currentStep: targetStep, multiplier: multipliers[targetStep - 1], multipliers, note: 'The chicken follows the generated signal automatically.' };
     } else if (game === 'apple-of-fortune') {
       const APPLE_MULTIPLIERS = ['1.23', '1.54', '1.93', '2.41', '4.02', '6.71', '11.18', '27.97', '69.93', '349.68'];
     analysis = { ...base, rows: APPLE_MULTIPLIERS.map((multiplier, index) => ({ level: index + 1, recommendedCell: ((zone + index) % 5) + 1, cells: [1, 2, 3, 4, 5], multiplier: `x${multiplier}` })), note: 'One safe cell is shown for visual simulation; all outcomes remain uncertain.' };
     } else if (game === 'mines') {
       const size = [16, 25, 36].includes(Number(input.size)) ? Number(input.size) : 25;
       const mines = Math.min(Math.max(Number(input.mines) || 4, 1), Math.floor(size / 2));
-      analysis = { ...base, size, mines, recommendedCells: [0, zone, size - zone - 1].filter((item, index, list) => item >= 0 && item < size && list.indexOf(item) === index), mineIndicators: Array.from({ length: mines }, (_, index) => index + 1), note: 'Highlighted cells are a simulation aid, not a guaranteed route.' };
+      const minePositions = sampleUnique(size, mines);
+      const recommendedCells = sampleUnique(size, Math.min(5, size - mines), new Set(minePositions));
+      analysis = { ...base, size, mines, recommendedCells, minePositions, note: 'Highlighted cells are a simulation aid, not a guaranteed route.' };
     } else {
-      analysis = { ...base, zones: 5, recommendedZone: zone, direction: ['left', 'left-center', 'center', 'right-center', 'right'][zone - 1], goalkeeper: 'visualized', outcome: 'READ THE ANGLE', note: 'A directional read cannot determine the real kick outcome.' };
+      const recommendedZone = crypto.randomInt(1, 6);
+      const outcomeRoll = secureRandom();
+      const result = outcomeRoll < 0.76 ? 'goal' : outcomeRoll < 0.95 ? 'save' : 'miss';
+      analysis = { ...base, zones: 5, role: 'striker', recommendedZone, direction: ['left', 'left-center', 'center', 'right-center', 'right'][recommendedZone - 1], goalkeeper: 'visualized', outcome: result.toUpperCase(), result, note: 'The striker follows the generated shot signal automatically.' };
     }
     const stamp = nowIso();
-    const cleanInput = Object.fromEntries(Object.entries(input || {}).filter(([key, value]) => ['difficulty', 'size', 'mines'].includes(key) && ['string', 'number'].includes(typeof value)));
+    const cleanInput = Object.fromEntries(Object.entries(input || {}).filter(([key, value]) => ['difficulty', 'size', 'mines', 'amount'].includes(key) && ['string', 'number'].includes(typeof value)));
     const transaction = db.transaction(() => {
       db.prepare('INSERT INTO game_events (player_id, game, event_type, payload_json, created_at) VALUES (?, ?, ?, ?, ?)').run(playerId, game, 'analysis_requested', JSON.stringify({ input: cleanInput, mode: 'simulation' }), stamp);
       const result = db.prepare('INSERT INTO analysis_requests (player_id, game, request_json, result_json, created_at) VALUES (?, ?, ?, ?, ?)').run(playerId, game, JSON.stringify(cleanInput), JSON.stringify(analysis), stamp);

@@ -161,6 +161,29 @@ test('game analysis accepts the five supported games and rejects unknown games',
   assert.equal(unknown.status, 404);
 });
 
+test('signal analysis records the entered amount and returns playable local-game outcomes', async () => {
+  const app = makeApp();
+  const agent = await loginAndProfile(app, 'player-signals', 'ACCESS-SIGNALS');
+  const chicken = await agent.post('/api/games/chicken-road/analyze').send({ amount: 500 });
+  assert.equal(chicken.status, 200);
+  assert.equal(chicken.body.analysis.signalAmount, 500);
+  assert.ok(chicken.body.analysis.accuracy >= 82 && chicken.body.analysis.accuracy <= 98);
+  assert.ok(chicken.body.analysis.targetStep >= 1 && chicken.body.analysis.targetStep <= 6);
+  assert.equal(chicken.body.analysis.safeSteps.length, chicken.body.analysis.targetStep);
+
+  for (const size of [16, 25, 36]) {
+    const mines = await agent.post('/api/games/mines/analyze').send({ amount: 100, size, mines: 4 });
+    assert.equal(mines.status, 200);
+    assert.equal(mines.body.analysis.size, size);
+    assert.equal(mines.body.analysis.mines, 4);
+    assert.ok(mines.body.analysis.recommendedCells.every((cell) => !mines.body.analysis.minePositions.includes(cell)));
+  }
+
+  const football = await agent.post('/api/games/football-penalties/analyze').send({ amount: 100 });
+  assert.equal(football.body.analysis.role, 'striker');
+  assert.ok(['goal', 'save', 'miss'].includes(football.body.analysis.result));
+});
+
 test('admin auth and player detail never reveal access codes', async () => {
   const app = makeApp();
   const agent = await loginAndProfile(app, 'player-admin', 'ACCESS-SECRET');

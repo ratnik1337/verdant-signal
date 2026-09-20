@@ -132,3 +132,13 @@ Full audit against the extracted art pack, all 8 usable style/reference screensh
 - Changed the aircraft trajectory to monotonic eased travel with a smooth lift curve; there is no circular/orbiting motion or second position owner.
 - Moved the countdown to the lower-right corner as a compact visible semicircle. The eight markers remain in order with the eighth orange, and the white ball interpolates from one marker to the next once per second.
 - Final browser QA at 390×844 confirmed no aircraft in the countdown frame, visible corner ball/semicircle, `7,6,5,4,3,2,1,0`, phases `countdown → takeoff → flying → crash → ended`, no page errors, and clean flight/ended frames.
+
+## 2026-09-20 (local reference games and signal-only flow)
+
+- Created and pushed the immutable pre-change backup branch `codex/backup-pre-local-games-20260920` at commit `073d7ea4658fe18f23da658b48d32f28d38267dd` before changing the game clients.
+- Replaced the remote game iframes for Aviator, Chicken Road, Diamond Mines and Football Penalties with local scenes built from the supplied reference-client assets under `public/assets/local-games/`; Apple of Fortune was intentionally left unchanged.
+- Removed in-game stake, balance, cash-out and manual play controls from those four scenes. The host panel now accepts an amount only for signal-confidence calculation, waits about 2–3 seconds, then automatically plays the generated result.
+- Added weighted outcomes so high Aviator multipliers and long Chicken Road runs are rare, automatic mine-cell reveals, and automatic striker-only football shots. Football no longer exposes keeper mode.
+- Mines supports 4×4, 5×5 and 6×6 fields plus mine-count selection in the existing right-hand control panel. The reference Diamond Mines background, board, cell and gem art remain local and responsive.
+- Signal confidence uses the entered amount without charging or deducting it; formatting follows the profile currency. Guest sessions receive the same local demo flow when the protected analysis endpoint returns 401.
+- Desktop and mobile browser QA covered 390×844 and 412×915 layouts, all four automatic game flows, all Mines sizes, and the fixed striker role. Browser console reported 0 errors/warnings. `node --check public/app.js`, `node --check server/services.js`, and `npm test` passed (34/34).

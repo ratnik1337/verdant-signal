@@ -9,6 +9,34 @@
   const appleFallbackRows = () => APPLE_MULTIPLIERS.map((multiplier, index) => ({ level: index + 1, recommendedCell: (index % 5) + 1, multiplier: `x${multiplier}` }));
   const ART_ROOT = '/assets/verdant-artpack';
   const PACKAGE_ART_ROOT = '/assets/game-animations-ready/SourceArt';
+  const LOCAL_GAME_ROOT = '/assets/local-games';
+  const LOCAL_GAME_ART = {
+    aviator: {
+      background: `${LOCAL_GAME_ROOT}/aviator/background.webp`,
+      logo: `${LOCAL_GAME_ROOT}/aviator/logo.webp`,
+      planeAtlas: `${LOCAL_GAME_ROOT}/aviator/plane.webp`,
+    },
+    chicken: {
+      logo: `${LOCAL_GAME_ROOT}/chicken-road/logo.svg`,
+      idle: `${LOCAL_GAME_ROOT}/chicken-road/chicken-idle.png`,
+      jump: `${LOCAL_GAME_ROOT}/chicken-road/chicken-jump.png`,
+      dead: `${LOCAL_GAME_ROOT}/chicken-road/chicken-dead.png`,
+      decors: `${LOCAL_GAME_ROOT}/chicken-road/decors.png`,
+    },
+    mines: {
+      background: `${LOCAL_GAME_ROOT}/mines/background.jpg`,
+      logo: `${LOCAL_GAME_ROOT}/mines/logo.png`,
+      cell: `${LOCAL_GAME_ROOT}/mines/cell.png`,
+      gem: `${LOCAL_GAME_ROOT}/mines/gem.png`,
+      mine: `${LOCAL_GAME_ROOT}/mines/mine.png`,
+    },
+    football: {
+      background: `${LOCAL_GAME_ROOT}/football/background.jpg`,
+      logo: `${LOCAL_GAME_ROOT}/football/logo.png`,
+      goalkeeper: `${LOCAL_GAME_ROOT}/football/goalkeeper.png`,
+      ball: `${LOCAL_GAME_ROOT}/football/ball.png`,
+    },
+  };
   // The supplied Aviator launch/flight sheets are flattened composites with baked-in motion.
   // The scene must own position and rotation, otherwise the composite and the scene path fight.
   const AVIATOR_USE_FLATTENED_COMPOSITE = false;
@@ -111,6 +139,7 @@
     catalogs: null, player: null, guestMode: true, view: 'overview', activeGame: 'aviator', analysis: null,
     history: [], activePlayers: [], activity: null, busy: false, message: '', balanceMessage: '', minWithdrawalMinor: 10000,
     runtime: null, footballHistory: [], debugRuntime: null, sceneLoop: null, animationManifest: null,
+    signalAmounts: { aviator: 100, 'chicken-road': 100, mines: 100, 'football-penalties': 100 },
   };
 
   let locale = localStorage.getItem('verdant-locale') || 'ru';
@@ -398,10 +427,23 @@
       if (caption) caption.textContent = runtime.phase === 'countdown' ? `${t('countdown')}: ${runtime.countdown}` : 'РАУНД';
       if (liveState) liveState.textContent = phaseLabel(runtime.phase);
       if (startButton) { startButton.disabled = ['countdown', 'takeoff', 'flying'].includes(runtime.phase); startButton.textContent = runtime.phase === 'ended' ? t('nextRound') : t('startRound'); }
+      if (root) {
+        const progress = Math.max(0, Math.min(1, Number(runtime.progress) || 0));
+        root.style.setProperty('--flight-progress', progress);
+        const plane = root.querySelector('[data-aviator-plane]');
+        if (plane) {
+          const x = 7 + progress * 72;
+          const y = 13 + Math.pow(progress, 0.7) * 58;
+          plane.style.left = `${x}%`;
+          plane.style.bottom = `${y}%`;
+        }
+        const curve = root.querySelector('[data-aviator-curve]');
+        if (curve) curve.style.strokeDashoffset = String(100 - progress * 100);
+      }
     }
   }
   function phaseLabel(phase) {
-    return t({ ready: 'ready', countdown: 'countdownState', takeoff: 'takeoff', flying: 'flying', crash: 'crash', ended: 'roundEnded', jumping: 'jumping', safe: 'safeStep', fallen: 'stepFailed', opening: 'opening', mine: 'cellMine', goal: 'goal', save: 'save', miss: 'miss', kick: 'kick', reaction: 'kick' }[phase] || 'ready');
+    return t({ ready: 'ready', analyzing: 'analysisLoading', revealing: 'opening', revealed: 'roundEnded', countdown: 'countdownState', takeoff: 'takeoff', flying: 'flying', crash: 'crash', ended: 'roundEnded', jumping: 'jumping', safe: 'safeStep', fallen: 'stepFailed', opening: 'opening', mine: 'cellMine', goal: 'goal', save: 'save', miss: 'miss', kick: 'kick', reaction: 'kick' }[phase] || 'ready');
   }
 
   async function api(url, options = {}) {
@@ -461,14 +503,31 @@
   function renderFooter() { return `<footer class="statement-footer"><div><p>BETWINNER LINE / ${t('analysisEngine')} / ${t('simulatedData')}</p><div class="footer-links"><button class="text-link" data-legal="privacy" type="button">${t('legalPrivacy')}</button><button class="text-link" data-legal="terms" type="button">${t('legalTerms')}</button><button class="text-link" data-legal="responsible" type="button">${t('legalResponsible')}</button><button class="text-link" data-legal="disclaimer" type="button">${t('legalDisclaimer')}</button></div></div><p>${t('disclaimerText')}</p></footer>`; }
 
   function renderAviatorStage() {
-    const isMobileViewport = typeof window !== 'undefined' && window.innerWidth <= 780;
-    const aviatorUrl = `https://gx-games-54rg78cw-tralt14.click/fg-aviashow-client/game/?activeGameId=0&partnerId=2695&token=&playerId=0&culture=en&isDemo=true&isMobile=${isMobileViewport}&referer=&isFeatureMessagePackEnabled=true&isMessagePackEnabled=false&backUrl=gx-games-54rg78cw-tralt14.click/fg-aviashow-api&gameKindName=AviaShow&gameTypeName=AviaShow&mode=2&partnerPlayerId=`;
-    return `<div class="visual-stage external-game-stage aviator-embed-stage" data-runtime-game="aviator"><iframe class="external-game-embed" src="${aviatorUrl}" title="Aviator game" referrerpolicy="no-referrer" allow="fullscreen; autoplay; gamepad" loading="eager"></iframe></div>`;
+    const runtime = runtimeFor('aviator') || createReadyRuntime('aviator');
+    const progress = Math.max(0, Math.min(1, Number(runtime.progress) || 0));
+    const multiplier = Number(runtime.multiplier || 1).toFixed(2);
+    return `<div class="visual-stage reference-game reference-aviator" data-runtime-game="aviator" data-phase="${escapeHTML(runtime.phase)}" style="--flight-progress:${progress}">
+      <img class="reference-aviator-logo" src="${LOCAL_GAME_ART.aviator.logo}" alt="AviaShow">
+      <div class="reference-aviator-history" aria-hidden="true"><span>1.38x</span><span>1.57x</span><span>1.71x</span><span>4.36x</span><span>2.48x</span><span>1.73x</span><span>14.00x</span></div>
+      <svg class="reference-aviator-curve" viewBox="0 0 1000 560" preserveAspectRatio="none" aria-hidden="true"><path data-aviator-curve pathLength="100" d="M 8 530 C 210 526, 250 480, 330 390 S 520 215, 790 95"></path></svg>
+      <div class="reference-aviator-plane" data-aviator-plane aria-hidden="true"><span class="reference-plane-crop"></span><i class="reference-plane-propeller"></i></div>
+      <div class="reference-aviator-readout"><strong data-runtime-multiplier>${multiplier}x</strong><span data-runtime-state>${phaseLabel(runtime.phase)}</span></div>
+      <div class="reference-aviator-ready" data-aviator-ready>${runtime.phase === 'ready' ? 'GET SIGNAL TO START' : ''}</div>
+    </div>`;
   }
 
   function renderChickenStage() {
-    const chickenUrl = 'https://chicken-road-stage.inoutgames.dev/api/modes/game?gameMode=chicken-road&operatorId=1a1233dd-527d-472a-a5d9-f3d816550d15&authToken=e1405a2945d7e42111f20dfa62717753760b738c5599f17d1dde7e21353004e05238e12d04fe0e5ed1f7846257e59f6fbc3ab152b59d482f7b8671494daf14e3&currency=USD&lang=en&_enableCanvasTestGrid=1&theme=&lobbyUrl=';
-    return `<div class="visual-stage external-game-stage" data-runtime-game="chicken-road"><iframe class="external-game-embed" src="${chickenUrl}" title="Chicken Road game" referrerpolicy="no-referrer" allow="fullscreen; autoplay; gamepad" loading="eager"></iframe></div>`;
+    const runtime = runtimeFor('chicken-road') || createChickenRuntime();
+    const multipliers = ['1.12x', '1.28x', '1.47x', '1.70x', '1.98x', '2.33x'];
+    const step = Math.max(0, Math.min(6, Number(runtime.step) || 0));
+    const target = Math.max(1, Math.min(6, Number(runtime.targetStep || state.analysis?.targetStep) || 1));
+    const medals = multipliers.map((value, index) => { const lane = index + 1; const stateClass = lane < step ? 'is-used' : lane === step ? 'is-current' : lane === target && runtime.phase === 'ended' ? 'is-current' : ''; return `<div class="reference-road-lane ${stateClass}"><span class="reference-road-medal">${value}</span><i class="reference-road-grate"></i></div>`; }).join('');
+    const sprite = runtime.phase === 'jumping' ? LOCAL_GAME_ART.chicken.jump : runtime.phase === 'fallen' ? LOCAL_GAME_ART.chicken.dead : LOCAL_GAME_ART.chicken.idle;
+    return `<div class="visual-stage reference-game reference-chicken" data-runtime-game="chicken-road" data-phase="${escapeHTML(runtime.phase)}" data-step="${step}" style="--chicken-step:${step}">
+      <header class="reference-chicken-bar"><img src="${LOCAL_GAME_ART.chicken.logo}" alt="Chicken Road"><span>LIVE WINS <b>•</b> ONLINE</span></header>
+      <div class="reference-road-scene"><div class="reference-road-lanes">${medals}</div><div class="reference-chicken-actor" data-chicken-actor style="--chicken-sprite:url('${sprite}')"><span></span></div></div>
+      <div class="reference-chicken-result"><span>${step ? `${multipliers[step - 1]} · ${phaseLabel(runtime.phase)}` : 'WAITING FOR SIGNAL'}</span></div>
+    </div>`;
   }
 
   function renderChickenStageLegacy() {
@@ -569,13 +628,30 @@
   }
 
   function renderMinesStage() {
-    const minesGameUrl = 'https://democasino.betsoftgaming.com/cwguestlogin.do?bankId=675&CDN=AUTO&gameId=959';
-    return `<div class="visual-stage mines-stage mines-embedded-stage" data-runtime-game="mines"><iframe class="mines-game-embed" src="${minesGameUrl}" title="Mines casino game" referrerpolicy="no-referrer" allow="fullscreen; autoplay" loading="eager"></iframe></div>`;
+    const runtime = runtimeFor('mines') || createMineRuntime();
+    const size = [16, 25, 36].includes(Number(runtime.size)) ? Number(runtime.size) : 25;
+    const columns = Math.sqrt(size);
+    const revealed = new Set(runtime.revealedCells || []);
+    const recommended = new Set(state.analysis?.game === 'mines' ? state.analysis.recommendedCells || [] : []);
+    const cells = Array.from({ length: size }, (_, index) => `<div class="reference-mine-cell ${revealed.has(index) ? 'is-safe' : ''} ${recommended.has(index) && runtime.phase === 'ready' ? 'is-suggested' : ''}" aria-label="${t('cell')} ${index + 1}"><span class="reference-mine-tile"></span>${revealed.has(index) ? '<i class="reference-mine-gem"></i>' : ''}</div>`).join('');
+    return `<div class="visual-stage reference-game reference-mines" data-runtime-game="mines" data-phase="${escapeHTML(runtime.phase)}">
+      <img class="reference-mines-logo" src="${LOCAL_GAME_ART.mines.logo}" alt="Diamond Mines">
+      <div class="reference-mines-board" style="--mine-columns:${columns}">${cells}</div>
+      <div class="reference-mines-status"><span>${columns} × ${columns}</span><strong>${runtime.phase === 'revealed' ? `${revealed.size} SAFE` : phaseLabel(runtime.phase)}</strong></div>
+    </div>`;
   }
 
   function renderFootballStage() {
-    const footballGameUrl = 'https://staging-mines-ui.s3-eu-west-1.amazonaws.com/index.html?game_code=football_miner_94&platform=desktop&play_for_fun=true&casino_token=gamingcorps&currency=EUR&language=en&config=games/football-miner/config.json';
-    return `<div class="visual-stage football-stage football-embedded-stage" data-runtime-game="football-penalties"><iframe class="football-game-embed" src="${footballGameUrl}" title="Football penalty casino game" referrerpolicy="no-referrer" allow="fullscreen; autoplay" loading="eager"></iframe></div>`;
+    const runtime = runtimeFor('football-penalties') || createFootballRuntime();
+    const zone = Math.max(1, Math.min(5, Number(runtime.shotZone || state.analysis?.recommendedZone) || 3));
+    const zones = Array.from({ length: 5 }, (_, index) => `<span class="reference-goal-zone ${index + 1 === zone && runtime.phase !== 'ready' ? 'is-target' : ''}">${index + 1}</span>`).join('');
+    return `<div class="visual-stage reference-game reference-football" data-runtime-game="football-penalties" data-phase="${escapeHTML(runtime.phase)}" data-zone="${zone}">
+      <img class="reference-football-logo" src="${LOCAL_GAME_ART.football.logo}" alt="Penalty Champion">
+      <div class="reference-scoreboard"><span>STRIKER</span><strong>${runtime.score || 0} : 0</strong></div>
+      <div class="reference-goal"><div class="reference-net"></div><div class="reference-goal-zones">${zones}</div><div class="reference-keeper" aria-hidden="true"></div></div>
+      <div class="reference-ball" aria-hidden="true"></div>
+      <div class="reference-football-status">${runtime.phase === 'ready' ? 'WAITING FOR SIGNAL' : phaseLabel(runtime.phase)}</div>
+    </div>`;
   }
 
   function renderGameStage(game) { if (game === 'aviator') return renderAviatorStage(); if (game === 'chicken-road') return renderChickenStage(); if (game === 'apple-of-fortune') return renderAppleStage(); if (game === 'mines') return renderMinesStage(); return renderFootballStage(); }
@@ -583,7 +659,9 @@
   function renderResult(analysis) {
     if (!analysis) return `<div class="result-empty"><span class="empty-mark">◎</span><p>${t('noHistory')}</p><small>${t('resultAppearsHere')}</small></div>`;
     const details = analysis.game === 'aviator' ? `${t('multiplier')}: ${analysis.multiplier} · ${t('countdown')}: ${analysis.countdown}s` : analysis.game === 'chicken-road' ? `${t('safeSteps')}: ${analysis.safeSteps.join(', ')} · ${t('multiplier')}: ${analysis.multiplier}` : analysis.game === 'apple-of-fortune' ? `${t('rows')}: ${analysis.rows.length} · ${t('safeCell')}: ${analysis.rows[0].recommendedCell}` : analysis.game === 'mines' ? `${t('fieldSize')}: ${analysis.size} · ${t('mineCount')}: ${analysis.mines}` : `${t('shotZones')}: ${analysis.zones} · ${t('direction')}: ${analysis.direction}`;
-    return `<h3>${t('latestSignal')}</h3><p class="result-detail">${escapeHTML(details)}</p><p>${escapeHTML(analysis.note || analysis.disclaimer)}</p><div class="result-stamp">${t('demoAnalysis')} / ${t('simulatedData')}</div><div class="analysis-actions"><button class="button button-ghost" data-copy="${analysis.game}" type="button">${t('copyResult')}</button></div>`;
+    const amount = Number(analysis.signalAmount || 0);
+    const amountText = amount > 0 ? formatMoney(amount * (10 ** Number(state.player?.currencyFractionDigits ?? 2))) : '';
+    return `<h3>${t('latestSignal')}</h3>${Number.isFinite(Number(analysis.accuracy)) ? `<div class="signal-accuracy"><span>${t('signalAccuracy')}</span><strong>${Number(analysis.accuracy)}%</strong></div>` : ''}<p class="result-detail">${escapeHTML(details)}</p>${amountText ? `<p class="signal-amount-result">${t('signalAmount')}: <strong>${escapeHTML(amountText)}</strong></p>` : ''}<p>${escapeHTML(analysis.note || analysis.disclaimer)}</p><div class="result-stamp">${t('demoAnalysis')} / ${t('simulatedData')}</div><div class="analysis-actions"><button class="button button-ghost" data-copy="${analysis.game}" type="button">${t('copyResult')}</button></div>`;
   }
 
   function renderHistory() {
@@ -592,10 +670,12 @@
   }
 
   function gameControls(game) {
-    if (game === 'chicken-road') return `<label for="difficulty">${t('difficulty')}<select id="difficulty"><option value="calm">${t('calm')}</option><option value="balanced" selected>${t('balanced')}</option><option value="sharp">${t('sharp')}</option></select></label><div class="control-note">${t('probabilisticNote')}</div>`;
-    if (game === 'mines') { const runtime = runtimeFor(game); const active = runtime?.phase === 'analyzing'; return `<label for="mine-size">${t('fieldSize')}<select id="mine-size" ${active ? 'disabled' : ''}><option value="16">4 × 4</option><option value="25" ${Number(runtime?.size || 25) === 25 ? 'selected' : ''}>5 × 5</option><option value="36" ${Number(runtime?.size || 25) === 36 ? 'selected' : ''}>6 × 6</option></select></label><label for="mine-count">${t('mineCount')}<select id="mine-count" ${active ? 'disabled' : ''}><option ${Number(runtime?.mines || 4) === 3 ? 'selected' : ''}>3</option><option ${Number(runtime?.mines || 4) === 4 ? 'selected' : ''}>4</option><option ${Number(runtime?.mines || 4) === 6 ? 'selected' : ''}>6</option><option ${Number(runtime?.mines || 4) === 8 ? 'selected' : ''}>8</option></select></label><div class="control-note">${t('mineNote')}</div>`; }
-    if (game === 'football-penalties') { const runtime = runtimeFor(game); return `<label for="football-role">${t('role')}<select id="football-role" ${runtime?.phase && runtime.phase !== 'ready' ? 'disabled' : ''}><option value="striker" ${(runtime?.role || 'striker') === 'striker' ? 'selected' : ''}>${t('striker')}</option><option value="keeper" ${runtime?.role === 'keeper' ? 'selected' : ''}>${t('keeper')}</option></select></label><div class="control-note">${t('signalOnlyNote')}</div>`; }
-    const runtime = runtimeFor(game); return `<div class="aviator-control-grid"><div class="aviator-live-badge"><span class="status-dot"></span><strong data-runtime-state>${phaseLabel(runtime?.phase || 'ready')}</strong><small>${t('liveRoundHint')}</small></div></div><div class="control-note">${t('aviatorRoundNote')}</div>`;
+    const runtime = runtimeFor(game);
+    const amount = Math.max(1, Number(state.signalAmounts[game]) || 100);
+    const amountControl = `<label for="signal-amount">${t('signalAmount')}<div class="signal-amount-field"><input id="signal-amount" type="number" inputmode="decimal" min="1" max="1000000" step="1" value="${amount}"><span>${escapeHTML(state.player?.currencyCode || '')}</span></div></label>`;
+    if (game === 'mines') { const active = state.busy || runtime?.phase === 'revealing'; return `${amountControl}<label for="mine-size">${t('fieldSize')}<select id="mine-size" ${active ? 'disabled' : ''}><option value="16" ${Number(runtime?.size || 25) === 16 ? 'selected' : ''}>4 × 4</option><option value="25" ${Number(runtime?.size || 25) === 25 ? 'selected' : ''}>5 × 5</option><option value="36" ${Number(runtime?.size || 25) === 36 ? 'selected' : ''}>6 × 6</option></select></label><label for="mine-count">${t('mineCount')}<select id="mine-count" ${active ? 'disabled' : ''}><option ${Number(runtime?.mines || 4) === 3 ? 'selected' : ''}>3</option><option ${Number(runtime?.mines || 4) === 4 ? 'selected' : ''}>4</option><option ${Number(runtime?.mines || 4) === 6 ? 'selected' : ''}>6</option><option ${Number(runtime?.mines || 4) === 8 ? 'selected' : ''}>8</option></select></label><div class="control-note">${t('signalAmountNote')}</div>`; }
+    if (game === 'football-penalties') return `${amountControl}<div class="fixed-role"><span>${t('role')}</span><strong>${t('striker')}</strong></div><div class="control-note">${t('strikerOnlyNote')}</div>`;
+    return `${amountControl}<div class="signal-state-card"><span class="status-dot"></span><strong data-runtime-state>${phaseLabel(runtime?.phase || 'ready')}</strong><small>${t('signalAmountNote')}</small></div>`;
   }
 
   function debugEffectButtons() {
@@ -612,7 +692,7 @@
   function renderGameView(game) {
     if (game === 'apple-of-fortune') return renderAppleGameView();
     const runtime = runtimeFor(game); const terminalFootball = game === 'football-penalties' && ['goal', 'save', 'miss'].includes(runtime?.phase);
-    return `<header class="workspace-header game-header"><div><p class="eyebrow">${t('games')} / ${String(games.indexOf(game) + 1).padStart(2, '0')}</p><h1>${gameLabel(game)}</h1><p class="lede">${t('gameIntro')}</p></div><div class="header-actions"><button class="game-exit-button" data-view="overview" type="button"><span class="game-exit-icon" aria-hidden="true">&#8592;</span>${t('backToHome')}</button></div></header><div class="content-width game-view"><div class="game-layout"><section class="game-stage"><div class="stage-topline"><div><span class="stage-index">0${games.indexOf(game) + 1}</span><span class="status-badge muted">РАУНД</span></div><span class="round-state" data-game-live-state aria-live="polite">${phaseLabel(runtime?.phase || 'ready')}</span></div>${renderGameStage(game)}<div class="game-action-row">${game === 'aviator' ? `<button class="button button-primary" data-game-action="aviator-start" type="button" ${runtime && ['countdown', 'takeoff', 'flying'].includes(runtime.phase) ? 'disabled' : ''}>${runtime?.phase === 'ended' ? t('getSignal') : t('startRound')}</button>` : game === 'chicken-road' ? `<button class="button button-primary" data-game-action="chicken-step" type="button" ${runtime?.phase === 'jumping' || runtime?.phase === 'fallen' || runtime?.step >= 5 ? 'disabled' : ''}>${t('jumpStep')}</button><button class="button button-ghost" data-game-action="chicken-reset" type="button">${t('resetRoad')}</button>` : game === 'apple-of-fortune' ? `<button class="button button-ghost" data-game-action="apple-reset" type="button">${t('resetBoard')}</button>` : game === 'mines' ? `<button class="button button-primary" data-game-action="mine-start" type="button" ${runtime?.phase === 'analyzing' ? 'disabled' : ''}>${runtime?.phase === 'analyzing' ? t('analyzingSignal') : t('getSignal')}</button><button class="button button-ghost" data-game-action="mine-reset" type="button">${t('resetField')}</button>` : `<button class="button button-primary" data-game-action="${terminalFootball ? 'football-next' : 'football-run'}" type="button" ${runtime?.phase === 'kick' || runtime?.phase === 'reaction' ? 'disabled' : ''}>${terminalFootball ? t('nextRound') : t('runPenalty')}</button><button class="button button-ghost" data-game-action="football-rules" type="button">${t('rules')}</button>`}</div>${renderArtDebug()}</section><aside class="game-side"><section class="panel control-panel"><div class="panel-head"><div><p class="panel-kicker">${t('controlStack')}</p><h2>${t('gameStatus')}</h2></div><span class="status-dot"></span></div><div class="panel-body control-fields">${gameControls(game)}<button class="button button-primary button-full" data-analyze="${game}" type="button" ${state.busy ? 'disabled' : ''}>${state.busy ? t('analysisLoading') : t('getAnalysis')}</button><button class="button button-ghost button-full" data-copy="${game}" type="button" ${state.analysis?.game === game ? '' : 'disabled'}>${t('copyResult')}</button><p class="form-message" role="alert" aria-live="polite">${escapeHTML(state.message)}</p></div></section><section class="panel result-panel"><div class="panel-head"><div><p class="panel-kicker">${t('result')}</p><h2>${t('latestSignal')}</h2></div></div><div class="panel-body">${renderResult(state.analysis?.game === game ? state.analysis : null)}</div></section><section class="panel history-panel"><div class="panel-head"><div><p class="panel-kicker">${t('history')}</p><h3>${t('attempts')}</h3></div></div><div class="panel-body">${game === 'football-penalties' && state.footballHistory.length ? `<div class="history-list">${state.footballHistory.map((item) => `<div class="history-item"><strong>${phaseLabel(item.result)}</strong><span>${item.role === 'striker' ? t('striker') : t('keeper')} · ${item.zone} · ${formatMoney(item.stake, { currencyFractionDigits: 0, currencyCode: 'RUB' })}</span></div>`).join('')}</div>` : renderHistory()}</div></section></aside></div>${renderFooter()}</div>`;
+    return `<header class="workspace-header game-header"><div><p class="eyebrow">${t('games')} / ${String(games.indexOf(game) + 1).padStart(2, '0')}</p><h1>${gameLabel(game)}</h1><p class="lede">${t('gameIntro')}</p></div><div class="header-actions"><button class="game-exit-button" data-view="overview" type="button"><span class="game-exit-icon" aria-hidden="true">&#8592;</span>${t('backToHome')}</button></div></header><div class="content-width game-view"><div class="game-layout"><section class="game-stage"><div class="stage-topline"><div><span class="stage-index">0${games.indexOf(game) + 1}</span><span class="status-badge muted">РАУНД</span></div><span class="round-state" data-game-live-state aria-live="polite">${phaseLabel(runtime?.phase || 'ready')}</span></div>${renderGameStage(game)}${renderArtDebug()}</section><aside class="game-side"><section class="panel control-panel"><div class="panel-head"><div><p class="panel-kicker">${t('controlStack')}</p><h2>${t('gameStatus')}</h2></div><span class="status-dot"></span></div><div class="panel-body control-fields">${gameControls(game)}<button class="button button-primary button-full" data-analyze="${game}" type="button" ${state.busy ? 'disabled' : ''}>${state.busy ? t('analysisLoading') : t('getSignal')}</button><button class="button button-ghost button-full" data-copy="${game}" type="button" ${state.analysis?.game === game ? '' : 'disabled'}>${t('copyResult')}</button><p class="form-message" role="alert" aria-live="polite">${escapeHTML(state.message)}</p></div></section><section class="panel result-panel"><div class="panel-head"><div><p class="panel-kicker">${t('result')}</p><h2>${t('latestSignal')}</h2></div></div><div class="panel-body">${renderResult(state.analysis?.game === game ? state.analysis : null)}</div></section><section class="panel history-panel"><div class="panel-head"><div><p class="panel-kicker">${t('history')}</p><h3>${t('attempts')}</h3></div></div><div class="panel-body">${renderHistory()}</div></section></aside></div>${renderFooter()}</div>`;
   }
 
   function renderActivityView() {
@@ -669,10 +749,59 @@
   }
 
   async function requestAnalysis(game) {
-    const payload = {}; if (game === 'chicken-road') payload.difficulty = document.getElementById('difficulty')?.value || 'balanced'; if (game === 'mines') { payload.size = Number(document.getElementById('mine-size')?.value || 25); payload.mines = Number(document.getElementById('mine-count')?.value || 4); }
-    stopGameAnimation(); state.busy = true; state.message = ''; render();
-    try { const result = await api(`/api/games/${game}/analyze`, { method: 'POST', body: payload }); state.analysis = result.analysis; state.player = result.activity.player; state.busy = false; state.runtime = createReadyRuntime(game); const history = await api(`/api/games/${game}/history`); state.history = history.history || []; render(); }
+    const amount = Math.max(1, Math.min(1000000, Number(document.getElementById('signal-amount')?.value || state.signalAmounts[game] || 100)));
+    const payload = { amount };
+    state.signalAmounts[game] = amount;
+    if (game === 'mines') { payload.size = Number(document.getElementById('mine-size')?.value || 25); payload.mines = Number(document.getElementById('mine-count')?.value || 4); }
+    stopGameAnimation();
+    state.runtime = createReadyRuntime(game);
+    if (game === 'mines') { state.runtime.size = payload.size; state.runtime.mines = payload.mines; }
+    state.busy = true; state.message = ''; render();
+    const thinkingDelay = reducedMotion() ? 300 : 2100 + Math.floor(Math.random() * 900);
+    try {
+      const request = api(`/api/games/${game}/analyze`, { method: 'POST', body: payload }).catch((requestError) => ({ requestError }));
+      let [result] = await Promise.all([request, new Promise((resolve) => window.setTimeout(resolve, thinkingDelay))]);
+      if (result.requestError) {
+        if (result.requestError.status !== 401) throw result.requestError;
+        result = { analysis: createGuestSignal(game, payload), activity: { player: state.player } };
+      }
+      state.analysis = result.analysis; state.player = result.activity?.player || state.player; state.busy = false; state.runtime = createSignalRuntime(game, result.analysis); render(); startSignalPlayback(game);
+      if (!state.guestMode) api(`/api/games/${game}/history`).then((history) => { state.history = history.history || []; if (state.view === 'game' && state.activeGame === game) render(); }).catch(() => {});
+    }
     catch (error) { state.busy = false; state.message = error.message; render(); }
+  }
+
+  function localWeighted(entries) {
+    const roll = Math.random(); let cursor = 0;
+    for (const [value, weight] of entries) { cursor += weight; if (roll <= cursor) return value; }
+    return entries[entries.length - 1][0];
+  }
+
+  function localAccuracy(amount) {
+    const normalized = Math.max(1, Math.min(1000000, Number(amount) || 100));
+    return Math.max(82, Math.min(98, Math.round(82 + 15 * (1 - Math.exp(-normalized / 250)) + (Math.random() * 3.2 - 1.6))));
+  }
+
+  function localAviatorMultiplier() {
+    const band = localWeighted([['low', .7], ['medium', .22], ['high', .07], ['rare', .01]]);
+    const ranges = { low: [1.05, 1.99], medium: [2, 4.99], high: [5, 9.99], rare: [10, 25] };
+    const [min, max] = ranges[band];
+    return Number((min + Math.random() * (max - min)).toFixed(2));
+  }
+
+  function localSample(total, count, excluded = new Set()) {
+    const values = Array.from({ length: total }, (_, index) => index).filter((index) => !excluded.has(index));
+    for (let index = values.length - 1; index > 0; index -= 1) { const swap = Math.floor(Math.random() * (index + 1)); [values[index], values[swap]] = [values[swap], values[index]]; }
+    return values.slice(0, Math.min(count, values.length));
+  }
+
+  function createGuestSignal(game, payload) {
+    const amount = Number(payload.amount) || 100;
+    const base = { game, gameLabel: gameLabel(game), demo: true, mode: 'SIMULATED DATA', status: 'AI ANALYSIS', generatedAt: new Date().toISOString(), signalAmount: amount, accuracy: localAccuracy(amount), disclaimer: t('disclaimerText') };
+    if (game === 'aviator') { const multiplier = localAviatorMultiplier(); return { ...base, multiplier: `${multiplier.toFixed(2)}x`, countdown: 2 + Math.floor(Math.random() * 2), note: 'The generated signal is played locally.' }; }
+    if (game === 'chicken-road') { const multipliers = ['1.12x', '1.28x', '1.47x', '1.70x', '1.98x', '2.33x']; const targetStep = localWeighted([[1,.2],[2,.28],[3,.25],[4,.15],[5,.08],[6,.04]]); return { ...base, targetStep, safeSteps: Array.from({ length: targetStep }, (_, index) => index + 1), multiplier: multipliers[targetStep - 1], multipliers, note: 'The chicken follows the generated signal automatically.' }; }
+    if (game === 'mines') { const size = [16,25,36].includes(Number(payload.size)) ? Number(payload.size) : 25; const mines = Math.min(Math.max(Number(payload.mines) || 4, 1), Math.floor(size / 2)); const minePositions = localSample(size, mines); return { ...base, size, mines, minePositions, recommendedCells: localSample(size, Math.min(5, size - mines), new Set(minePositions)), note: 'Highlighted cells are a simulation aid, not a guaranteed route.' }; }
+    const recommendedZone = 1 + Math.floor(Math.random() * 5); const roll = Math.random(); const result = roll < .76 ? 'goal' : roll < .95 ? 'save' : 'miss'; return { ...base, zones: 5, role: 'striker', recommendedZone, direction: ['left','left-center','center','right-center','right'][recommendedZone - 1], result, outcome: result.toUpperCase(), note: 'The striker follows the generated shot signal automatically.' };
   }
 
   async function copyResult(game) {
@@ -691,30 +820,12 @@
   function bindLegalLinks() { document.querySelectorAll('[data-legal]').forEach((button) => button.addEventListener('click', () => openLegal(button.dataset.legal))); }
   function bindDialogClose() { document.querySelector('[data-close-dialog]')?.addEventListener('click', () => document.getElementById('legal-dialog')?.close()); }
 
-  const LIVE_GAME_URL = 'https://betwinner-72427.pro/games-frame/games/373?co=1&cu=1&lg=ru&wh=55&tzo=3';
-  function openGameFrame() {
-    let dialog = document.getElementById('game-frame-dialog');
-    if (!dialog) {
-      dialog = document.createElement('dialog');
-      dialog.id = 'game-frame-dialog';
-      dialog.className = 'game-frame-dialog';
-      dialog.innerHTML = `<button class="dialog-close" data-close-frame type="button" aria-label="${t('close')}">×</button><div class="game-frame-head"><span class="game-frame-title">Betwinner Live</span></div><iframe class="game-frame-embed" title="Betwinner Live" allow="autoplay; fullscreen; payment" allowfullscreen referrerpolicy="no-referrer"></iframe>`;
-      document.body.appendChild(dialog);
-      dialog.querySelector('[data-close-frame]').addEventListener('click', () => dialog.close());
-      dialog.addEventListener('close', () => { const frame = dialog.querySelector('iframe'); if (frame) frame.src = 'about:blank'; });
-      dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
-    }
-    dialog.querySelector('iframe').src = LIVE_GAME_URL;
-    dialog.showModal();
-  }
-
   function scrollWorkspaceToTop() { window.scrollTo(0, 0); document.querySelector('.workspace-main')?.scrollTo?.(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }
 
   function bindShell() {
   document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', async (event) => { event.preventDefault(); stopGameAnimation(); state.view = button.dataset.view; state.message = ''; scrollWorkspaceToTop(); if (state.view === 'activity') await refreshActivity(); else render(); }));
   document.querySelectorAll('[data-game]').forEach((button) => button.addEventListener('click', () => openGame(button.dataset.game)));
     document.querySelectorAll('[data-auth-action]').forEach((button) => button.addEventListener('click', () => openAuthModal(button.dataset.authAction)));
-    document.querySelectorAll('[data-game-frame]').forEach((button) => button.addEventListener('click', () => openGameFrame()));
     document.querySelectorAll('[data-analyze]').forEach((button) => button.addEventListener('click', () => requestAnalysis(button.dataset.analyze)));
     document.querySelectorAll('[data-copy]').forEach((button) => button.addEventListener('click', () => copyResult(button.dataset.copy)));
     document.querySelectorAll('.language-select, .rail-language').forEach((select) => select.addEventListener('change', () => { locale = select.value; localStorage.setItem('verdant-locale', locale); render(); }));
@@ -722,7 +833,7 @@
     document.querySelectorAll('[data-game-action]').forEach((button) => button.addEventListener('click', () => handleGameAction(button.dataset.gameAction, button.dataset.cell, button.dataset.zone, button.dataset.stake)));
     document.querySelector('[data-apple-stake-input]')?.addEventListener('input', (event) => setAppleStake(event.target.value));
     document.getElementById('mine-size')?.addEventListener('change', resetMineFromControls); document.getElementById('mine-count')?.addEventListener('change', resetMineFromControls);
-    document.getElementById('football-role')?.addEventListener('change', (event) => { const runtime = runtimeFor('football-penalties') || createFootballRuntime(); runtime.role = event.target.value; state.runtime = runtime; render(); });
+    document.getElementById('signal-amount')?.addEventListener('input', (event) => { state.signalAmounts[state.activeGame] = Math.max(1, Number(event.target.value) || 1); });
     document.querySelectorAll('[data-debug-effect]').forEach((button) => button.addEventListener('click', () => startDebugEffect(button.dataset.debugEffect))); document.querySelector('[data-debug-stop]')?.addEventListener('click', () => { stopGameAnimation(); render(); });
     bindLegalLinks();
     bindDialogClose();
@@ -737,6 +848,61 @@
     if (game === 'apple-of-fortune') return createAppleRuntime();
     if (game === 'mines') return createMineRuntime();
     return createFootballRuntime();
+  }
+
+  function createSignalRuntime(game, analysis) {
+    if (game === 'aviator') return { game, token: Date.now(), phase: 'ready', multiplier: 1, targetMultiplier: Number.parseFloat(analysis.multiplier) || 1.25, progress: 0, startedAt: 0, timers: new Set() };
+    if (game === 'chicken-road') return { ...createChickenRuntime(), targetStep: Number(analysis.targetStep || analysis.safeSteps?.length || 1), multiplier: 1 };
+    if (game === 'mines') return { ...createMineRuntime(), size: Number(analysis.size) || 25, mines: Number(analysis.mines) || 4, revealedCells: [], phase: 'ready' };
+    return { ...createFootballRuntime(), shotZone: Number(analysis.recommendedZone) || 3, result: analysis.result || 'goal', stake: Number(analysis.signalAmount) || 100 };
+  }
+
+  function startSignalPlayback(game) {
+    const runtime = runtimeFor(game);
+    if (!runtime) return;
+    if (game === 'aviator') {
+      runtime.phase = 'takeoff'; runtime.startedAt = performance.now(); render();
+      state.sceneLoop.start((now) => tickSignalAviator(runtime.token, now));
+      return;
+    }
+    if (game === 'chicken-road') { runtime.phase = 'jumping'; runtime.step = 0; render(); advanceChickenSignal(runtime.token); return; }
+    if (game === 'mines') { runtime.phase = 'revealing'; runtime.revealedCells = []; render(); advanceMineSignal(runtime.token, 0); return; }
+    runtime.phase = 'kick'; runtime.score = 0; render();
+    scheduleRuntime(() => { const current = runtimeFor('football-penalties'); if (!current) return; current.phase = current.result; current.score = current.result === 'goal' ? 1 : 0; state.footballHistory.unshift({ role: 'striker', stake: current.stake, zone: current.shotZone, result: current.result }); state.footballHistory = state.footballHistory.slice(0, 6); render(); }, 1250);
+  }
+
+  function tickSignalAviator(token, now) {
+    const runtime = runtimeFor('aviator');
+    if (!runtime || runtime.token !== token) return state.sceneLoop.stop();
+    const target = Math.max(1.01, Number(runtime.targetMultiplier) || 1.25);
+    const duration = reducedMotion() ? 350 : Math.min(7200, 3200 + Math.log2(target) * 900);
+    const progress = Math.min(1, (now - runtime.startedAt) / duration);
+    const eased = 1 - Math.pow(1 - progress, 2.2);
+    runtime.progress = eased;
+    runtime.phase = progress < 0.18 ? 'takeoff' : 'flying';
+    runtime.multiplier = 1 + (target - 1) * eased;
+    updateRuntimeDom('aviator');
+    if (progress < 1) return;
+    runtime.multiplier = target; runtime.phase = 'ended'; state.sceneLoop.stop(); updateRuntimeDom('aviator'); render();
+  }
+
+  function advanceChickenSignal(token) {
+    const runtime = runtimeFor('chicken-road');
+    if (!runtime || runtime.token !== token) return;
+    scheduleRuntime(() => {
+      const current = runtimeFor('chicken-road'); if (!current || current.token !== token) return;
+      current.step += 1; current.multiplier = Number.parseFloat(state.analysis?.multipliers?.[current.step - 1] || state.analysis?.multiplier) || 1;
+      current.phase = current.step >= current.targetStep ? 'ended' : 'safe'; render();
+      if (current.step < current.targetStep) scheduleRuntime(() => { current.phase = 'jumping'; render(); advanceChickenSignal(token); }, 260);
+    }, 610);
+  }
+
+  function advanceMineSignal(token, index) {
+    const runtime = runtimeFor('mines');
+    const cells = state.analysis?.game === 'mines' ? state.analysis.recommendedCells || [] : [];
+    if (!runtime || runtime.token !== token) return;
+    if (index >= cells.length) { runtime.phase = 'revealed'; render(); return; }
+    scheduleRuntime(() => { const current = runtimeFor('mines'); if (!current || current.token !== token) return; current.revealedCells.push(cells[index]); render(); advanceMineSignal(token, index + 1); }, 360);
   }
 
   function createAviatorRuntime() { const sprites = createAtlasSet(); Object.values(sprites).forEach((player) => player.play()); return { game: 'aviator', token: Date.now(), phase: 'countdown', countdown: 7, countdownStep: 0, countdownStartedAt: performance.now(), multiplier: 1, progress: 0, startedAt: 0, crashAt: 0, sprites, timers: new Set() }; }
@@ -1060,8 +1226,6 @@
     if (closeDialogTarget) { document.getElementById('legal-dialog')?.close(); return; }
     const closeAuthTarget = event.target.closest('[data-close-auth]');
     if (closeAuthTarget) { document.getElementById('auth-modal')?.close(); return; }
-    const closeFrameTarget = event.target.closest('[data-close-frame]');
-    if (closeFrameTarget) { document.getElementById('game-frame-dialog')?.close(); return; }
     if (event.target.id === 'legal-dialog' || event.target.id === 'auth-modal') event.target.close();
   });
 

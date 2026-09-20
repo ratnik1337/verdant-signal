@@ -1137,3 +1137,146 @@ h1, h2, h3 { text-wrap: balance; }
 .football-animation-canvas { z-index: 2; }
 .goal-net.has-animation-clip .keeper-actor, .goal-net.has-animation-clip .football-ball { visibility: hidden; }
 .goal-net.has-animation-clip .goal-zones { z-index: 6; }
+
+/* Local reference games: the casino controls are intentionally absent. Only the host signal panel drives play. */
+.reference-game { position: relative; width: 100%; min-height: 500px; overflow: hidden; border-radius: 8px; isolation: isolate; }
+.reference-game::after { position: absolute; z-index: 20; right: 10px; bottom: 8px; padding: 4px 8px; border-radius: 999px; color: rgba(255,255,255,.62); background: rgba(0,0,0,.34); font: 600 .52rem/1 var(--font-mono); letter-spacing: .08em; content: 'SIGNAL MODE'; pointer-events: none; }
+.signal-amount-field { position: relative; display: flex; align-items: center; }
+.signal-amount-field input { width: 100%; padding-right: 58px; }
+.signal-amount-field span { position: absolute; right: 13px; color: #8bb39a; font: 700 .66rem/1 var(--font-mono); pointer-events: none; }
+.signal-state-card, .fixed-role { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px 10px; padding: 12px; border: 1px solid rgba(53,139,91,.25); border-radius: 7px; background: #eff8f3; }
+.signal-state-card small { grid-column: 2; color: var(--color-muted); }
+.fixed-role { grid-template-columns: 1fr auto; }
+.fixed-role span { color: var(--color-muted); font: 600 .62rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.fixed-role strong { color: #17442f; }
+.signal-accuracy { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 14px; padding: 12px 14px; border: 1px solid rgba(45,151,89,.28); border-radius: 8px; background: linear-gradient(135deg, #eff9f2, #e3f4e9); }
+.signal-accuracy span { color: #608674; font: 700 .62rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.signal-accuracy strong { color: #168344; font-family: var(--font-display); font-size: 1.65rem; }
+.signal-amount-result strong { color: #17442f; }
+
+/* Aviator — original AviaShow palette, radial field and gold aircraft atlas. */
+.game-stage .visual-stage.reference-aviator { min-height: 500px; background: #020202 url('/assets/local-games/aviator/background.webp') center/cover no-repeat !important; box-shadow: inset 0 0 80px #000; }
+.reference-aviator::before { position: absolute; z-index: 0; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.34)); content: ''; }
+.reference-aviator-logo { position: absolute; z-index: 3; top: 48px; left: 38px; width: min(27%, 220px); height: auto; opacity: .96; }
+.reference-aviator-history { position: absolute; z-index: 3; top: 10px; right: 18px; left: 18px; display: flex; gap: 18px; overflow: hidden; color: #9b7222; font: 600 .55rem/1 var(--font-mono); white-space: nowrap; }
+.reference-aviator-history span:nth-child(4n) { color: #7e3f19; }
+.reference-aviator-curve { position: absolute; z-index: 2; inset: 15% 7% 9% 4%; width: 89%; height: 76%; overflow: visible; }
+.reference-aviator-curve path { fill: none; stroke: #d59f19; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; filter: drop-shadow(0 0 7px rgba(255,207,65,.55)); }
+.reference-aviator-plane { position: absolute; z-index: 5; left: 7%; bottom: 13%; width: 160px; height: 90px; transition: opacity .2s ease; filter: drop-shadow(0 10px 9px rgba(0,0,0,.72)); }
+.reference-plane-crop { position: absolute; top: 50%; left: 50%; width: 167px; height: 409px; background: url('/assets/local-games/aviator/plane.webp') -756px -113px / 1000px 524px no-repeat; transform: translate(-50%,-50%) rotate(-90deg) scale(.37); }
+.reference-plane-propeller { position: absolute; z-index: 2; top: 26px; right: -1px; width: 4px; height: 40px; border-radius: 100%; background: linear-gradient(180deg, transparent, #f7d44b 24%, #f7d44b 76%, transparent); transform-origin: center; animation: reference-propeller 90ms linear infinite; }
+.reference-aviator[data-phase="ready"] .reference-aviator-plane { opacity: .12; }
+.reference-aviator[data-phase="ended"] .reference-aviator-plane { animation: reference-aviator-away .58s ease-in both; }
+.reference-aviator-readout { position: absolute; z-index: 6; top: 43%; left: 50%; display: grid; justify-items: center; color: #fff; transform: translate(-50%,-50%); text-shadow: 0 4px 15px #000; }
+.reference-aviator-readout strong { color: #a70d0d; font: 800 clamp(3.5rem, 10vw, 6.5rem)/.88 Arial, sans-serif; letter-spacing: -.07em; }
+.reference-aviator-readout span { margin-top: 10px; color: #d9d9d9; font: 700 .64rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+.reference-aviator-ready { position: absolute; z-index: 5; right: 0; bottom: 22px; left: 0; color: rgba(255,255,255,.55); font: 700 .58rem/1 var(--font-mono); letter-spacing: .14em; text-align: center; }
+@keyframes reference-propeller { to { transform: rotate(360deg); } }
+@keyframes reference-aviator-away { to { opacity: 0; transform: translate(90px,-65px) scale(.8); } }
+
+/* Chicken Road — original slate lanes, medallions and chicken sprites. */
+.game-stage .visual-stage.reference-chicken { min-height: 500px; color: #fff; background: #3e466a !important; }
+.reference-chicken-bar { position: relative; z-index: 5; display: flex; align-items: center; justify-content: space-between; height: 54px; padding: 0 22px; background: #363b56; box-shadow: 0 2px 0 rgba(0,0,0,.14); }
+.reference-chicken-bar img { width: min(31%, 220px); max-height: 34px; }
+.reference-chicken-bar span { color: #a7b2e8; font: 700 .58rem/1 var(--font-mono); letter-spacing: .06em; }
+.reference-chicken-bar b { margin: 0 8px; color: #38ed6a; }
+.reference-road-scene { position: absolute; inset: 54px 0 0; overflow: hidden; background: linear-gradient(90deg, rgba(32,37,62,.42) 0 15%, transparent 15% 100%); }
+.reference-road-scene::after { position: absolute; right: 0; bottom: 0; left: 0; height: 28px; border-top: 7px solid #515a78; background: #30364f; content: ''; }
+.reference-road-lanes { position: absolute; inset: 0 -1% 28px 14%; display: grid; grid-template-columns: repeat(6, minmax(70px, 1fr)); }
+.reference-road-lane { position: relative; display: grid; place-items: center; border-left: 3px dashed #aab3d9; }
+.reference-road-lane::before, .reference-road-lane::after { position: absolute; width: 46px; height: 19px; border-radius: 8px; background: rgba(48,54,85,.55); content: ''; }
+.reference-road-lane::before { top: 7%; right: 11%; }
+.reference-road-lane::after { top: 56%; left: 10%; }
+.reference-road-medal { position: relative; z-index: 2; display: grid; width: clamp(66px, 10vw, 92px); aspect-ratio: 1; place-items: center; border: 7px solid #303752; border-radius: 50%; color: #b9c3ee; background: radial-gradient(circle at 38% 28%, #6978b5, #4c5a91 66%, #394264 67%); box-shadow: inset 0 0 0 3px rgba(182,192,235,.22), 0 6px 0 #303650; font: 800 clamp(.92rem, 2vw, 1.3rem)/1 Arial, sans-serif; text-shadow: 0 2px 0 #41486a; }
+.reference-road-lane.is-current .reference-road-medal { border-color: #188940; color: #eaffee; background: radial-gradient(circle at 38% 28%, #4ada6e, #1eae4a 68%, #157a35 69%); box-shadow: 0 0 26px rgba(42,224,96,.45), inset 0 0 0 3px rgba(216,255,223,.25); }
+.reference-road-lane.is-used .reference-road-medal { border-color: #a27b18; color: #fff5b8; background: radial-gradient(circle at 38% 28%, #e6c347, #bd8e16 68%, #795b13 69%); }
+.reference-road-grate { position: absolute; z-index: 2; bottom: 2px; left: 50%; width: 78px; height: 55px; border: 7px solid #555f81; border-bottom: 0; border-radius: 42px 42px 0 0; background: repeating-linear-gradient(90deg, #252b46 0 6px, #596282 6px 10px); transform: translateX(-50%); }
+.reference-chicken-actor { position: absolute; z-index: 8; bottom: 18px; left: calc(7% + var(--chicken-step) * 15%); width: clamp(76px, 13vw, 112px); aspect-ratio: 1; transform: translateX(-50%); transition: left 540ms cubic-bezier(.2,.78,.24,1); filter: drop-shadow(0 8px 5px rgba(20,22,39,.52)); }
+.reference-chicken-actor span { position: absolute; inset: 0; background-image: var(--chicken-sprite); background-repeat: no-repeat; background-size: 500% 500%; background-position: 0 0; }
+.reference-chicken[data-phase="jumping"] .reference-chicken-actor { animation: reference-chicken-jump 610ms cubic-bezier(.2,.7,.25,1) both; }
+.reference-chicken[data-phase="jumping"] .reference-chicken-actor span { background-size: 400% 300%; }
+.reference-chicken-result { position: absolute; z-index: 9; right: 18px; bottom: 36px; color: rgba(255,255,255,.72); font: 700 .58rem/1 var(--font-mono); letter-spacing: .08em; }
+@keyframes reference-chicken-jump { 0%,100% { transform: translateX(-50%) translateY(0) rotate(0); } 48% { transform: translateX(-50%) translateY(-74px) rotate(-7deg); } }
+
+/* Diamond Mines — original magenta board language, now generated at 4x4, 5x5 or 6x6. */
+.game-stage .visual-stage.reference-mines { display: grid; grid-template-columns: minmax(120px, .42fr) minmax(260px, 1fr); align-items: center; gap: 20px; min-height: 540px; padding: 34px; background: #321037 url('/assets/local-games/mines/background.jpg') center/cover no-repeat !important; }
+.reference-mines::before { position: absolute; z-index: 0; inset: 0; background: radial-gradient(circle at 29% 23%, rgba(252,50,224,.35), transparent 32%); content: ''; }
+.reference-mines-logo { position: relative; z-index: 2; align-self: start; width: min(100%, 310px); margin-top: 20px; filter: drop-shadow(0 10px 20px rgba(0,0,0,.35)); }
+.reference-mines-board { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(var(--mine-columns), minmax(0,1fr)); gap: clamp(5px, 1vw, 10px); width: min(100%, 560px); justify-self: end; padding: clamp(10px, 2vw, 16px); border: 8px solid #2a0830; border-radius: 28px; background: rgba(35,5,42,.74); box-shadow: 0 0 0 3px #a04bab, inset 0 0 28px rgba(0,0,0,.72); }
+.reference-mine-cell { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: clamp(8px,1.4vw,16px); background: #7d3388; box-shadow: 0 5px 0 #47154d, 0 0 0 2px #e282e7; }
+.reference-mine-cell.is-suggested { box-shadow: 0 5px 0 #56205c, 0 0 0 3px #f5b3f7, 0 0 18px #ed67f5; }
+.reference-mine-tile { position: absolute; inset: 0; background: url('/assets/local-games/mines/cell.png') 80% 0 / auto 100% no-repeat; }
+.reference-mine-cell.is-safe { background: radial-gradient(circle, #263d73, #120c2f); animation: reference-mine-open .55s cubic-bezier(.2,.8,.24,1) both; }
+.reference-mine-cell.is-safe .reference-mine-tile { opacity: .18; }
+.reference-mine-gem { position: absolute; z-index: 3; inset: 10%; background: url('/assets/local-games/mines/gem.png') 0 0 / 700% 300% no-repeat; filter: drop-shadow(0 0 12px #62a8ff); }
+.reference-mines-status { position: absolute; z-index: 4; bottom: 17px; left: 34px; display: grid; gap: 5px; color: #f0a7f3; font: 700 .58rem/1 var(--font-mono); letter-spacing: .08em; }
+.reference-mines-status strong { color: #ffdc5d; }
+@keyframes reference-mine-open { 0% { transform: scale(.76) rotateY(90deg); } 70% { transform: scale(1.08) rotateY(0); } 100% { transform: scale(1); } }
+
+/* Penalty Champion — striker-only local signal playback. */
+.game-stage .visual-stage.reference-football { min-height: 540px; background: #153e56 url('/assets/local-games/football/background.jpg') center/cover no-repeat !important; }
+.reference-football::before { position: absolute; z-index: 0; inset: 0; background: linear-gradient(180deg, rgba(0,20,45,.18), rgba(0,35,15,.08)); content: ''; }
+.reference-football-logo { position: absolute; z-index: 5; top: 20px; left: 50%; width: min(62%, 480px); transform: translateX(-50%); filter: drop-shadow(0 5px 7px rgba(0,0,0,.42)); }
+.reference-scoreboard { position: absolute; z-index: 5; top: 102px; left: 50%; display: flex; align-items: center; gap: 18px; padding: 7px 18px; border: 3px solid #505b5d; border-radius: 4px; color: #ffe533; background: #111; box-shadow: inset 0 0 12px #000; transform: translateX(-50%); font: 800 .62rem/1 var(--font-mono); letter-spacing: .12em; white-space: nowrap; }
+.reference-scoreboard strong { font-size: 1rem; }
+.reference-goal { position: absolute; z-index: 3; right: 18%; bottom: 9%; left: 18%; height: 47%; border: 9px solid #f1f2ed; border-bottom-width: 11px; box-shadow: 0 10px 15px rgba(0,0,0,.45); }
+.reference-net { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent 0 27px, rgba(255,255,255,.62) 28px 30px), repeating-linear-gradient(90deg, transparent 0 35px, rgba(255,255,255,.62) 36px 38px); transform: perspective(500px) rotateX(-4deg); }
+.reference-goal-zones { position: absolute; z-index: 4; inset: 8% 4% 42%; display: grid; grid-template-columns: repeat(5,1fr); gap: 7px; }
+.reference-goal-zone { display: grid; place-items: center; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; color: rgba(255,255,255,.5); background: rgba(0,25,42,.18); font: 800 .8rem/1 var(--font-mono); }
+.reference-goal-zone.is-target { border-color: #ffd83c; color: #fff; background: rgba(255,216,60,.34); box-shadow: 0 0 20px rgba(255,216,60,.72); }
+.reference-keeper { position: absolute; z-index: 5; bottom: 0; left: 50%; width: 108px; height: 152px; overflow: hidden; background: url('/assets/local-games/football/goalkeeper.png') -912px -18px / 1024px 1010px no-repeat; transform: translateX(-50%); transform-origin: 50% 100%; filter: drop-shadow(0 8px 5px rgba(0,0,0,.42)); }
+.reference-ball { --ball-x:50%; position: absolute; z-index: 7; bottom: 4%; left: 50%; width: clamp(42px,6vw,62px); aspect-ratio: 1; border-radius: 50%; background: url('/assets/local-games/football/ball.png') 0 0 / 800% 400% no-repeat; transform: translateX(-50%); filter: drop-shadow(0 6px 5px rgba(0,0,0,.48)); }
+.reference-football[data-zone="1"] { --ball-x:25%; }.reference-football[data-zone="2"] { --ball-x:37%; }.reference-football[data-zone="3"] { --ball-x:50%; }.reference-football[data-zone="4"] { --ball-x:63%; }.reference-football[data-zone="5"] { --ball-x:75%; }
+.reference-football[data-phase="kick"] .reference-ball { animation: reference-ball-kick 1.2s cubic-bezier(.22,.72,.24,1) both; }
+.reference-football[data-phase="goal"] .reference-ball, .reference-football[data-phase="save"] .reference-ball { bottom: 56%; left: var(--ball-x); width: 28px; }
+.reference-football[data-phase="miss"] .reference-ball { bottom: 67%; left: calc(var(--ball-x) + 8%); width: 24px; }
+.reference-football[data-phase="save"] .reference-keeper { animation: reference-keeper-save .58s ease-out both; }
+.reference-football[data-phase="goal"] .reference-keeper { transform: translateX(-50%) rotate(12deg) translateX(-55px); }
+.reference-football-status { position: absolute; z-index: 8; right: 0; bottom: 13px; left: 0; color: #fff; font: 800 .62rem/1 var(--font-mono); letter-spacing: .12em; text-align: center; text-shadow: 0 2px 5px #000; }
+@keyframes reference-ball-kick { 0% { bottom: 4%; left: 50%; transform: translateX(-50%) scale(1) rotate(0); } 48% { bottom: 36%; transform: translateX(-50%) scale(.72) rotate(380deg); } 100% { bottom: 56%; left: var(--ball-x); transform: translateX(-50%) scale(.48) rotate(720deg); } }
+@keyframes reference-keeper-save { to { transform: translateX(-50%) rotate(-68deg) translateY(-14px); } }
+
+@media (max-width: 780px) {
+  .reference-game { min-height: 420px; }
+  .game-stage .visual-stage.reference-aviator { min-height: 420px; }
+  .reference-aviator-logo { top: 42px; left: 20px; width: 34%; }
+  .reference-aviator-history { gap: 12px; }
+  .reference-aviator-plane { width: 125px; transform: scale(.82); transform-origin: left center; }
+  .reference-aviator-readout strong { font-size: clamp(3rem,17vw,5rem); }
+  .game-stage .visual-stage.reference-chicken { min-height: 430px; }
+  .reference-chicken-bar { height: 48px; padding: 0 12px; }
+  .reference-chicken-bar img { width: 44%; }
+  .reference-chicken-bar span { font-size: .48rem; }
+  .reference-road-scene { top: 48px; }
+  .reference-road-lanes { grid-template-columns: repeat(6,minmax(52px,1fr)); }
+  .reference-road-medal { width: clamp(48px,14vw,68px); border-width: 5px; font-size: .78rem; }
+  .reference-road-grate { width: 54px; height: 43px; }
+  .reference-chicken-actor { width: 78px; }
+  .game-stage .visual-stage.reference-mines { grid-template-columns: 1fr; align-content: start; gap: 10px; min-height: 520px; padding: 16px 12px 38px; }
+  .reference-mines-logo { width: 145px; margin: 0 auto; }
+  .reference-mines-board { width: min(100%,430px); justify-self: center; padding: 9px; border-width: 6px; border-radius: 19px; }
+  .reference-mines-status { bottom: 12px; left: 18px; }
+  .game-stage .visual-stage.reference-football { min-height: 460px; }
+  .reference-football-logo { top: 15px; width: 78%; }
+  .reference-scoreboard { top: 83px; }
+  .reference-goal { right: 8%; bottom: 11%; left: 8%; height: 45%; border-width: 6px; }
+  .reference-keeper { transform: translateX(-50%) scale(.86); transform-origin: 50% 100%; }
+}
+
+@media (max-width: 430px) {
+  .reference-game { min-height: 390px; }
+  .game-stage .visual-stage.reference-aviator { min-height: 390px; }
+  .game-stage .visual-stage.reference-chicken { min-height: 405px; }
+  .reference-road-lanes { right: -23%; grid-template-columns: repeat(6,minmax(54px,1fr)); }
+  .reference-chicken-actor { left: calc(5% + var(--chicken-step) * 15%); width: 70px; }
+  .game-stage .visual-stage.reference-mines { min-height: 470px; padding-inline: 7px; }
+  .reference-mines-board { gap: 4px; padding: 7px; }
+  .game-stage .visual-stage.reference-football { min-height: 420px; }
+  .reference-scoreboard { top: 72px; font-size: .5rem; }
+  .reference-goal { bottom: 12%; height: 43%; }
+  .reference-goal-zones { gap: 3px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reference-game * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

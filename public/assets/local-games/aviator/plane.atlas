@@ -1,0 +1,78 @@
+plane.webp
+size:1000,524
+filter:Linear,Linear
+scale:0.2
+Box
+bounds:379,14,245,113
+Girl example 2
+bounds:2,7,85,145
+rotate:90
+Hairs
+bounds:626,69,126,58
+Hair
+bounds:626,69,126,58
+PLG_Hairs
+bounds:626,69,126,58
+Leg left 1
+bounds:925,256,59,85
+Leg left 2
+bounds:754,33,82,78
+Leg right 1
+bounds:952,428,38,94
+Leg right 2
+bounds:838,35,76,83
+rotate:90
+PLG_Hand left 1
+bounds:980,200,54,18
+rotate:90
+PLG_Hand left 2
+bounds:952,381,45,38
+offsets:0,0,47,38
+rotate:90
+PLG_Hand right 1
+bounds:923,72,54,18
+PLG_Hand right 2
+bounds:243,18,47,35
+offsets:0,0,49,35
+PLG_Head
+bounds:626,14,53,126
+rotate:90
+PLG_Leg left 1
+bounds:925,171,83,53
+rotate:90
+PLG_Leg left 2
+bounds:149,18,92,35
+PLG_Leg right 1
+bounds:925,92,77,62
+rotate:90
+PLG_Leg right 2
+bounds:838,2,91,31
+Parachute example 2
+bounds:2,94,375,428
+ParachuteBox
+bounds:379,129,375,393
+Seat
+bounds:754,2,29,54
+rotate:90
+Tail wing
+bounds:149,3,84,13
+Wing
+bounds:925,343,179,25
+rotate:90
+back wheel1
+bounds:810,6,25,25
+back wheel2
+bounds:952,355,24,24
+blank
+bounds:376,91,1,1
+front wheel1
+bounds:314,32,60,60
+front wheel2
+bounds:931,13,57,57
+plane
+bounds:756,113,409,167
+rotate:90
+turbinB
+bounds:149,55,37,163
+offsets:8,25,53,213
+rotate:90
