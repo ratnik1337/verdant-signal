@@ -185,7 +185,17 @@ test('signal analysis records the entered amount and returns playable local-game
     assert.equal(mines.body.analysis.size, size);
     assert.equal(mines.body.analysis.mines, 4);
     assert.ok(mines.body.analysis.recommendedCells.every((cell) => !mines.body.analysis.minePositions.includes(cell)));
-    assert.match(mines.body.analysis.video.src, /^\/assets\/game-videos\/mines\/(?:Lose|x[\d.]+)\.mp4$/);
+    assert.ok(['safe', 'mine'].includes(mines.body.analysis.result));
+    assert.equal(mines.body.analysis.video, undefined);
+    assert.equal(mines.body.analysis.revealPath.length, mines.body.analysis.safeCount);
+    assert.equal(new Set(mines.body.analysis.revealPath).size, mines.body.analysis.revealPath.length);
+    assert.ok(mines.body.analysis.revealPath.every((cell) => !mines.body.analysis.minePositions.includes(cell)));
+    if (mines.body.analysis.result === 'mine') {
+      assert.ok(mines.body.analysis.minePositions.includes(mines.body.analysis.bombCell));
+      assert.equal(mines.body.analysis.revealPath.includes(mines.body.analysis.bombCell), false);
+    } else {
+      assert.equal(mines.body.analysis.bombCell, null);
+    }
   }
 
   const football = await agent.post('/api/games/football-penalties/analyze').send({ amount: 100 });
@@ -203,12 +213,24 @@ test('authored outcome videos are served locally as MP4 files', async () => {
   for (const source of [
     '/assets/game-videos/aviator/x1.11.mp4',
     '/assets/game-videos/chicken-road/x1.28.mp4',
-    '/assets/game-videos/mines/Lose.mp4',
     '/assets/game-videos/football-penalties/x1.02.mp4',
   ]) {
     const response = await request(app).get(source);
     assert.equal(response.status, 200);
     assert.match(response.headers['content-type'], /video\/mp4/);
+    assert.ok(response.body.length > 100000);
+  }
+});
+
+test('Mines procedural animation assets are served locally', async () => {
+  const app = makeApp();
+  for (const source of [
+    '/assets/mines-signals/diamond-reveal-spritesheet.png',
+    '/assets/mines-signals/diamond-close-preview.gif',
+    '/assets/mines-signals/bomb-explosion-spritesheet.png',
+  ]) {
+    const response = await request(app).get(source);
+    assert.equal(response.status, 200);
     assert.ok(response.body.length > 100000);
   }
 });

@@ -11,6 +11,16 @@
   const PACKAGE_ART_ROOT = '/assets/game-animations-ready/SourceArt';
   const LOCAL_GAME_ROOT = '/assets/local-games';
   const GAME_VIDEO_ROOT = '/assets/game-videos';
+  const MINES_SIGNAL_ART = {
+    reveal: '/assets/mines-signals/diamond-reveal-spritesheet.png',
+    close: '/assets/mines-signals/diamond-close-preview.gif',
+    bomb: '/assets/mines-signals/bomb-explosion-spritesheet.png',
+  };
+  const MINES_ANIMATIONS = {
+    reveal: { frames: 12, columns: 4, rows: 3, frameDuration: 55 },
+    bomb: { frames: 31, columns: 4, rows: 8, frameDuration: 55 },
+    closeDuration: 650,
+  };
   const GAME_VIDEO_OUTCOMES = {
     aviator: [
       ['x1.11.mp4', 1.11, 180], ['x1.36.mp4', 1.36, 170], ['x1.43.mp4', 1.43, 145],
@@ -22,10 +32,6 @@
     'chicken-road': [
       ['x1.28.mp4', 1.28, 36, 2], ['x1.47.mp4', 1.47, 30, 3], ['x2.76.mp4', 2.76, 19, 4],
       ['x4.03.mp4', 4.03, 10, 5], ['x6.91.mp4', 6.91, 5, 6],
-    ],
-    mines: [
-      ['Lose.mp4', null, 28, 'lose'], ['x1.14.mp4', 1.14, 28, 'win'], ['x1.33.mp4', 1.33, 21, 'win'],
-      ['x1.71.mp4', 1.71, 14, 'win'], ['x4.8.mp4', 4.8, 7, 'win'], ['x8.mp4', 8, 2, 'win'],
     ],
     'football-penalties': [
       ['x1.02.mp4', 1.02, 32], ['x1.38.mp4', 1.38, 26], ['1.68.mp4', 1.68, 18],
@@ -402,7 +408,22 @@
   }
 
   window.SpriteAtlasPlayer = SpriteAtlasPlayer;
-  window.render_game_to_text = () => JSON.stringify({ view: state.view, game: state.activeGame, phase: state.runtime?.phase || 'ready', animationManifest: Boolean(state.animationManifest), multiplier: state.runtime?.multiplier || null, step: state.runtime?.step ?? null, opened: state.runtime?.opened ? Object.keys(state.runtime.opened).length : 0 });
+  window.render_game_to_text = () => JSON.stringify({
+    view: state.view,
+    game: state.activeGame,
+    phase: state.runtime?.phase || 'ready',
+    animationManifest: Boolean(state.animationManifest),
+    multiplier: state.runtime?.multiplier || state.analysis?.multiplier || null,
+    step: state.runtime?.step ?? null,
+    mines: state.activeGame === 'mines' ? {
+      size: state.runtime?.size || null,
+      mineCount: state.runtime?.mines || null,
+      openedCells: state.runtime?.revealedCells || [],
+      activeCell: state.runtime?.activeCell ?? null,
+      bombCell: state.runtime?.bombCell ?? null,
+      result: state.runtime?.result || null,
+    } : null,
+  });
   window.advanceTime = (milliseconds) => {
     const runtime = state.runtime;
     if (!runtime) return window.render_game_to_text();
@@ -493,20 +514,18 @@
     document.querySelectorAll('[data-runtime-state], [data-game-live-state]').forEach((node) => { node.textContent = phaseLabel(runtime.phase); });
   }
 
-  function updateMineSignalDom(runtime, revealedIndex = null) {
+  function updateMineSignalDom(runtime) {
     const root = document.querySelector('[data-runtime-game="mines"]');
     if (!root) return;
     root.dataset.phase = runtime.phase;
     root.querySelectorAll('.reference-mine-cell.is-suggested').forEach((cell) => cell.classList.remove('is-suggested'));
-    if (revealedIndex !== null) {
-      const cell = root.querySelector(`[data-mine-index="${revealedIndex}"]`);
-      if (cell && !cell.classList.contains('is-safe')) {
-        cell.classList.add('is-safe');
-        cell.insertAdjacentHTML('beforeend', '<i class="reference-mine-gem" aria-hidden="true"></i>');
-      }
-    }
     const status = root.querySelector('[data-mines-status]');
-    if (status) status.textContent = runtime.phase === 'revealed' ? `${runtime.revealedCells.length} SAFE` : phaseLabel(runtime.phase);
+    if (status) {
+      if (runtime.phase === 'revealed') status.textContent = `${runtime.revealedCells.length} SAFE · ${runtime.multiplier || ''}`.trim();
+      else if (runtime.phase === 'mine') status.textContent = `${runtime.revealedCells.length} SAFE · MINE`;
+      else if (runtime.phase === 'revealing') status.textContent = `${runtime.revealedCells.length}/${runtime.revealPath.length} OPEN`;
+      else status.textContent = phaseLabel(runtime.phase);
+    }
     document.querySelectorAll('[data-runtime-state], [data-game-live-state]').forEach((node) => { node.textContent = phaseLabel(runtime.phase); });
   }
 
@@ -526,7 +545,7 @@
     document.querySelectorAll('[data-runtime-state], [data-game-live-state]').forEach((node) => { node.textContent = phaseLabel(runtime.phase); });
   }
   function phaseLabel(phase) {
-    return t({ ready: 'ready', analyzing: 'analysisLoading', revealing: 'opening', revealed: 'roundEnded', countdown: 'countdownState', takeoff: 'takeoff', flying: 'flying', crash: 'crash', ended: 'roundEnded', jumping: 'jumping', safe: 'safeStep', fallen: 'stepFailed', opening: 'opening', mine: 'cellMine', goal: 'goal', save: 'save', miss: 'miss', kick: 'kick', reaction: 'kick' }[phase] || 'ready');
+    return t({ ready: 'ready', analyzing: 'analysisLoading', closing: 'opening', revealing: 'opening', revealed: 'roundEnded', countdown: 'countdownState', takeoff: 'takeoff', flying: 'flying', crash: 'crash', ended: 'roundEnded', jumping: 'jumping', safe: 'safeStep', fallen: 'stepFailed', opening: 'opening', mine: 'cellMine', goal: 'goal', save: 'save', miss: 'miss', kick: 'kick', reaction: 'kick' }[phase] || 'ready');
   }
 
   async function api(url, options = {}) {
@@ -675,12 +694,17 @@
     const size = [16, 25, 36].includes(Number(runtime.size)) ? Number(runtime.size) : 25;
     const columns = Math.sqrt(size);
     const revealed = new Set(runtime.revealedCells || []);
-    const recommended = new Set(state.analysis?.game === 'mines' ? state.analysis.recommendedCells || [] : []);
-    const cells = Array.from({ length: size }, (_, index) => `<div class="reference-mine-cell ${revealed.has(index) ? 'is-safe' : ''} ${recommended.has(index) && runtime.phase === 'ready' ? 'is-suggested' : ''}" data-mine-index="${index}" aria-label="${t('cell')} ${index + 1}"><span class="reference-mine-tile"></span>${revealed.has(index) ? '<i class="reference-mine-gem" aria-hidden="true"></i>' : ''}</div>`).join('');
+    const bombCell = runtime.phase === 'mine' ? Number(runtime.bombCell) : -1;
+    const cells = Array.from({ length: size }, (_, index) => {
+      const safe = revealed.has(index);
+      const bomb = index === bombCell;
+      return `<div class="reference-mine-cell ${safe ? 'is-safe' : ''} ${bomb ? 'is-bomb' : ''}" data-mine-index="${index}" aria-label="${t('cell')} ${index + 1}"><span class="reference-mine-tile"></span><span class="reference-mine-sprite ${safe ? 'is-reveal' : ''} ${bomb ? 'is-bomb' : ''}" aria-hidden="true"></span></div>`;
+    }).join('');
+    const status = runtime.phase === 'revealed' ? `${revealed.size} SAFE · ${runtime.multiplier || ''}` : runtime.phase === 'mine' ? `${revealed.size} SAFE · MINE` : phaseLabel(runtime.phase);
     return `<div class="visual-stage reference-game reference-mines" data-runtime-game="mines" data-phase="${escapeHTML(runtime.phase)}">
       <img class="reference-mines-logo" src="${LOCAL_GAME_ART.mines.logo}" alt="Diamond Mines">
-      <div class="reference-mines-board" style="--mine-columns:${columns}">${cells}</div>
-      <div class="reference-mines-status"><span>${columns} × ${columns}</span><strong data-mines-status>${runtime.phase === 'revealed' ? `${revealed.size} SAFE` : phaseLabel(runtime.phase)}</strong></div>
+      <div class="reference-mines-board" style="--mine-columns:${columns}">${cells}<i class="reference-mines-blast" data-mines-blast aria-hidden="true"></i></div>
+      <div class="reference-mines-status"><span>${columns} × ${columns}</span><strong data-mines-status>${escapeHTML(status)}</strong></div>
     </div>`;
   }
 
@@ -718,7 +742,7 @@
 
   function renderResult(analysis) {
     if (!analysis) return `<div class="result-empty"><span class="empty-mark">◎</span><p>${t('noHistory')}</p><small>${t('resultAppearsHere')}</small></div>`;
-    const details = analysis.game === 'aviator' ? `${t('multiplier')}: ${analysis.multiplier} · ${t('countdown')}: ${analysis.countdown}s` : analysis.game === 'chicken-road' ? `${t('safeSteps')}: ${analysis.safeSteps.join(', ')} · ${t('multiplier')}: ${analysis.multiplier}` : analysis.game === 'apple-of-fortune' ? `${t('rows')}: ${analysis.targetRow || analysis.rows.length} · ${t('safeCell')}: ${analysis.rows.slice(0, analysis.targetRow || analysis.rows.length).map((row) => row.recommendedCell).join(' → ')}` : analysis.game === 'mines' ? `${t('fieldSize')}: ${analysis.size} · ${t('mineCount')}: ${analysis.mines}` : `${t('shotZones')}: ${analysis.zones} · ${t('direction')}: ${analysis.direction}`;
+    const details = analysis.game === 'aviator' ? `${t('multiplier')}: ${analysis.multiplier} · ${t('countdown')}: ${analysis.countdown}s` : analysis.game === 'chicken-road' ? `${t('safeSteps')}: ${analysis.safeSteps.join(', ')} · ${t('multiplier')}: ${analysis.multiplier}` : analysis.game === 'apple-of-fortune' ? `${t('rows')}: ${analysis.targetRow || analysis.rows.length} · ${t('safeCell')}: ${analysis.rows.slice(0, analysis.targetRow || analysis.rows.length).map((row) => row.recommendedCell).join(' → ')}` : analysis.game === 'mines' ? `${t('fieldSize')}: ${analysis.size} · ${t('mineCount')}: ${analysis.mines} · ${analysis.safeCount} SAFE · ${analysis.outcome} · ${analysis.multiplier}` : `${t('shotZones')}: ${analysis.zones} · ${t('direction')}: ${analysis.direction}`;
     const amount = Number(analysis.signalAmount || 0);
     const amountText = amount > 0 ? formatMoney(amount * (10 ** Number(state.player?.currencyFractionDigits ?? 2))) : '';
     return `<h3>${t('latestSignal')}</h3>${Number.isFinite(Number(analysis.accuracy)) ? `<div class="signal-accuracy"><span>${t('signalAccuracy')}</span><strong>${Number(analysis.accuracy)}%</strong></div>` : ''}<p class="result-detail">${escapeHTML(details)}</p>${amountText ? `<p class="signal-amount-result">${t('signalAmount')}: <strong>${escapeHTML(amountText)}</strong></p>` : ''}<p>${escapeHTML(analysis.note || analysis.disclaimer)}</p><div class="result-stamp">${t('demoAnalysis')} / ${t('simulatedData')}</div><div class="analysis-actions"><button class="button button-ghost" data-copy="${analysis.game}" type="button">${t('copyResult')}</button></div>`;
@@ -733,7 +757,7 @@
     const runtime = runtimeFor(game);
     const amount = Math.max(1, Number(state.signalAmounts[game]) || 100);
     const amountControl = `<label for="signal-amount">${t('signalAmount')}<div class="signal-amount-field"><input id="signal-amount" type="number" inputmode="decimal" min="1" max="1000000" step="1" value="${amount}"><span>${escapeHTML(state.player?.currencyCode || '')}</span></div></label>`;
-    if (game === 'mines') { const active = state.busy || runtime?.phase === 'revealing'; return `${amountControl}<label for="mine-size">${t('fieldSize')}<select id="mine-size" ${active ? 'disabled' : ''}><option value="16" ${Number(runtime?.size || 25) === 16 ? 'selected' : ''}>4 × 4</option><option value="25" ${Number(runtime?.size || 25) === 25 ? 'selected' : ''}>5 × 5</option><option value="36" ${Number(runtime?.size || 25) === 36 ? 'selected' : ''}>6 × 6</option></select></label><label for="mine-count">${t('mineCount')}<select id="mine-count" ${active ? 'disabled' : ''}><option ${Number(runtime?.mines || 4) === 3 ? 'selected' : ''}>3</option><option ${Number(runtime?.mines || 4) === 4 ? 'selected' : ''}>4</option><option ${Number(runtime?.mines || 4) === 6 ? 'selected' : ''}>6</option><option ${Number(runtime?.mines || 4) === 8 ? 'selected' : ''}>8</option></select></label><div class="control-note">${t('signalAmountNote')}</div>`; }
+    if (game === 'mines') { const active = state.busy || ['closing', 'revealing'].includes(runtime?.phase); return `${amountControl}<label for="mine-size">${t('fieldSize')}<select id="mine-size" ${active ? 'disabled' : ''}><option value="16" ${Number(runtime?.size || 25) === 16 ? 'selected' : ''}>4 × 4</option><option value="25" ${Number(runtime?.size || 25) === 25 ? 'selected' : ''}>5 × 5</option><option value="36" ${Number(runtime?.size || 25) === 36 ? 'selected' : ''}>6 × 6</option></select></label><label for="mine-count">${t('mineCount')}<select id="mine-count" ${active ? 'disabled' : ''}><option ${Number(runtime?.mines || 4) === 3 ? 'selected' : ''}>3</option><option ${Number(runtime?.mines || 4) === 4 ? 'selected' : ''}>4</option><option ${Number(runtime?.mines || 4) === 6 ? 'selected' : ''}>6</option><option ${Number(runtime?.mines || 4) === 8 ? 'selected' : ''}>8</option></select></label><div class="control-note">${t('signalAmountNote')}</div>`; }
     if (game === 'football-penalties') return `${amountControl}<div class="fixed-role"><span>${t('role')}</span><strong>${t('striker')}</strong></div><div class="control-note">${t('strikerOnlyNote')}</div>`;
     return `${amountControl}<div class="signal-state-card"><span class="status-dot"></span><strong data-runtime-state>${phaseLabel(runtime?.phase || 'ready')}</strong><small>${t('signalAmountNote')}</small></div>`;
   }
@@ -751,7 +775,7 @@
 
   function renderGameView(game) {
     if (game === 'apple-of-fortune') return renderAppleGameView();
-    const runtime = runtimeFor(game); const signalPlaying = runtime?.phase === 'video';
+    const runtime = runtimeFor(game); const signalPlaying = runtime?.phase === 'video' || (game === 'mines' && ['closing', 'revealing'].includes(runtime?.phase));
     return `<header class="workspace-header game-header"><div><p class="eyebrow">${t('games')} / ${String(games.indexOf(game) + 1).padStart(2, '0')}</p><h1>${gameLabel(game)}</h1><p class="lede">${t('gameIntro')}</p></div><div class="header-actions"><button class="game-exit-button" data-view="overview" type="button"><span class="game-exit-icon" aria-hidden="true">&#8592;</span>${t('backToHome')}</button></div></header><div class="content-width game-view"><div class="game-layout"><section class="game-stage"><div class="stage-topline"><div><span class="stage-index">0${games.indexOf(game) + 1}</span><span class="status-badge muted">РАУНД</span></div><span class="round-state" data-game-live-state aria-live="polite">${signalPlaying ? 'СИГНАЛ' : phaseLabel(runtime?.phase || 'ready')}</span></div>${renderGameStage(game)}${renderArtDebug()}</section><aside class="game-side"><section class="panel control-panel"><div class="panel-head"><div><p class="panel-kicker">${t('controlStack')}</p><h2>${t('gameStatus')}</h2></div><span class="status-dot"></span></div><div class="panel-body control-fields">${gameControls(game)}<button class="button button-primary button-full" data-analyze="${game}" type="button" ${state.busy || signalPlaying ? 'disabled' : ''}>${state.busy || signalPlaying ? t('analysisLoading') : t('getSignal')}</button><button class="button button-ghost button-full" data-copy="${game}" type="button" ${state.analysis?.game === game ? '' : 'disabled'}>${t('copyResult')}</button><p class="form-message" role="alert" aria-live="polite">${escapeHTML(state.message)}</p></div></section><section class="panel result-panel"><div class="panel-head"><div><p class="panel-kicker">${t('result')}</p><h2>${t('latestSignal')}</h2></div></div><div class="panel-body">${renderResult(state.analysis?.game === game ? state.analysis : null)}</div></section><section class="panel history-panel"><div class="panel-head"><div><p class="panel-kicker">${t('history')}</p><h3>${t('attempts')}</h3></div></div><div class="panel-body">${renderHistory()}</div></section></aside></div>${renderFooter()}</div>`;
   }
 
@@ -813,6 +837,14 @@
     const payload = { amount };
     state.signalAmounts[game] = amount;
     if (game === 'mines') { payload.size = Number(document.getElementById('mine-size')?.value || 25); payload.mines = Number(document.getElementById('mine-count')?.value || 4); }
+    const previousRuntime = runtimeFor(game);
+    if (game === 'mines' && previousRuntime?.revealedCells?.length && ['revealed', 'mine'].includes(previousRuntime.phase)) {
+      state.busy = true;
+      const analyzeButton = document.querySelector('[data-analyze="mines"]');
+      if (analyzeButton) analyzeButton.disabled = true;
+      await closeMineSignalBoard(previousRuntime);
+      if (state.view !== 'game' || state.activeGame !== game) { state.busy = false; return; }
+    }
     stopGameAnimation();
     state.runtime = createReadyRuntime(game);
     if (game === 'mines') { state.runtime.size = payload.size; state.runtime.mines = payload.mines; }
@@ -826,7 +858,7 @@
         result = { analysis: createGuestSignal(game, payload), activity: { player: state.player } };
       }
       state.analysis = result.analysis; state.player = result.activity?.player || state.player; state.busy = false; state.runtime = createSignalRuntime(game, result.analysis); render(); startSignalPlayback(game);
-      if (!state.guestMode) api(`/api/games/${game}/history`).then((history) => { state.history = history.history || []; if (state.view === 'game' && state.activeGame === game && runtimeFor(game)?.phase !== 'video') render(); }).catch(() => {});
+      if (!state.guestMode) api(`/api/games/${game}/history`).then((history) => { state.history = history.history || []; if (state.view === 'game' && state.activeGame === game && !['video', 'closing', 'revealing'].includes(runtimeFor(game)?.phase)) render(); }).catch(() => {});
     }
     catch (error) { state.busy = false; state.message = error.message; render(); }
   }
@@ -872,13 +904,27 @@
     return values.slice(0, Math.min(count, values.length));
   }
 
+  function localMinesOutcome(size, mines) {
+    const minePositions = localSample(size, mines);
+    const desiredSafeCount = localWeighted([[1,.08],[2,.2],[3,.25],[4,.2],[5,.13],[6,.08],[7,.04],[8,.02]]);
+    const safeCount = Math.max(1, Math.min(desiredSafeCount, size - mines));
+    const revealPath = localSample(size, safeCount, new Set(minePositions));
+    const explosionChance = Math.min(.52, .22 + (mines / size) * .9);
+    const explodes = Math.random() < explosionChance;
+    const bombCell = explodes ? minePositions[Math.floor(Math.random() * minePositions.length)] : null;
+    let survival = 1;
+    for (let pick = 0; pick < safeCount; pick += 1) survival *= (size - mines - pick) / (size - pick);
+    const multiplier = Number((survival > 0 ? .97 / survival : 0).toFixed(2));
+    return { minePositions, revealPath, recommendedCells: revealPath, safeCount, bombCell, result: explodes ? 'mine' : 'safe', outcome: explodes ? 'MINE' : 'SAFE STOP', multiplier: `${multiplier.toFixed(2)}x` };
+  }
+
   function createGuestSignal(game, payload) {
     const amount = Number(payload.amount) || 100;
     const base = { game, gameLabel: gameLabel(game), demo: true, mode: 'SIMULATED DATA', status: 'AI ANALYSIS', generatedAt: new Date().toISOString(), signalAmount: amount, accuracy: localAccuracy(amount), disclaimer: t('disclaimerText') };
     if (game === 'aviator') { const video = localVideoOutcome(game); return { ...base, video, multiplier: `${Number(video.multiplier).toFixed(2)}x`, countdown: 2 + Math.floor(Math.random() * 2), note: 'The generated outcome video plays automatically.' }; }
     if (game === 'chicken-road') { const video = localVideoOutcome(game); const targetStep = video.step; const multipliers = GAME_VIDEO_OUTCOMES[game].map((outcome) => `${outcome[1]}x`); return { ...base, video, targetStep, safeSteps: Array.from({ length: targetStep }, (_, index) => index + 1), multiplier: `${video.multiplier}x`, multipliers, note: 'The chicken follows the generated video signal automatically.' }; }
     if (game === 'apple-of-fortune') { const targetRow = localWeighted([[1,.2],[2,.22],[3,.2],[4,.15],[5,.1],[6,.06],[7,.04],[8,.02],[9,.008],[10,.002]]); return { ...base, targetRow, rows: APPLE_MULTIPLIERS.map((multiplier, index) => ({ level: index + 1, recommendedCell: 1 + Math.floor(Math.random() * 5), cells: [1,2,3,4,5], multiplier: `x${multiplier}` })), note: 'The generated signal opens the recommended path automatically.' }; }
-    if (game === 'mines') { const video = localVideoOutcome(game); const size = [16,25,36].includes(Number(payload.size)) ? Number(payload.size) : 25; const mines = Math.min(Math.max(Number(payload.mines) || 4, 1), Math.floor(size / 2)); const minePositions = localSample(size, mines); return { ...base, video, size, mines, minePositions, recommendedCells: localSample(size, Math.min(5, size - mines), new Set(minePositions)), result: video.outcome, multiplier: video.multiplier ? `${video.multiplier}x` : null, note: 'The generated Mines outcome video plays automatically.' }; }
+    if (game === 'mines') { const size = [16,25,36].includes(Number(payload.size)) ? Number(payload.size) : 25; const mines = Math.min(Math.max(Number(payload.mines) || 4, 1), Math.floor(size / 2)); const outcome = localMinesOutcome(size, mines); return { ...base, size, mines, ...outcome, note: outcome.result === 'mine' ? 'The procedural signal opens safe cells, then reaches a mine.' : 'The procedural signal stops safely before a mine.' }; }
     const video = localVideoOutcome(game); const recommendedZone = 1 + Math.floor(Math.random() * 5); return { ...base, video, zones: 5, role: 'striker', recommendedZone, direction: ['left','left-center','center','right-center','right'][recommendedZone - 1], result: 'goal', outcome: 'GOAL', multiplier: `${video.multiplier}x`, note: 'The striker follows the generated video signal automatically.' };
   }
 
@@ -935,7 +981,7 @@
     if (game === 'aviator') return { game, token: Date.now(), phase: 'ready', multiplier: 1, targetMultiplier: Number.parseFloat(analysis.multiplier) || 1.25, progress: 0, takeoffProgress: 0, cruiseProgress: 0, startedAt: 0, timers: new Set() };
     if (game === 'chicken-road') return { ...createChickenRuntime(), targetStep: Number(analysis.targetStep || analysis.safeSteps?.length || 1), multiplier: 1 };
     if (game === 'apple-of-fortune') return createAppleSignalRuntime(analysis);
-    if (game === 'mines') return { ...createMineRuntime(), size: Number(analysis.size) || 25, mines: Number(analysis.mines) || 4, revealedCells: [], phase: 'ready' };
+    if (game === 'mines') return { ...createMineRuntime(), size: Number(analysis.size) || 25, mines: Number(analysis.mines) || 4, minePositions: analysis.minePositions || [], revealPath: analysis.revealPath || analysis.recommendedCells || [], bombCell: analysis.bombCell ?? null, result: analysis.result || 'safe', multiplier: analysis.multiplier || '1.00x', revealedCells: [], activeCell: null, phase: 'ready' };
     return { ...createFootballRuntime(), shotZone: Number(analysis.recommendedZone) || 3, result: analysis.result || 'goal', stake: Number(analysis.signalAmount) || 100 };
   }
 
@@ -955,7 +1001,7 @@
     }
     if (game === 'chicken-road') { runtime.phase = 'jumping'; runtime.step = 0; runtime.nextStep = 1; updateChickenSignalDom(runtime, true); advanceChickenSignal(runtime.token); return; }
     if (game === 'apple-of-fortune') { runtime.phase = 'opening'; runtime.activeRow = 1; runtime.revealedCells = {}; advanceAppleSignal(runtime.token, 0); return; }
-    if (game === 'mines') { runtime.phase = 'revealing'; runtime.revealedCells = []; updateMineSignalDom(runtime); advanceMineSignal(runtime.token, 0); return; }
+    if (game === 'mines') { runtime.phase = 'revealing'; runtime.revealedCells = []; updateMineSignalDom(runtime); playMineSignal(runtime.token); return; }
     runtime.phase = 'kick'; runtime.score = 0; render();
     scheduleRuntime(() => { const current = runtimeFor('football-penalties'); if (!current) return; current.phase = current.result; current.score = current.result === 'goal' ? 1 : 0; state.footballHistory.unshift({ role: 'striker', stake: current.stake, zone: current.shotZone, result: current.result }); state.footballHistory = state.footballHistory.slice(0, 6); render(); }, 1250);
   }
@@ -1027,12 +1073,84 @@
     }, 620);
   }
 
-  function advanceMineSignal(token, index) {
+  function waitForMineFrame(delay) { return new Promise((resolve) => window.setTimeout(resolve, delay)); }
+
+  function setMineSpriteFrame(sprite, frame, config) {
+    const column = frame % config.columns;
+    const row = Math.floor(frame / config.columns);
+    const x = config.columns === 1 ? 0 : (column / (config.columns - 1)) * 100;
+    const y = config.rows === 1 ? 0 : (row / (config.rows - 1)) * 100;
+    sprite.style.backgroundPosition = `${x}% ${y}%`;
+  }
+
+  async function animateMineCell(token, cellIndex, kind) {
     const runtime = runtimeFor('mines');
-    const cells = state.analysis?.game === 'mines' ? state.analysis.recommendedCells || [] : [];
+    const root = document.querySelector('[data-runtime-game="mines"]');
+    const cell = root?.querySelector(`[data-mine-index="${cellIndex}"]`);
+    const sprite = cell?.querySelector('.reference-mine-sprite');
+    const config = MINES_ANIMATIONS[kind];
+    if (!runtime || runtime.token !== token || !cell || !sprite || !config) return false;
+    cell.classList.add('is-opening');
+    sprite.className = `reference-mine-sprite is-active is-${kind}`;
+    const startFrame = reducedMotion() ? config.frames - 1 : 0;
+    for (let frame = startFrame; frame < config.frames; frame += 1) {
+      const current = runtimeFor('mines');
+      if (!current || current.token !== token) return false;
+      setMineSpriteFrame(sprite, frame, config);
+      if (kind === 'bomb') root.classList.toggle('is-blasting', frame >= 24);
+      if (!reducedMotion()) await waitForMineFrame(config.frameDuration);
+    }
+    root.classList.remove('is-blasting');
+    cell.classList.remove('is-opening');
+    cell.classList.add(kind === 'bomb' ? 'is-bomb' : 'is-safe');
+    sprite.className = `reference-mine-sprite is-${kind}`;
+    setMineSpriteFrame(sprite, config.frames - 1, config);
+    return true;
+  }
+
+  async function playMineSignal(token) {
+    const runtime = runtimeFor('mines');
     if (!runtime || runtime.token !== token) return;
-    if (index >= cells.length) { runtime.phase = 'revealed'; updateMineSignalDom(runtime); return; }
-    scheduleRuntime(() => { const current = runtimeFor('mines'); if (!current || current.token !== token) return; current.revealedCells.push(cells[index]); updateMineSignalDom(current, cells[index]); advanceMineSignal(token, index + 1); }, 440);
+    for (const cellIndex of runtime.revealPath) {
+      const current = runtimeFor('mines');
+      if (!current || current.token !== token) return;
+      current.phase = 'revealing';
+      current.activeCell = cellIndex;
+      updateMineSignalDom(current);
+      if (!await animateMineCell(token, cellIndex, 'reveal')) return;
+      current.revealedCells.push(cellIndex);
+      current.activeCell = null;
+      updateMineSignalDom(current);
+      if (!reducedMotion()) await waitForMineFrame(180);
+    }
+    const current = runtimeFor('mines');
+    if (!current || current.token !== token) return;
+    if (current.result === 'mine' && Number.isInteger(current.bombCell)) {
+      current.activeCell = current.bombCell;
+      updateMineSignalDom(current);
+      if (!reducedMotion()) await waitForMineFrame(220);
+      if (!await animateMineCell(token, current.bombCell, 'bomb')) return;
+      current.activeCell = null;
+      current.phase = 'mine';
+    } else {
+      current.phase = 'revealed';
+    }
+    state.runtime = current;
+    updateMineSignalDom(current);
+  }
+
+  async function closeMineSignalBoard(runtime) {
+    if (!runtime?.revealedCells?.length) return;
+    runtime.phase = 'closing';
+    updateMineSignalDom(runtime);
+    const nonce = `${runtime.token}-${Date.now()}`;
+    runtime.revealedCells.forEach((cellIndex) => {
+      const cell = document.querySelector(`[data-runtime-game="mines"] [data-mine-index="${cellIndex}"]`);
+      if (!cell) return;
+      cell.classList.add('is-closing');
+      cell.insertAdjacentHTML('beforeend', `<img class="reference-mine-close" src="${MINES_SIGNAL_ART.close}?v=${nonce}-${cellIndex}" alt="" aria-hidden="true">`);
+    });
+    if (!reducedMotion()) await waitForMineFrame(MINES_ANIMATIONS.closeDuration);
   }
 
   function createAviatorRuntime() { const sprites = createAtlasSet(); Object.values(sprites).forEach((player) => player.play()); return { game: 'aviator', token: Date.now(), phase: 'countdown', countdown: 7, countdownStep: 0, countdownStartedAt: performance.now(), multiplier: 1, progress: 0, startedAt: 0, crashAt: 0, sprites, timers: new Set() }; }
@@ -1093,7 +1211,7 @@
     state.player.balanceMinor += toAppleMinor(runtime.score); runtime.phase = 'ended'; runtime.auto = false; state.runtime = runtime; render();
   }
 
-  function createMineRuntime() { return { game: 'mines', token: Date.now(), phase: 'ready', size: Number(document.getElementById('mine-size')?.value || 25), mines: Number(document.getElementById('mine-count')?.value || 4), minePositions: [], accuracy: 0, animationStartedAt: 0, timers: new Set() }; }
+  function createMineRuntime() { return { game: 'mines', token: Date.now(), phase: 'ready', size: Number(document.getElementById('mine-size')?.value || 25), mines: Number(document.getElementById('mine-count')?.value || 4), minePositions: [], revealPath: [], revealedCells: [], bombCell: null, activeCell: null, result: null, multiplier: null, accuracy: 0, animationStartedAt: 0, timers: new Set() }; }
   function startMineRound() {
     const runtime = runtimeFor('mines') || createMineRuntime();
     if (runtime.phase === 'analyzing') return;

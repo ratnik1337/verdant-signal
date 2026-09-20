@@ -36,14 +36,6 @@ const GAME_VIDEO_OUTCOMES = {
     { file: 'x4.03.mp4', multiplier: 4.03, step: 5, weight: 10 },
     { file: 'x6.91.mp4', multiplier: 6.91, step: 6, weight: 5 },
   ],
-  mines: [
-    { file: 'Lose.mp4', outcome: 'lose', label: 'LOSE', weight: 28 },
-    { file: 'x1.14.mp4', outcome: 'win', multiplier: 1.14, weight: 28 },
-    { file: 'x1.33.mp4', outcome: 'win', multiplier: 1.33, weight: 21 },
-    { file: 'x1.71.mp4', outcome: 'win', multiplier: 1.71, weight: 14 },
-    { file: 'x4.8.mp4', outcome: 'win', multiplier: 4.8, weight: 7 },
-    { file: 'x8.mp4', outcome: 'win', multiplier: 8, weight: 2 },
-  ],
   'football-penalties': [
     { file: 'x1.02.mp4', multiplier: 1.02, weight: 32 },
     { file: 'x1.38.mp4', multiplier: 1.38, weight: 26 },
@@ -157,6 +149,32 @@ function sampleUnique(total, count, excluded = new Set()) {
     [available[index], available[swapIndex]] = [available[swapIndex], available[index]];
   }
   return available.slice(0, Math.max(0, Math.min(count, available.length)));
+}
+
+function calculateMinesMultiplier(size, mines, safeCount) {
+  let survival = 1;
+  for (let pick = 0; pick < safeCount; pick += 1) survival *= (size - mines - pick) / (size - pick);
+  return Number((survival > 0 ? 0.97 / survival : 0).toFixed(2));
+}
+
+function createMinesOutcome(size, mines) {
+  const minePositions = sampleUnique(size, mines);
+  const desiredSafeCount = weightedChoice([[1, 0.08], [2, 0.2], [3, 0.25], [4, 0.2], [5, 0.13], [6, 0.08], [7, 0.04], [8, 0.02]]);
+  const safeCount = Math.max(1, Math.min(desiredSafeCount, size - mines));
+  const revealPath = sampleUnique(size, safeCount, new Set(minePositions));
+  const explosionChance = Math.min(0.52, 0.22 + (mines / size) * 0.9);
+  const explodes = secureRandom() < explosionChance;
+  const bombCell = explodes ? minePositions[crypto.randomInt(0, minePositions.length)] : null;
+  return {
+    minePositions,
+    revealPath,
+    recommendedCells: revealPath,
+    safeCount,
+    bombCell,
+    result: explodes ? 'mine' : 'safe',
+    outcome: explodes ? 'MINE' : 'SAFE STOP',
+    multiplier: `${calculateMinesMultiplier(size, mines, safeCount).toFixed(2)}x`,
+  };
 }
 
 function safePlayer(row) {
@@ -325,12 +343,10 @@ function createServices({ db, countries, currencies, minWithdrawalMinor }) {
       const targetRow = weightedChoice([[1, 0.2], [2, 0.22], [3, 0.2], [4, 0.15], [5, 0.1], [6, 0.06], [7, 0.04], [8, 0.02], [9, 0.008], [10, 0.002]]);
       analysis = { ...base, targetRow, rows: APPLE_MULTIPLIERS.map((multiplier, index) => ({ level: index + 1, recommendedCell: ((zone + index) % 5) + 1, cells: [1, 2, 3, 4, 5], multiplier: `x${multiplier}` })), note: 'The generated signal opens the recommended path automatically.' };
     } else if (game === 'mines') {
-      const video = chooseVideoOutcome(game);
       const size = [16, 25, 36].includes(Number(input.size)) ? Number(input.size) : 25;
       const mines = Math.min(Math.max(Number(input.mines) || 4, 1), Math.floor(size / 2));
-      const minePositions = sampleUnique(size, mines);
-      const recommendedCells = sampleUnique(size, Math.min(5, size - mines), new Set(minePositions));
-      analysis = { ...base, video, size, mines, recommendedCells, minePositions, result: video.outcome, multiplier: video.multiplier ? `${video.multiplier}x` : null, note: 'The generated Mines outcome video plays automatically.' };
+      const outcome = createMinesOutcome(size, mines);
+      analysis = { ...base, size, mines, ...outcome, note: outcome.result === 'mine' ? 'The procedural signal opens safe cells, then reaches a mine.' : 'The procedural signal stops safely before a mine.' };
     } else {
       const video = chooseVideoOutcome(game);
       const recommendedZone = crypto.randomInt(1, 6);

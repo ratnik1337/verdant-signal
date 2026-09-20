@@ -160,3 +160,12 @@ Full audit against the extracted art pack, all 8 usable style/reference screensh
 - During the 2–3 second analysis delay the existing waiting scene remains visible. The selected MP4 then replaces it, plays once muted/inline without crop or controls, disables duplicate signal requests, and returns to the waiting scene when playback ends.
 - Apple of Fortune remains on its existing signal-only animation because no Apple MP4 outcome folder was supplied.
 - Verification: `node --check public/app.js`, `node --check server/services.js`, `git diff --check`, and `npm test` pass (35/35). Live Chrome QA confirmed actual playback for Aviator (792×440), Chicken Road (816×304), Mines (792×492), and Football (792×600), no horizontal overflow, automatic return to ready after `ended`, and zero browser console messages.
+
+## 2026-09-20 (procedural Mines signal mode)
+
+- Replaced Mines MP4 outcome playback with a procedural signal round while preserving the current Diamond Mines background, logo, board proportions and the shared green site shell.
+- `Get signal` now generates a unique safe-cell route, opens its cells one by one, and ends either with a weighted safe stop and calculated multiplier or with a mine-cell explosion. Low/medium reveal counts remain substantially more common than long routes.
+- Integrated the supplied 12-frame diamond reveal sheet and 31-frame bomb explosion sheet. The supplied close spritesheet was malformed and could not be decoded, so the valid supplied `diamond-close-preview.gif` is used for the reset transition before the next signal.
+- Removed the obsolete Mines result MP4 files. Mines now uses only local animation assets under `public/assets/mines-signals/`; no archive UI, stake controls, balance controls or manual tile selection was copied.
+- Verified 4×4, 5×5 and 6×6 boards (16/25/36 cells), centered final diamonds, isolated bomb animation without full-screen flashing, closing animation on the next round, safe and mine outcomes, and no horizontal overflow at 390×844.
+- Final checks: `node --check public/app.js`, `node --check server/services.js`, `git diff --check`, and `node --test test/app.test.js` pass (14/14). Live Chrome QA reports zero console warnings/errors.

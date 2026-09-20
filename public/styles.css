@@ -1214,14 +1214,21 @@ h1, h2, h3 { text-wrap: balance; }
 .reference-mines-logo { position: relative; z-index: 2; align-self: start; width: min(100%, 310px); margin-top: 20px; filter: drop-shadow(0 10px 20px rgba(0,0,0,.35)); }
 .reference-mines-board { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(var(--mine-columns), minmax(0,1fr)); gap: clamp(5px, 1vw, 10px); width: min(100%, 560px); justify-self: end; padding: clamp(10px, 2vw, 16px); border: 8px solid #2a0830; border-radius: 28px; background: rgba(35,5,42,.74); box-shadow: 0 0 0 3px #a04bab, inset 0 0 28px rgba(0,0,0,.72); }
 .reference-mine-cell { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: clamp(8px,1.4vw,16px); background: #7d3388; box-shadow: 0 5px 0 #47154d, 0 0 0 2px #e282e7; }
-.reference-mine-cell.is-suggested { box-shadow: 0 5px 0 #56205c, 0 0 0 3px #f5b3f7, 0 0 18px #ed67f5; }
 .reference-mine-tile { position: absolute; inset: 0; background: url('/assets/local-games/mines/cell.png') 80% 0 / auto 100% no-repeat; }
-.reference-mine-cell.is-safe { background: radial-gradient(circle, #263d73, #120c2f); animation: reference-mine-open .55s cubic-bezier(.2,.8,.24,1) both; }
-.reference-mine-cell.is-safe .reference-mine-tile { opacity: .18; }
-.reference-mine-gem { position: absolute; z-index: 3; inset: 14%; background: url('/assets/generated/mines-diamond.svg') center / contain no-repeat; filter: drop-shadow(0 0 12px #62a8ff); transform: translateZ(0); }
+.reference-mine-sprite { position: absolute; z-index: 3; inset: 0; opacity: 0; background-position: 0 0; background-repeat: no-repeat; transform: translateZ(0); }
+.reference-mine-sprite.is-active, .reference-mine-cell.is-safe .reference-mine-sprite, .reference-mine-cell.is-bomb .reference-mine-sprite { opacity: 1; }
+.reference-mine-sprite.is-reveal { background-image: url('/assets/mines-signals/diamond-reveal-spritesheet.png'); background-size: 400% 300%; background-position: 100% 100%; }
+.reference-mine-sprite.is-bomb { background-image: url('/assets/mines-signals/bomb-explosion-spritesheet.png'); background-size: 400% 800%; background-position: 66.6667% 100%; }
+.reference-mine-cell.is-opening { z-index: 8; box-shadow: 0 6px 0 #47154d, 0 0 0 2px #f0a0f2, 0 0 24px rgba(100,187,255,.48); }
+.reference-mine-cell.is-safe { background: #100a28; box-shadow: 0 4px 0 #25123c, 0 0 0 2px #df77e5, 0 0 16px rgba(74,163,255,.3); }
+.reference-mine-cell.is-bomb { z-index: 9; background: #54102c; box-shadow: 0 4px 0 #3b0c28, 0 0 0 2px #ff9e55, 0 0 30px rgba(255,75,36,.72); }
+.reference-mine-cell.is-opening .reference-mine-tile, .reference-mine-cell.is-safe .reference-mine-tile, .reference-mine-cell.is-bomb .reference-mine-tile, .reference-mine-cell.is-closing .reference-mine-sprite { opacity: 0; }
+.reference-mine-close { position: absolute; z-index: 5; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
+.reference-mines-blast { position: absolute; z-index: 20; inset: 0; opacity: 0; border-radius: 20px; background: radial-gradient(circle at 62% 52%, rgba(255,255,242,.96), rgba(255,219,55,.68) 8%, rgba(255,68,21,.3) 24%, transparent 58%); mix-blend-mode: screen; pointer-events: none; }
+.reference-mines.is-blasting .reference-mines-blast { animation: reference-mines-blast .42s ease-out both; }
 .reference-mines-status { position: absolute; z-index: 4; bottom: 17px; left: 34px; display: grid; gap: 5px; color: #f0a7f3; font: 700 .58rem/1 var(--font-mono); letter-spacing: .08em; }
 .reference-mines-status strong { color: #ffdc5d; }
-@keyframes reference-mine-open { 0% { transform: scale(.76) rotateY(90deg); } 70% { transform: scale(1.08) rotateY(0); } 100% { transform: scale(1); } }
+@keyframes reference-mines-blast { 0% { opacity: 0; } 35% { opacity: .92; } 100% { opacity: 0; } }
 
 /* Penalty Champion — striker-only local signal playback. */
 .game-stage .visual-stage.reference-football { min-height: 540px; background: #153e56 url('/assets/local-games/football/background.jpg') center/cover no-repeat !important; }
