@@ -10,10 +10,12 @@
   --color-ink: oklch(95% 0.018 150);
   --color-muted: oklch(74% 0.026 150);
   --color-faint: oklch(62% 0.024 150);
-  --color-accent: oklch(78% 0.17 142);
-  --color-accent-deep: oklch(61% 0.13 148);
-  --color-accent-ink: oklch(15% 0.035 150);
-  --color-success: oklch(78% 0.17 142);
+  --color-accent: oklch(85% 0.185 96);
+  --color-accent-deep: oklch(76% 0.16 92);
+  --color-accent-ink: oklch(22% 0.03 150);
+  --color-success: oklch(74% 0.16 150);
+  --platform-green: oklch(46% 0.095 165);
+  --platform-green-deep: oklch(34% 0.08 165);
   --color-warning: oklch(84% 0.15 92);
   --color-error: oklch(70% 0.17 28);
   --color-info: oklch(75% 0.08 178);
@@ -157,7 +159,11 @@ p { line-height: 1.55; }
 .status-badge { display: inline-flex; min-height: 28px; align-items: center; gap: 7px; padding: 0 10px; border: 1px solid oklch(78% 0.185 96 / 0.28); border-radius: 999px; color: var(--color-accent); background: oklch(78% 0.185 96 / 0.07); font-family: var(--font-mono); font-size: 0.63rem; font-weight: 600; letter-spacing: 0.08em; }
 .status-badge::before { width: 5px; height: 5px; border-radius: 50%; background: currentColor; content: ''; }
 .status-badge.muted { border-color: var(--color-rule); color: var(--color-muted); background: transparent; }
-.status-badge.warning { border-color: oklch(84% 0.15 92 / 0.3); color: var(--color-warning); background: oklch(84% 0.15 92 / 0.07); }
+ .status-badge.warning { border-color: oklch(84% 0.15 92 / 0.3); color: var(--color-warning); background: oklch(84% 0.15 92 / 0.07); }
+ .status-badge.online-badge { border-color: oklch(72% 0.19 145 / 0.35); color: oklch(78% 0.19 145); background: oklch(72% 0.19 145 / 0.08); }
+ .status-badge.online-badge::before { display: none; }
+ .online-pulse { width: 7px; height: 7px; border-radius: 50%; background: oklch(78% 0.19 145); box-shadow: 0 0 0 0 oklch(78% 0.19 145 / 0.6); animation: online-pulse-anim 1.8s ease-out infinite; }
+ @keyframes online-pulse-anim { 0% { box-shadow: 0 0 0 0 oklch(78% 0.19 145 / 0.55); } 70% { box-shadow: 0 0 0 6px oklch(78% 0.19 145 / 0); } 100% { box-shadow: 0 0 0 0 oklch(78% 0.19 145 / 0); } }
 .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; margin-bottom: var(--space-6); border: 1px solid var(--color-rule); background: var(--color-rule); }
 .metric { min-height: 122px; padding: 19px; background: var(--color-surface); }
 .metric-label { display: block; margin-bottom: 22px; color: var(--color-faint); font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; }
@@ -253,6 +259,13 @@ p { line-height: 1.55; }
 .apple-cell.recommended { border-color: var(--color-accent); color: var(--color-accent-ink); background: var(--color-accent); box-shadow: 0 0 22px oklch(78% 0.185 96 / 0.12); }
 .apple-cell.danger { color: var(--color-error); }
   .mine-stage { display: grid; place-items: center; padding: 24px; }
+ .mines-embedded-stage, .football-embedded-stage { min-height: 620px; padding: 0; overflow: hidden; border-color: oklch(78% 0.185 96 / 0.34); background: #07130e; }
+ .mines-game-embed, .football-game-embed, .external-game-embed { position: relative; z-index: 1; display: block; width: 100%; height: min(78dvh, 760px); min-height: 560px; border: 0; background: #07130e; pointer-events: auto; touch-action: manipulation; }
+ .external-game-stage { min-height: 0; height: clamp(420px, 58dvh, 560px); padding: 0; overflow: hidden; border-color: #9ccfbb; background: #07130e; }
+  .external-game-embed { height: 100%; min-height: 0; }
+  .game-view .game-action-row { display: none; }
+  .game-view [data-game-action="aviator-start"], .game-view [data-game-action="mine-start"], .game-view [data-game-action="mine-reset"], .game-view [data-game-action="chicken-step"], .game-view [data-game-action="football-run"] { display: none; }
+  .game-view .game-actions:has([data-game-action="aviator-start"]), .game-view .game-actions:has([data-game-action="mine-start"]) { display: none; }
 
 .mine-grid { display: grid; width: min(100%, 360px); grid-template-columns: repeat(5, 1fr); gap: 8px; }
 .mine-cell { display: grid; aspect-ratio: 1; place-items: center; border: 1px solid var(--color-rule); border-radius: 9px; color: var(--color-muted); background: var(--color-surface-raised); font-family: var(--font-mono); font-size: 0.7rem; }
@@ -294,6 +307,11 @@ p { line-height: 1.55; }
 .withdrawal-card.locked { border-color: oklch(84% 0.15 92 / 0.2); }
 .withdrawal-card h2 { margin-bottom: 10px; }
 .withdrawal-card p { color: var(--color-muted); font-size: 0.82rem; }
+.manual-balance-panel .manual-balance-note { margin-bottom: var(--space-4); color: var(--color-muted); font-size: 0.82rem; }
+.manual-balance-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-4); }
+.manual-balance-form label { flex: 1 1 240px; min-width: 200px; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-faint); }
+.manual-balance-form input { width: 100%; min-height: 48px; margin-top: 7px; padding: 0 14px; border: 1px solid var(--color-rule); border-radius: var(--radius-sm); outline: 0; color: var(--color-ink); background: var(--color-surface); font-family: var(--font-sans); text-transform: none; }
+.manual-balance-form button { flex: 0 0 auto; }
 .activity-table { width: 100%; border-collapse: collapse; }
 .activity-table th, .activity-table td { padding: 14px 12px; border-bottom: 1px solid var(--color-rule); text-align: left; }
 .activity-table th { color: var(--color-faint); font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -308,6 +326,12 @@ p { line-height: 1.55; }
 .legal-dialog h2 { padding-right: 40px; }
 .legal-dialog p { color: var(--color-muted); font-size: 0.88rem; }
 .legal-dialog p:last-child { margin-bottom: 0; }
+.game-frame-dialog { width: min(1040px, calc(100vw - 24px)); height: min(88dvh, 760px); max-width: none; padding: 0; overflow: hidden; border: 1px solid var(--color-accent); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--shadow-soft); }
+.game-frame-dialog::backdrop { background: oklch(6% 0.03 155 / 0.82); backdrop-filter: blur(4px); }
+.game-frame-head { display: flex; align-items: center; min-height: 48px; padding: 0 56px 0 18px; border-bottom: 1px solid var(--color-rule); background: linear-gradient(90deg, var(--platform-green-deep), var(--platform-green)); }
+.game-frame-title { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.06em; color: var(--color-ink); }
+.game-frame-embed { display: block; width: 100%; height: calc(100% - 48px); border: 0; background: #06120c; }
+.game-frame-dialog .dialog-close { z-index: 2; color: var(--color-ink); }
 .game-card-live { border-color: var(--color-accent); background: linear-gradient(135deg, oklch(46% 0.095 165 / 0.55), var(--color-surface)); }
 .game-card-live::after { border-color: var(--color-accent); }
 .game-card-live strong { color: var(--color-accent); }
@@ -691,6 +715,105 @@ h1, h2, h3 { text-wrap: balance; }
 .apple-cell::before { position: absolute; inset: 5px; border: 1px solid rgba(255, 227, 163, 0.13); content: ''; }
 .apple-cell:hover:not(:disabled) { border-color: #f8dc91; transform: translateY(-2px); }.apple-cell:disabled { cursor: not-allowed; opacity: 0.5; }.apple-cell.is-suggested { border-color: #baf08b; box-shadow: 0 0 0 2px rgba(186, 240, 139, 0.16); }.apple-cell.is-safe { color: #142d18; background: #b3eb80; }.apple-cell.is-danger { color: #fff0db; background: #a95b4d; }.apple-face { position: relative; z-index: 1; font-size: 3.4rem; transform: scale(2.4); }.apple-leaf { position: absolute; right: 6px; top: 4px; color: rgba(219, 247, 143, 0.65); font-size: 0.66rem; }.apple-cell.is-flipping { animation: apple-flip 520ms ease both; }
 
+/* Apple of Fortune: full fairy-tale stage, wood board with side multiplier column */
+.apple-game-stage { display: flex; min-height: 0; padding: clamp(8px, 1.4vw, 14px); }
+.apple-balance-panel .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.apple-round-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
+.apple-round-metric { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--color-rule); border-radius: 10px; background: var(--color-surface-raised); }
+.apple-round-metric .metric-value { font-size: 1.1rem; }
+.apple-round-metric-stake, .apple-round-metric-potential { border-color: #1f7a35; background: linear-gradient(160deg, #0f3d1c, #0a2812); box-shadow: inset 0 0 0 1px rgba(90, 230, 130, 0.18); }
+.apple-round-metric-stake .metric-label, .apple-round-metric-potential .metric-label { color: #8ff0ab; }
+.apple-stake-value, .apple-potential-value { color: #4ade6a !important; text-shadow: 0 0 14px rgba(74, 222, 106, 0.55); }
+.apple-inline-message { margin: 0 0 14px; padding: 10px 12px; border: 1px solid rgba(230, 90, 90, 0.4); border-radius: 8px; background: rgba(230, 90, 90, 0.12); color: #ffb4b4; font-size: 0.85rem; }
+.apple-cashout-btn { grid-column: 1 / -1; padding: 12px 20px; border: none; border-radius: 10px; color: #072b0f; background: linear-gradient(160deg, #6bf58f, #2fb559); box-shadow: 0 4px 0 #1f7a3b, 0 7px 12px rgba(0, 0, 0, 0.35); font-weight: 700; letter-spacing: 0.03em; cursor: pointer; }
+.apple-fullstage { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; width: 100%; min-height: 560px; border: 1px solid #3a2716; border-radius: 16px; background: #0c1f14; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45); }
+.apple-fullstage .apple-bg { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; }
+.apple-fullstage .apple-vignette { position: absolute; inset: 0; z-index: 1; background: radial-gradient(ellipse at 50% 42%, transparent 42%, rgba(3, 12, 7, 0.55) 82%), linear-gradient(180deg, rgba(4, 12, 8, 0.25), transparent 18%, transparent 74%, rgba(3, 10, 6, 0.55)); pointer-events: none; }
+.apple-fullstage .apple-character { position: absolute; z-index: 2; bottom: 0; height: 96%; max-width: 30%; object-fit: contain; object-position: bottom; filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.45)); pointer-events: none; }
+.apple-fullstage .apple-queen { left: -2%; }
+.apple-fullstage .apple-snow { right: -2%; }
+.apple-fullstage .apple-logo { position: absolute; z-index: 5; top: 2%; right: 2%; width: clamp(96px, 14vw, 168px); filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5)); pointer-events: none; }
+.apple-fullstage .apple-panel { position: relative; z-index: 4; display: grid; gap: 10px; width: min(92%, 640px); margin: clamp(14px, 3vw, 30px) auto 0; padding: clamp(10px, 1.6vw, 18px); border: 5px solid #a1723c; border-radius: 16px; background: linear-gradient(150deg, #6d4a29, #392616); box-shadow: 0 14px 0 rgba(10, 8, 5, 0.55), inset 0 0 0 2px rgba(244, 197, 120, 0.24), 0 20px 34px rgba(0, 0, 0, 0.4); }
+.apple-fullstage .apple-vine { position: absolute; z-index: 6; width: clamp(56px, 9vw, 108px); pointer-events: none; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4)); }
+.apple-fullstage .apple-vine-left { top: -14px; left: -14px; }
+.apple-fullstage .apple-vine-right { top: -14px; right: -14px; transform: scaleX(-1); }
+.apple-fullstage .apple-panel-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 12px; border: 1px solid rgba(244, 197, 120, 0.3); border-radius: 10px; background: linear-gradient(180deg, #241a10, #120c07); }
+.apple-fullstage .apple-panel-title { flex: 1; overflow: hidden; color: #f4e6c6; font-family: var(--font-display); font-size: clamp(0.72rem, 1.6vw, 0.98rem); text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.apple-fullstage .apple-icon-btn { display: grid; flex: none; width: clamp(28px, 4vw, 38px); height: clamp(28px, 4vw, 38px); place-items: center; border: none; border-radius: 50%; color: #fff; background: linear-gradient(160deg, #d24b3f, #a12a20); box-shadow: 0 3px 0 #6e1a13, 0 5px 10px rgba(0, 0, 0, 0.4); cursor: pointer; }
+.apple-fullstage .apple-icon-btn:hover { filter: brightness(1.08); }
+.apple-fullstage .apple-icon-btn.is-active { background: linear-gradient(160deg, #7a7a7a, #4a4a4a); box-shadow: 0 3px 0 #262626, 0 5px 10px rgba(0, 0, 0, 0.4); }
+.apple-fullstage .apple-board { display: grid; gap: 5px; padding: 4px; }
+.apple-fullstage .apple-row { display: flex; align-items: stretch; gap: 6px; }
+.apple-fullstage .apple-row.is-current .apple-cells { outline: 1px solid rgba(247, 201, 103, 0.5); }
+.apple-fullstage .apple-cells { display: grid; flex: 1; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; border-radius: 6px; }
+.apple-fullstage .apple-cell { position: relative; min-height: 0; aspect-ratio: 2.4 / 1; overflow: hidden; padding: 0; border: none; border-radius: 4px; background: none; cursor: pointer; transition: transform 200ms var(--motion-snap); }
+.apple-fullstage .apple-cell:hover:not(:disabled) { transform: translateY(-2px); }
+.apple-fullstage .apple-cell:disabled { cursor: not-allowed; }
+.apple-fullstage .apple-cell-inner { position: relative; display: block; width: 100%; height: 100%; }
+.apple-fullstage .apple-tile { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; object-fit: cover; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35); }
+.apple-fullstage .apple-cell.is-suggested .apple-tile { box-shadow: inset 0 0 0 2px #baf08b, 0 0 10px rgba(186, 240, 139, 0.5); }
+.apple-fullstage .apple-cell.is-safe .apple-tile { box-shadow: inset 0 0 0 2px #b3eb80, 0 0 10px rgba(179, 235, 128, 0.5); }
+.apple-fullstage .apple-cell.is-danger .apple-tile { box-shadow: inset 0 0 0 2px #e0685a, 0 0 10px rgba(224, 104, 90, 0.5); }
+.apple-fullstage .apple-sprite { position: absolute; z-index: 2; top: 50%; left: 50%; width: 42%; transform: translate(-50%, -50%); filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45)); }
+.apple-fullstage .apple-cell-animation { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; }
+.apple-fullstage .apple-cell.is-flipping .apple-sprite { animation: apple-flip 520ms ease both; }
+.apple-fullstage .apple-row-multiplier { display: grid; flex: none; width: clamp(46px, 8vw, 66px); place-items: center; border: 1px solid rgba(180, 190, 196, 0.35); border-radius: 4px; color: #dfe6e8; background: linear-gradient(180deg, #8b969c, #5c666b); font-family: var(--font-mono); font-size: clamp(0.56rem, 1.2vw, 0.72rem); font-weight: 700; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 0 rgba(0, 0, 0, 0.25); }
+.apple-fullstage .apple-row-multiplier.is-current { color: #2b1c08; background: linear-gradient(180deg, #f8dc91, #e0af4c); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 12px rgba(248, 220, 145, 0.55); }
+.apple-fullstage .apple-bottom-bar { position: relative; z-index: 4; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: clamp(8px, 2vw, 18px); width: min(92%, 640px); margin: clamp(10px, 2vw, 20px) auto 16px; padding: clamp(10px, 1.6vw, 16px); border: 4px solid #a1723c; border-radius: 14px; background: linear-gradient(150deg, #6d4a29, #392616); box-shadow: 0 12px 0 rgba(10, 8, 5, 0.5), inset 0 0 0 2px rgba(244, 197, 120, 0.2); }
+.apple-fullstage .apple-stake-chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.apple-fullstage .apple-chip { padding: 6px 10px; border: 1px solid rgba(200, 208, 212, 0.4); border-radius: 6px; color: #e8edee; background: linear-gradient(180deg, #8b969c, #5c666b); font-family: var(--font-mono); font-size: 0.72rem; cursor: pointer; }
+.apple-fullstage .apple-chip.is-active { color: #2b1c08; background: linear-gradient(180deg, #f8dc91, #e0af4c); }
+.apple-fullstage .apple-chip:disabled { cursor: not-allowed; opacity: 0.55; }
+.apple-fullstage .apple-stake-field { position: relative; display: flex; align-items: center; }
+.apple-fullstage .apple-stake-field input { width: clamp(90px, 14vw, 150px); padding: 10px 30px 10px 12px; border: 1px solid rgba(120, 128, 132, 0.5); border-radius: 8px; color: #1a1a1a; background: #f4efe4; font-family: var(--font-mono); font-size: 0.85rem; }
+.apple-fullstage .apple-stake-clear { position: absolute; right: 6px; display: grid; width: 20px; height: 20px; place-items: center; border: none; border-radius: 50%; color: #6b6b6b; background: none; cursor: pointer; font-size: 0.9rem; line-height: 1; }
+.apple-fullstage .apple-play-btn { display: grid; flex: none; width: clamp(52px, 8vw, 68px); height: clamp(52px, 8vw, 68px); place-items: center; border: 3px solid #d8f7c2; border-radius: 50%; color: #0e2b0a; background: radial-gradient(circle at 35% 30%, #a6e572, #4f9c2c); box-shadow: 0 5px 0 #2a5c17, 0 8px 14px rgba(0, 0, 0, 0.4); cursor: pointer; }
+.apple-fullstage .apple-play-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+.apple-fullstage .apple-auto-btn { padding: 12px 20px; border: none; border-radius: 10px; color: #fff; background: linear-gradient(160deg, #9b3ff0, #6a1fb0); box-shadow: 0 4px 0 #4a1580, 0 7px 12px rgba(0, 0, 0, 0.35); font-weight: 700; letter-spacing: 0.03em; cursor: pointer; }
+.apple-fullstage .apple-auto-btn.is-active { background: linear-gradient(160deg, #f8dc91, #e0af4c); color: #2b1c08; box-shadow: 0 4px 0 #a1722c, 0 7px 12px rgba(0, 0, 0, 0.35); }
+
+.apple-fullstage .apple-win-overlay { position: absolute; inset: 0; z-index: 8; display: grid; place-items: center; pointer-events: none; animation: apple-win-fade 2800ms ease forwards; }
+.apple-fullstage .apple-win-burst { position: absolute; width: min(70vw, 420px); height: min(70vw, 420px); border-radius: 50%; background: radial-gradient(circle, rgba(255, 214, 120, 0.55), rgba(255, 214, 120, 0) 70%); animation: apple-win-burst-pulse 1400ms ease-out both; }
+.apple-fullstage .apple-win-apple { position: relative; z-index: 1; width: clamp(110px, 20vw, 210px); filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.55)); animation: apple-win-pop 900ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.apple-fullstage .apple-win-score { position: absolute; z-index: 1; bottom: 14%; padding: 10px 24px; border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 999px; color: #2b1c08; background: linear-gradient(180deg, #ffe9a8, #f0b94c); font-family: var(--font-display); font-size: clamp(1rem, 3.2vw, 1.7rem); font-weight: 800; text-align: center; white-space: nowrap; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4); animation: apple-win-score-rise 700ms 260ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes apple-win-pop { 0% { transform: scale(0.2) rotate(-14deg); opacity: 0; } 55% { transform: scale(1.2) rotate(6deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+@keyframes apple-win-score-rise { 0% { transform: translateY(26px) scale(0.8); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes apple-win-burst-pulse { 0% { transform: scale(0.4); opacity: 0.9; } 100% { transform: scale(1.5); opacity: 0; } }
+@keyframes apple-win-fade { 0%, 76% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .apple-fullstage .apple-win-overlay, .apple-fullstage .apple-win-burst, .apple-fullstage .apple-win-apple, .apple-fullstage .apple-win-score { animation: none; opacity: 1; }
+}
+
+@media (min-width: 861px) {
+  .apple-fullstage { max-width: 980px; margin: 0 auto; }
+}
+
+@media (max-width: 860px) {
+  .apple-fullstage { aspect-ratio: auto; min-height: 0; }
+  .apple-fullstage .apple-character { display: none; }
+  .apple-fullstage .apple-logo { width: clamp(80px, 22vw, 120px); }
+  .apple-fullstage .apple-panel, .apple-fullstage .apple-bottom-bar { width: 96%; }
+  .apple-fullstage .apple-row-multiplier { width: clamp(38px, 12vw, 54px); font-size: 0.58rem; }
+  .apple-fullstage .apple-win-apple { width: clamp(84px, 26vw, 150px); }
+  .apple-fullstage .apple-win-score { font-size: clamp(0.82rem, 4vw, 1.15rem); padding: 8px 16px; }
+}
+
+@media (max-width: 480px) {
+  .apple-fullstage .apple-panel, .apple-fullstage .apple-bottom-bar { width: 100%; border-radius: 12px; }
+  .apple-fullstage .apple-board { gap: 4px; padding: 3px; }
+  .apple-fullstage .apple-row { gap: 4px; }
+  .apple-fullstage .apple-cells { gap: 4px; }
+  .apple-fullstage .apple-row-multiplier { width: clamp(30px, 14vw, 42px); font-size: 0.52rem; }
+  .apple-fullstage .apple-bottom-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+  .apple-fullstage .apple-stake-chips { grid-template-columns: repeat(3, 1fr); }
+  .apple-fullstage .apple-stake-field, .apple-fullstage .apple-play-btn, .apple-fullstage .apple-auto-btn { justify-self: center; }
+  .apple-fullstage .apple-bottom-bar > * { width: 100%; }
+  .apple-fullstage .apple-stake-field input { width: 100%; box-sizing: border-box; }
+  .apple-fullstage .apple-play-btn { width: 56px; height: 56px; margin: 0 auto; }
+  .apple-fullstage .apple-auto-btn { text-align: center; }
+  .apple-fullstage .apple-panel-title { font-size: 0.68rem; }
+}
+
 /* Mines: square target buttons keep the grid legible and keyboard friendly */
 .mines-stage { min-height: 430px; padding: 25px; background: radial-gradient(circle at 50% 30%, rgba(91, 191, 101, 0.2), transparent 34%), #061d13; }
 .mine-frame { width: min(100%, 470px); padding: 12px; border: 8px solid #1d5838; border-radius: 10px; background: #0a2b1b; box-shadow: 0 0 0 1px rgba(163, 237, 140, 0.38), inset 0 0 0 2px #03150d; }
@@ -863,6 +986,13 @@ h1, h2, h3 { text-wrap: balance; }
 @keyframes apple-cell-flip { 0% { transform: rotateY(0deg); } 48% { transform: rotateY(90deg); } 100% { transform: rotateY(0deg); } }
 
   @media (max-width: 780px) {
+  .external-game-stage { width: 100%; height: min(76svh, 620px); min-height: 460px; border-radius: 10px; }
+  .external-game-stage .external-game-embed { width: 100%; height: 100%; min-height: 0; }
+  .aviator-embed-stage { height: min(76svh, 620px); min-height: 460px; }
+ .game-view:has(.external-game-stage), .game-view:has(.mines-embedded-stage), .game-view:has(.football-embedded-stage) { --embed-active: 1; }
+ .game-view:has(.external-game-stage) .game-stage-panel, .game-view:has(.mines-embedded-stage) .game-stage-panel, .game-view:has(.football-embedded-stage) .game-stage-panel { padding: 8px; }
+ .game-view:has(.external-game-stage) .panel-body, .game-view:has(.mines-embedded-stage) .panel-body, .game-view:has(.football-embedded-stage) .panel-body { padding: 10px; }
+ .game-view:has(.external-game-stage) .stage-caption, .game-view:has(.mines-embedded-stage) .stage-caption, .game-view:has(.football-embedded-stage) .stage-caption { display: none; }
   .pipeline-stage { min-height: 405px; }
   .aviator-stage, .chicken-road-stage, .apple-stage, .mines-stage, .football-stage { min-height: 405px; }
   .road-playfield { right: 3%; left: 3%; height: 224px; }
@@ -952,9 +1082,9 @@ h1, h2, h3 { text-wrap: balance; }
    painted cell is only ~39px. A ::before with a negative inset grows the real, clickable hit box
    into the inter-cell gap (pointer events on a pseudo-element register on its host button) without
    resizing or shifting the visible cell itself. */
-.mine-overlay .mine-cell { position: relative; min-width: 0; min-height: 0; aspect-ratio: 1; padding: 0; border: 2px solid rgba(73, 128, 174, .74); border-radius: 10px; color: #d9f4ff; background: linear-gradient(145deg, rgba(11, 48, 76, .98), rgba(4, 22, 38, .98)); box-shadow: inset 0 0 0 2px rgba(18, 76, 118, .62), 0 3px 6px rgba(0, 0, 0, .28); pointer-events: auto; }
+.mine-overlay .mine-cell { position: relative; min-width: 0; min-height: 0; aspect-ratio: 1; padding: 0; border: 2px solid transparent; border-radius: 10px; color: #d9f4ff; background: transparent; box-shadow: none; pointer-events: auto; }
 .mine-overlay .mine-cell::before { position: absolute; inset: -5px; content: ''; }
-.mine-overlay .mine-cell:hover:not(:disabled), .mine-overlay .mine-cell.is-suggested { border-color: rgba(84, 230, 255, .92); background: linear-gradient(145deg, rgba(18, 104, 151, .98), rgba(5, 42, 68, .98)); box-shadow: 0 0 0 2px rgba(47, 211, 255, .2), inset 0 0 18px rgba(22, 173, 244, .16); }
+.mine-overlay .mine-cell:hover:not(:disabled), .mine-overlay .mine-cell.is-suggested { border-color: rgba(84, 230, 255, .92); background: rgba(17, 169, 235, .12); box-shadow: 0 0 0 2px rgba(47, 211, 255, .2), inset 0 0 18px rgba(22, 173, 244, .16); }
 .mine-overlay .mine-cell.is-opening { animation: mines-cell-open 460ms cubic-bezier(.2, .72, .25, 1) both; }
 .mine-overlay .mine-cell:disabled { cursor: default; opacity: 1; }
 /* Real layered art for both reveal outcomes (public/assets/generated/mines-*.svg): a faceted,
@@ -966,9 +1096,11 @@ h1, h2, h3 { text-wrap: balance; }
 .mine-hint { display: block; width: 10px; height: 10px; border: 1px solid #75eaff; border-radius: 50%; background: #b5f8ff; box-shadow: 0 0 12px #27d8ff; }
 @keyframes mine-face-in { 0% { transform: scale(0.4) rotate(-8deg); opacity: 0; } 65% { transform: scale(1.12) rotate(2deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
 @keyframes mine-explosion-flash { 0% { filter: drop-shadow(0 0 0 rgba(255, 120, 50, 0)); } 28% { filter: drop-shadow(0 0 26px rgba(255, 140, 60, 0.95)) brightness(1.5); } 100% { filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45)); } }
-/* The approved backdrop contains a legacy mid-board betting banner. Replace only that band
-   with the same blue-metal grid language as the playable cells. */
-.mine-banner-mask { position: absolute; z-index: 2; top: 49%; right: 3%; bottom: 24%; left: 3%; border: 2px solid rgba(73, 128, 174, .74); border-radius: 12px; background: repeating-linear-gradient(90deg, transparent 0 calc(20% - 2px), rgba(73, 128, 174, .48) calc(20% - 2px) 20%), repeating-linear-gradient(0deg, transparent 0 calc(50% - 2px), rgba(73, 128, 174, .42) calc(50% - 2px) 50%), linear-gradient(145deg, rgba(11, 48, 76, .98), rgba(4, 22, 38, .98)); box-shadow: inset 0 0 0 2px rgba(18, 76, 118, .62), 0 6px 14px rgba(0, 0, 0, .24); pointer-events: none; }
+/* The approved backdrop bakes in a "place your bet" banner across the mid-board rows. Once a round
+   starts this plate covers just that banner rect (matched to the neighbouring cell material) so the
+   grid underneath stays the only thing the player reads — never toggled before the round begins. */
+.mine-banner-mask { position: absolute; z-index: 2; top: 49%; right: 3%; bottom: 24%; left: 3%; border-radius: 12px; background: linear-gradient(145deg, #0b2945, #061827); opacity: 0.99; pointer-events: none; }
+  .mines-reference-board.is-active .mine-banner-mask { opacity: 0.98; }
 .mine-readout { width: min(100%, 430px); margin: 0; color: #a8c4e7; }
 .mine-readout strong { color: #e7f7ff; }
 .mine-frame-fallback { width: min(100%, 430px); border-color: #4f78a8; border-radius: 12px; background: linear-gradient(145deg, #164168, #071b2f); box-shadow: 0 0 0 3px rgba(75, 164, 235, .22), inset 0 0 0 2px rgba(186, 229, 255, .16); }
@@ -1005,260 +1137,3 @@ h1, h2, h3 { text-wrap: balance; }
 .football-animation-canvas { z-index: 2; }
 .goal-net.has-animation-clip .keeper-actor, .goal-net.has-animation-clip .football-ball { visibility: hidden; }
 .goal-net.has-animation-clip .goal-zones { z-index: 6; }
-
-/* Reference skins: retain the supplied Betwinner composition while the local
-   signal runtime owns the interaction and animation. Betting controls from
-   the source screens are intentionally covered, never made interactive. */
-.reference-aviator-stage {
-  min-height: 450px;
-  overflow: hidden;
-  border-color: #252b53;
-  background: #111731 url('/assets/reference-games/aviator-reference.png') center / 100% 100% no-repeat;
-}
-.reference-aviator-stage::before { display: none; }
-.reference-aviator-stage canvas { z-index: 3; pointer-events: none; }
-.reference-plane-eraser { position: absolute; z-index: 2; inset: 0; background: #111731 url('/assets/reference-games/aviator-reference.png') center / 100% 100% no-repeat; clip-path: ellipse(12% 22% at 30% 67%); pointer-events: none; }
-.reference-aviator-stage .aviator-grid-labels { display: none; }
-.reference-aviator-stage .aviator-center-readout { top: 15%; right: 18px; left: auto; transform: none; justify-items: end; opacity: .92; }
-.reference-aviator-stage .aviator-center-readout strong { font-size: clamp(1.5rem, 4vw, 2.8rem); color: #f7f8fb; text-shadow: none; }
-.reference-aviator-stage .aviator-center-readout .readout-label { color: rgba(255,255,255,.58); }
-.reference-aviator-stage .aviator-center-readout .round-state { margin-top: 3px; color: #f5a321; }
-.reference-aviator-stage .aviator-toolbar { z-index: 5; top: 20px; left: 24px; }
-.reference-aviator-stage .aviator-help-button { border-color: #f27c18; color: #f27c18; background: rgba(21, 27, 58, .92); }
-.reference-aviator-stage .aviator-instruction { z-index: 6; top: 68px; right: 18px; max-width: 260px; border-color: rgba(242,124,24,.7); background: rgba(13, 18, 42, .95); }
-.reference-aviator-stage .aviator-axis, .reference-aviator-stage .stage-caption { color: rgba(255,255,255,.55); }
-
-.reference-chicken-stage {
-  min-height: 500px;
-  padding: 0 0 12px;
-  overflow: hidden;
-  border-color: #9acfae;
-  background: #41496f;
-}
-.reference-chicken-stage::before { opacity: .22; background-size: 34px 34px; }
-.chicken-reference-topbar { position: relative; z-index: 6; display: grid; grid-template-columns: 1fr auto auto; align-items: center; min-height: 52px; padding: 0 20px; color: #eef0ff; background: #3a3e55; box-shadow: 0 5px 0 rgba(17,20,38,.26); }
-.chicken-reference-topbar strong { color: #f8f9ff; font-family: var(--font-display); font-size: clamp(1.2rem, 3vw, 2rem); letter-spacing: -.05em; }
-.chicken-reference-topbar span { margin-inline: 20px; color: #b7bfdf; font: 600 .68rem var(--font-mono); }
-.chicken-reference-topbar i { display: inline-block; width: 7px; height: 7px; margin: 0 4px; border-radius: 50%; background: #55dc70; }
-.chicken-reference-topbar b { padding: 9px 14px; border-radius: 8px; color: #f5f6ff; background: #4b506e; font: 700 .82rem var(--font-mono); }
-.reference-chicken-stage .road-playfield { position: relative; z-index: 1; min-height: 330px; margin: 0; padding: 46px 0 25px; overflow: hidden; border: 0; border-radius: 0; background: linear-gradient(90deg, rgba(28,33,58,.5), transparent 18%, transparent 82%, rgba(28,33,58,.5)), repeating-linear-gradient(90deg, transparent 0 calc(20% - 2px), rgba(212,218,247,.56) calc(20% - 2px) 20%), linear-gradient(180deg, #4c557d, #3a4268 77%, #252b47); box-shadow: inset 0 -28px 0 rgba(20,24,40,.32); }
-.reference-chicken-stage .road-shoulder { position: absolute; z-index: 0; inset: 0 auto 0 0; width: 15%; background: linear-gradient(90deg, rgba(16,20,34,.72), rgba(35,40,66,.25)); }
-.reference-chicken-stage .road-cells { position: relative; z-index: 2; display: grid; width: 100%; height: 100%; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; align-items: stretch; }
-.reference-chicken-stage .road-step { min-height: 242px; align-content: start; padding-top: 22px; border: 0; border-left: 1px dashed rgba(203,210,244,.52); border-radius: 0; color: #dce1ff; background: transparent; }
-.reference-chicken-stage .road-step:nth-child(even) { transform: none; }
-.reference-chicken-stage .road-step::after { content: ''; width: 64px; height: 58px; margin-top: 32px; border: 4px solid rgba(27,32,59,.75); border-bottom: 0; border-radius: 34px 34px 0 0; background: repeating-linear-gradient(90deg, transparent 0 8px, rgba(27,32,59,.62) 8px 12px); box-shadow: inset 0 -10px 0 rgba(93,101,147,.35); }
-.reference-chicken-stage .road-step.is-target::after { border-color: #ffd740; box-shadow: 0 0 22px rgba(255,215,64,.38), inset 0 -10px 0 rgba(255,215,64,.22); }
-.reference-chicken-stage .road-step.is-cleared::after { border-color: #63df7d; box-shadow: 0 0 18px rgba(99,223,125,.32); }
-.reference-chicken-stage .road-step.is-danger::after { border-color: #ff6b52; box-shadow: 0 0 18px rgba(255,107,82,.42); }
-.reference-chicken-stage .step-number { color: #f3f5ff; font: 700 clamp(1rem, 2.3vw, 1.45rem) var(--font-mono); }
-.reference-chicken-stage .step-marker { position: absolute; top: 88px; z-index: 2; color: transparent; }
-.reference-chicken-stage .road-step small { margin-top: 9px; color: #aab2d7; font: 600 .62rem var(--font-mono); text-transform: uppercase; }
-.reference-chicken-stage .chick-object { z-index: 5; bottom: 40px; width: clamp(76px, 13vw, 132px); }
-.reference-chicken-stage .van-object { z-index: 4; width: clamp(100px, 17vw, 170px); opacity: .9; }
-.reference-chicken-stage .road-shadow { position: absolute; z-index: 1; right: 0; bottom: 0; left: 0; height: 28px; background: rgba(13,17,29,.55); }
-.chicken-reference-footer { position: relative; z-index: 7; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; margin: 10px 16px 0; padding: 0 18px; border: 1px solid rgba(202,209,243,.2); border-radius: 9px; color: #c8cdea; background: #333950; font: 700 .7rem var(--font-mono); }
-.chicken-reference-footer strong { color: #f5f7ff; font-size: 1.15rem; }
-.chicken-reference-footer small { color: #ffd740; }
-.reference-chicken-stage .road-readout { display: none; }
-
-.reference-mines-board { width: 100%; max-width: none; aspect-ratio: 1153 / 693; border: 0; border-radius: 8px; box-shadow: inset 0 0 0 2px rgba(133,190,255,.48), 0 14px 26px rgba(0,0,0,.32); }
-.reference-mines-board .mines-reference-art { object-fit: fill; object-position: center; }
-.reference-mines-board .mine-overlay { top: 19%; right: 4%; bottom: 5%; left: 49%; gap: 1.3%; }
-.reference-mines-board .mine-overlay .mine-cell { border-radius: 9px; border-color: rgba(90,165,235,.46); background: rgba(3,24,42,.36); box-shadow: inset 0 0 0 2px rgba(24,77,118,.38), 0 4px 8px rgba(0,0,0,.28); }
-.reference-mines-board .mine-overlay .mine-cell:hover:not(:disabled), .reference-mines-board .mine-overlay .mine-cell.is-suggested { background: rgba(14,105,173,.42); border-color: #49d9ff; }
-.reference-mines-board .mine-bet-mask { position: absolute; z-index: 4; top: 4%; left: 1%; width: 40%; height: 62%; display: grid; align-content: center; gap: 8px; padding: 18px; border: 1px solid rgba(98,177,236,.4); border-radius: 10px; color: #d9efff; background: linear-gradient(145deg, rgba(7,45,76,.96), rgba(3,20,37,.98)); box-shadow: inset 0 0 0 2px rgba(29,98,152,.32); pointer-events: none; }
-.reference-mines-board .mine-bet-mask strong { color: #57e9bc; font: 800 clamp(.85rem, 2vw, 1.2rem) var(--font-display); text-transform: uppercase; }
-.reference-mines-board .mine-bet-mask span { color: #a5c9e4; font: 600 .67rem/1.45 var(--font-mono); }
-.reference-mines-board .mine-banner-mask { top: 48%; right: 8%; bottom: 20%; left: 52%; z-index: 4; border-color: rgba(73,128,174,.5); background: rgba(4,24,42,.96); }
-.reference-mines-board .mine-banner-mask::after { content: 'СИГНАЛ  •  ПОЛЕ ПОДСКАЗКИ'; position: absolute; inset: 0; display: grid; place-items: center; color: rgba(207,239,255,.78); font: 700 clamp(.52rem, 1.2vw, .78rem) var(--font-mono); letter-spacing: .08em; text-align: center; }
-
-.reference-football-stage { min-height: 480px; padding: 0 0 14px; overflow: hidden; border-color: #9fc4d4; background: #9cc1d1 url('/assets/reference-games/football-reference.png') center top / 100% auto no-repeat; }
-.reference-football-stage::after { position: absolute; z-index: 2; right: 0; bottom: 0; left: 0; height: 31%; background: linear-gradient(180deg, rgba(22,33,45,.12), rgba(19,29,38,.96) 24%); content: ''; pointer-events: none; }
-.football-reference-rolebar { position: relative; z-index: 6; display: flex; align-items: center; justify-content: space-between; min-height: 54px; padding: 0 18px; color: #fff; background: rgba(25,40,59,.72); text-transform: uppercase; }
-.football-reference-rolebar strong { color: #ffd42c; font: 900 clamp(1rem, 2.8vw, 1.55rem) var(--font-display); }
-.football-reference-rolebar span, .football-reference-rolebar b { color: rgba(255,255,255,.76); font: 700 .64rem var(--font-mono); }
-.reference-football-stage .goal-scene { position: relative; z-index: 5; width: min(94%, 760px); margin: 102px auto 0; }
-.reference-football-stage .goal-net { height: 190px; border: 3px solid rgba(248,251,255,.8); background: linear-gradient(180deg, rgba(37,76,105,.24), rgba(10,25,44,.6)), repeating-linear-gradient(0deg, transparent 0 30px, rgba(226,242,255,.25) 31px 32px), repeating-linear-gradient(90deg, transparent 0 44px, rgba(226,242,255,.25) 45px 46px); box-shadow: 0 12px 18px rgba(0,0,0,.3); }
-.reference-football-stage .goal-zones { inset: 9% 3% 25%; gap: 8px; }
-.reference-football-stage .goal-zone { min-height: 58px; border-color: rgba(255,255,255,.3); background: rgba(16,49,82,.26); }
-.reference-football-stage .goal-zone span { font-size: 1.2rem; }
-.reference-football-stage .goal-zone .zone-coefficient { font-size: .56rem; }
-.reference-football-stage .keeper-actor { bottom: 7px; width: 68px; height: 134px; }
-.reference-football-stage .football-ball { width: 30px; height: 30px; }
-.reference-football-stage .football-readout { position: relative; z-index: 7; margin-top: 12px; color: #f7f8ff; }
-.reference-football-stage .football-readout strong { color: #ffd42c; }
-.reference-football-stage .stage-caption { position: relative; z-index: 7; color: rgba(255,255,255,.72); }
-.reference-football-stage { position: relative; min-height: 620px; background: #0b2035 !important; }
-.reference-football-stage .reference-football-backdrop { position: absolute; z-index: 0; top: 0; right: 0; left: 0; display: block; width: 100%; height: auto; clip-path: inset(0 0 23% 0); pointer-events: none; }
-.reference-football-stage .football-reference-rolebar { margin-top: 244px; }
-.reference-football-stage .goal-scene { margin-top: 16px; }
-.reference-football-stage .goal-net { background: linear-gradient(180deg, rgba(37,76,105,.24), rgba(10,25,44,.6)), repeating-linear-gradient(0deg, transparent 0 30px, rgba(226,242,255,.25) 31px 32px), repeating-linear-gradient(90deg, transparent 0 44px, rgba(226,242,255,.25) 45px 46px); }
-
-@media (max-width: 600px) {
-  .reference-aviator-stage { min-height: 330px; }
-  .reference-chicken-stage { min-height: 410px; }
-  .chicken-reference-topbar { grid-template-columns: 1fr auto; padding-inline: 12px; }
-  .chicken-reference-topbar span { display: none; }
-  .reference-chicken-stage .road-playfield { min-height: 265px; }
-  .reference-chicken-stage .road-step { min-height: 190px; }
-  .reference-chicken-stage .road-step::after { width: 42px; height: 42px; margin-top: 28px; border-width: 3px; }
-  .reference-mines-board .mine-bet-mask { width: 42%; padding: 10px; }
-  .reference-mines-board .mine-bet-mask span { font-size: .54rem; }
-  .reference-football-stage { min-height: 390px; }
-  .reference-football-stage .goal-scene { margin-top: 74px; }
-  .reference-football-stage .goal-net { height: 150px; }
-}
-
-/* Accuracy panel + BK balance panel */
-.accuracy-badge { display: inline-flex; min-height: 28px; align-items: center; padding: 0 12px; border-radius: 999px; color: var(--color-accent-ink); background: var(--color-accent); font-family: var(--font-mono); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em; }
-.accuracy-badge.tier-2 { background: oklch(72% 0.14 180); }
-.accuracy-badge.tier-3 { background: oklch(68% 0.16 260); color: #fff; }
-.accuracy-badge.tier-4 { background: oklch(60% 0.18 320); color: #fff; }
-.accuracy-bar { position: relative; height: 10px; margin-bottom: var(--space-4); border-radius: 999px; background: var(--color-surface); overflow: hidden; }
-.accuracy-fill { height: 100%; border-radius: 999px; background: var(--color-accent); transition: width 300ms ease; }
-.accuracy-value { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: var(--color-ink); font-family: var(--font-mono); font-size: 0.6rem; font-weight: 600; }
-.accuracy-tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: var(--space-4); }
-.accuracy-tier { padding: var(--space-2); border: 1px solid var(--color-rule); border-radius: var(--radius-sm); text-align: center; font-size: 0.68rem; }
-.accuracy-tier.is-current { border-color: var(--color-accent); background: oklch(85% 0.185 96 / 0.08); }
-.accuracy-tier.is-unlocked { opacity: 0.5; }
-.tier-accuracy { display: block; color: var(--color-accent); font-family: var(--font-mono); font-size: 1rem; font-weight: 700; }
-.tier-title { display: block; color: var(--color-muted); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
-.tier-requirement { display: block; color: var(--color-muted); font-family: var(--font-mono); font-size: 0.58rem; margin-top: 4px; }
-.accuracy-max { padding: var(--space-3); border: 1px solid var(--color-success); border-radius: var(--radius-sm); color: var(--color-success); text-align: center; font-family: var(--font-mono); font-size: 0.72rem; }
-.accuracy-hint { margin: 0; color: var(--color-muted); font-family: var(--font-mono); font-size: 0.68rem; }
-.bk-balance-input { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
-.bk-balance-input span { display: block; margin-bottom: 6px; color: var(--color-muted); font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; }
-.bk-balance-input input { min-height: 44px; padding: 0 12px; border: 1px solid var(--color-rule); border-radius: var(--radius-sm); color: var(--color-ink); background: var(--color-surface); font-family: var(--font-mono); }
-.bk-balance-input input:focus { border-color: var(--color-accent); outline: none; }
-.bk-balance-hint { margin-top: var(--space-3); color: var(--color-faint); font-size: 0.72rem; }
-
-.aviator-toolbar { position: absolute; z-index: 7; top: 12px; right: 12px; }
-.aviator-help-button { min-height: 32px; padding: 0 11px; border: 1px solid rgba(163, 237, 140, .38); border-radius: 7px; color: #dff7d2; background: rgba(4, 26, 18, .62); font-family: var(--font-mono); font-size: .62rem; letter-spacing: .05em; text-transform: uppercase; cursor: pointer; }
-.aviator-help-button:hover, .aviator-help-button:focus-visible { border-color: var(--color-accent); background: rgba(8, 55, 32, .9); }
-.aviator-instruction { position: absolute; z-index: 8; top: 50%; left: 50%; width: min(86%, 420px); padding: 24px 24px 20px; transform: translate(-50%, -50%); border: 1px solid rgba(163, 237, 140, .45); border-radius: 12px; color: #e8f7df; background: rgba(4, 26, 18, .94); box-shadow: 0 16px 42px rgba(0, 0, 0, .28); }
-.aviator-instruction[hidden] { display: none; }
-.aviator-instruction strong { display: block; margin-bottom: 10px; color: var(--color-accent); font-family: var(--font-display); font-size: 1.35rem; }
-.aviator-instruction p, .aviator-instruction small { display: block; max-width: 34rem; color: rgba(232, 247, 223, .78); font-size: .78rem; line-height: 1.55; }
-.aviator-instruction small { margin-top: 10px; color: rgba(232, 247, 223, .58); }
-.aviator-instruction-close { position: absolute; top: 8px; right: 10px; width: 32px; height: 32px; border: 0; border-radius: 50%; color: #e8f7df; background: rgba(255, 255, 255, .08); font-size: 1.35rem; line-height: 1; cursor: pointer; }
-.aviator-instruction-close:hover, .aviator-instruction-close:focus-visible { color: #17372b; background: var(--color-accent); }
-
-/* Keep the supplied Aviator reference sheet as a real layer. The canvas only
-   draws the signal aircraft on top, so an animation frame can never restore
-   the obsolete green scene behind it. */
-.reference-aviator-stage {
-  background: #111731 !important;
-  background-image: url('/assets/reference-games/aviator-reference.png') !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  background-size: 100% 100% !important;
-}
-.reference-aviator-stage .reference-aviator-backdrop {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  pointer-events: none;
-}
-.reference-aviator-stage .reference-plane-eraser { z-index: 2; }
-.reference-aviator-stage canvas { z-index: 3; background: transparent !important; }
-
-/* The source project already contains the finished Betwinner game clients.
-   Keep those canvases/animations intact and cover only their betting controls;
-   the surrounding workspace remains the signal-only controller. */
-.external-game-stage,
-.mines-embedded-stage,
-.football-embedded-stage {
-  position: relative;
-  min-height: 560px;
-  height: clamp(560px, 78dvh, 760px);
-  padding: 0;
-  overflow: hidden;
-  border-color: rgba(156, 207, 187, .72);
-  background: #07130e;
-}
-.external-game-embed,
-.mines-game-embed,
-.football-game-embed {
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  border: 0;
-  background: #07130e;
-}
-.external-game-mask {
-  position: absolute;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  color: rgba(236, 249, 224, .82);
-  background: #061c13;
-  box-shadow: inset 0 0 0 1px rgba(164, 238, 142, .14);
-  pointer-events: auto;
-}
-.external-game-mask span {
-  padding: 8px 12px;
-  border: 1px solid rgba(164, 238, 142, .34);
-  border-radius: 999px;
-  color: #c8efa6;
-  background: rgba(9, 54, 32, .82);
-  font: 700 .62rem var(--font-mono);
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-.external-game-mask-aviator,
-.external-game-mask-chicken,
-.external-game-mask-football {
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 22%;
-}
-.external-game-mask-mines {
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 40%;
-  background: #1f0426;
-  box-shadow: inset 0 0 0 1px rgba(231, 112, 250, .16);
-}
-.external-game-mask-mines span { max-width: 15rem; text-align: center; color: #ffe98a; background: rgba(75, 8, 82, .84); border-color: rgba(244, 153, 255, .38); }
-.external-game-mask-mines-prompt span { display: none; }
-.external-game-mask-mines-prompt {
-  top: 29%;
-  right: 5%;
-  left: 43%;
-  height: 31%;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-}
-.external-game-mask-mines-footer {
-  right: 0;
-  bottom: 0;
-  left: 40%;
-  height: 19%;
-  background: #1f0426;
-  box-shadow: inset 0 1px 0 rgba(231, 112, 250, .16);
-}
-.game-view .external-game-stage + .game-action-row,
-.game-view .mines-embedded-stage + .game-action-row,
-.game-view .football-embedded-stage + .game-action-row { display: none; }
-.aviator-embed-stage { height: auto; min-height: 0; aspect-ratio: 16 / 9; }
-.mines-embedded-stage { height: auto; min-height: 0; aspect-ratio: 1153 / 693; }
-.football-embedded-stage { height: auto; min-height: 0; aspect-ratio: 16 / 9; }
-
-@media (max-width: 780px) {
-  .external-game-stage,
-  .mines-embedded-stage,
-  .football-embedded-stage { min-height: 0; height: auto; border-radius: 10px; }
-  .external-game-mask-mines { width: 42%; }
-  .external-game-mask-mines-prompt { right: 4%; left: 45%; }
-  .external-game-mask-mines-footer { left: 42%; }
-}

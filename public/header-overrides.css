@@ -27,36 +27,3 @@
   .topbar-game-links .game-nav { transition: color 180ms ease, background 180ms ease, transform 180ms ease; }
   .topbar-game-links .game-nav:hover { transform: translateY(-1px); }
 }
-
-/* Keep entry screens on the same light Betwinner palette as the signal workspace. */
-.auth-layout, .onboarding-layout { color: #17352c; background: #edf4f1; }
-.auth-visual { border-right-color: #c6d8d1; background: linear-gradient(145deg, #e5f4ed, #edf4f1); }
-.auth-card-wrap { background: #edf4f1; }
-.auth-visual::before, .auth-visual::after { border-color: rgba(24, 162, 117, .20); }
-.auth-visual::after { border-color: rgba(24, 162, 117, .12); }
-.auth-visual-copy p, .auth-layout .lede, .onboarding-layout .lede, .auth-layout .helper, .onboarding-layout .helper { color: #668077; }
-.auth-visual-copy h1, .auth-card h2, .onboarding-card h1 { color: #183a2f; }
-.auth-layout .stack-form label, .onboarding-layout .profile-form label { color: #557369; }
-.auth-layout .stack-form input, .onboarding-layout .profile-form input, .onboarding-layout .profile-form select { color: #17352c; background: #fff; border-color: #bfd5cb; }
-.auth-layout .stack-form input:focus, .onboarding-layout .profile-form input:focus, .onboarding-layout .profile-form select:focus { border-color: #18a275; box-shadow: 0 0 0 3px rgba(24, 162, 117, .12); }
-.auth-layout .brand-lockup strong, .onboarding-layout .brand-lockup strong { color: #197955; }
-.auth-layout .brand-lockup small, .onboarding-layout .brand-lockup small { color: #6d877d; }
-.auth-layout .brand-mark, .onboarding-layout .brand-mark { border: 0; border-radius: 5px; color: #17372b; background: #ffd400; box-shadow: 0 3px 0 rgba(174, 137, 0, .32); transform: none; }
-.auth-layout .button-primary, .onboarding-layout .button-primary { color: #1b3328; background: #ffd400; box-shadow: 0 3px 0 #c49e00; }
-.auth-layout .button-primary:hover:not(:disabled), .onboarding-layout .button-primary:hover:not(:disabled) { background: #ffe14a; }
-.auth-layout .auth-legal, .onboarding-layout .auth-legal { color: #6d877d; }
-.auth-layout .text-link, .onboarding-layout .text-link { color: #138762; }
-.signal-readout { border-color: #c8ddd5; background: #c8ddd5; }
-.signal-readout div { background: #fff; }
-.signal-readout span { color: #789087; }
-.signal-readout strong { color: #138762; }
-.onboarding-layout { place-items: center; padding: 28px; }
-.onboarding-card { border-color: #c6d8d1; color: #17352c; background: #fff; box-shadow: 0 7px 22px rgba(4, 57, 39, .07); }
-
-/* The reference game skins are deliberately the last visual layer in the
-   shell so the legacy green stage gradient cannot cover the supplied game
-   composition. Signal controls and local animation canvases stay interactive
-   above this background. */
-.workspace .reference-aviator-stage {
-  background: #111731 url('/assets/reference-games/aviator-reference.png') center / 100% 100% no-repeat !important;
-}

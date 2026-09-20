@@ -9,17 +9,31 @@ const helmet = require('helmet');
 const { openDatabase } = require('./db');
 const { COUNTRIES } = require('./catalogs/countries');
 const { CURRENCIES } = require('./catalogs/currencies');
-const { createServices, GAME_LABELS, ACCURACY_TIERS } = require('./services');
+const { createServices, GAME_LABELS } = require('./services');
 
 const PUBLIC_DIR = path.resolve(__dirname, '../public');
 const DEFAULT_MIN_WITHDRAWAL = 10000;
 
-async function createApp(options = {}) {
+function createApp(options = {}) {
   const dataDir = options.dataDir || process.env.DATA_DIR || path.resolve(__dirname, '../data');
   const dbPath = options.dbPath || path.join(dataDir, 'verdant-signal.sqlite');
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-  const db = await openDatabase(dbPath);
-  const sessionSecret = options.sessionSecret || process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
+  const db = openDatabase(dbPath);
+  const sessionSecretPath = path.join(dataDir, '.session-secret');
+  function resolveDevSessionSecret() {
+    try {
+      return fs.readFileSync(sessionSecretPath, 'utf8').trim();
+    } catch {
+      const generated = crypto.randomBytes(32).toString('hex');
+      try {
+        fs.writeFileSync(sessionSecretPath, generated, { mode: 0o600 });
+      } catch {
+        // Ignore write failures (e.g. read-only filesystem); fall back to in-memory secret.
+      }
+      return generated;
+    }
+  }
+  const sessionSecret = options.sessionSecret || process.env.SESSION_SECRET || resolveDevSessionSecret();
   const adminPassword = options.adminPassword || process.env.ADMIN_PASSWORD || 'change-this-development-password';
   const minWithdrawalMinor = Number.isSafeInteger(Number(options.minWithdrawalMinor || process.env.MIN_WITHDRAWAL_UNITS))
     ? Number(options.minWithdrawalMinor || process.env.MIN_WITHDRAWAL_UNITS)
@@ -56,6 +70,7 @@ async function createApp(options = {}) {
     handler: (_req, res) => sendError(res, 429, 'RATE_LIMITED', 'Too many requests. Please try again later.'),
   });
   app.use('/api', apiLimiter);
+
   function identifierDigest(value) {
     return crypto.createHmac('sha256', sessionSecret).update(value.trim().toLowerCase()).digest('hex');
   }
@@ -97,7 +112,7 @@ async function createApp(options = {}) {
 
   app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'verdant-signal' }));
   app.get('/api/catalogs', (_req, res) => res.json({ countries: COUNTRIES, currencies: CURRENCIES }));
-  app.get('/api/config', (_req, res) => res.json({ minWithdrawalMinor, games: Object.entries(GAME_LABELS).map(([id, label]) => ({ id, label })), accuracyTiers: ACCURACY_TIERS }));
+  app.get('/api/config', (_req, res) => res.json({ minWithdrawalMinor, games: Object.entries(GAME_LABELS).map(([id, label]) => ({ id, label })) }));
 
   app.post('/api/auth/login', loginLimiter, (req, res) => {
     const credentials = validateLogin(req.body);
@@ -147,16 +162,14 @@ async function createApp(options = {}) {
     return res.json({ ok: true, player: services.safePlayer(services.getPlayer(req.player.id)) });
   });
 
-  app.patch('/api/player/bookmaker-balance', requirePlayer, (req, res) => {
-    const balance = Number(req.body?.balance);
-    if (!Number.isFinite(balance) || balance < 0 || balance > 100000000) {
-      return sendError(res, 400, 'INVALID_INPUT', 'Balance must be a valid positive number.');
+  app.patch('/api/player/balance', requirePlayer, (req, res) => {
+    const raw = req.body?.balanceMinor;
+    const balanceMinor = Number(raw);
+    if (!Number.isSafeInteger(balanceMinor) || balanceMinor < 0 || balanceMinor > 1_000_000_000_00) {
+      return sendError(res, 400, 'INVALID_INPUT', 'Balance must be a non-negative amount.');
     }
     const stamp = new Date().toISOString();
-    const fractionDigits = req.player.currency_fraction_digits || 2;
-    const balanceMinor = Math.round(balance * Math.pow(10, fractionDigits));
-    db.prepare('UPDATE players SET bookmaker_balance_minor = ?, updated_at = ? WHERE id = ?')
-      .run(balanceMinor, stamp, req.player.id);
+    db.prepare('UPDATE players SET balance_minor = ?, updated_at = ? WHERE id = ?').run(balanceMinor, stamp, req.player.id);
     return res.json({ ok: true, player: services.safePlayer(services.getPlayer(req.player.id)) });
   });
 

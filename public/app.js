@@ -4,6 +4,9 @@
   const dictionaries = window.VERDANT_TRANSLATIONS || {};
   const locales = ['en', 'ru', 'uk', 'pl', 'es', 'pt', 'de', 'fr', 'it', 'tr', 'ar'];
   const games = ['aviator', 'chicken-road', 'apple-of-fortune', 'mines', 'football-penalties'];
+  const APPLE_MULTIPLIERS = ['1.23', '1.54', '1.93', '2.41', '4.02', '6.71', '11.18', '27.97', '69.93', '349.68'];
+  const APPLE_STAKES = [10, 50, 100, 500, 1000, 5000];
+  const appleFallbackRows = () => APPLE_MULTIPLIERS.map((multiplier, index) => ({ level: index + 1, recommendedCell: (index % 5) + 1, multiplier: `x${multiplier}` }));
   const ART_ROOT = '/assets/verdant-artpack';
   const PACKAGE_ART_ROOT = '/assets/game-animations-ready/SourceArt';
   // The supplied Aviator launch/flight sheets are flattened composites with baked-in motion.
@@ -32,6 +35,11 @@
       whole: `${ART_ROOT}/apple/objects/apple-whole.png`,
       bitten: `${ART_ROOT}/apple/objects/apple-bitten.png`,
       tile: `${ART_ROOT}/apple/tiles/closed-wooden-board-tile-reconstruction.png`,
+      background: '/images/apple-fortune/background.png',
+      queen: '/images/apple-fortune/evil-queen.png',
+      snowWhite: '/images/apple-fortune/snow-white.png',
+      logo: '/images/apple-fortune/logo.png',
+      vine: '/images/apple-fortune/vine-corner.png',
     },
     football: {
       goalkeeper: `${ART_ROOT}/football/concepts/goalkeeper-green-unassigned.png`,
@@ -100,15 +108,9 @@
   const ANIMATION_ROOT = '/assets/game-animations-ready';
   const app = document.getElementById('app');
   const state = {
-    catalogs: null, player: null, view: 'overview', activeGame: 'aviator', analysis: null,
-    history: [], activePlayers: [], activity: null, busy: false, message: '', minWithdrawalMinor: 10000,
+    catalogs: null, player: null, guestMode: true, view: 'overview', activeGame: 'aviator', analysis: null,
+    history: [], activePlayers: [], activity: null, busy: false, message: '', balanceMessage: '', minWithdrawalMinor: 10000,
     runtime: null, footballHistory: [], debugRuntime: null, sceneLoop: null, animationManifest: null,
-    accuracyTiers: [
-      { tier: 1, accuracy: 83, title: 'Basic', requiredActiveDays: 0 },
-      { tier: 2, accuracy: 91, title: 'Advanced', requiredActiveDays: 7 },
-      { tier: 3, accuracy: 95, title: 'Pro', requiredActiveDays: 30 },
-      { tier: 4, accuracy: 99, title: 'Elite', requiredActiveDays: 90 },
-    ],
   };
 
   let locale = localStorage.getItem('verdant-locale') || 'ru';
@@ -128,6 +130,12 @@
 
   function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
+  }
+
+  function fakeOnlineCount() {
+    const bucket = Math.floor(Date.now() / 45000);
+    const wave = Math.sin(bucket / 6) * 900 + Math.sin(bucket / 17) * 400;
+    return Math.max(12084, Math.round(13260 + wave));
   }
 
   function formatMoney(minor, player = state.player) {
@@ -176,10 +184,6 @@
       const response = await fetch(`${ANIMATION_ROOT}/manifest.json`, { credentials: 'same-origin' });
       if (!response.ok) throw new Error(`Animation manifest HTTP ${response.status}`);
       state.animationManifest = await response.json();
-      // The shell may already be visible while the manifest is fetched. Rehydrate
-      // the existing scene immediately so it switches from the source-art fallback
-      // to the authored frame-sheet animation without requiring a route change.
-      if (state.view === 'game' || state.view === 'overview') hydrateSceneArt();
     } catch (error) {
       state.animationManifest = null;
       console.warn('[animations] manifest unavailable; using source-art fallback', error);
@@ -346,7 +350,7 @@
   }
 
   window.SpriteAtlasPlayer = SpriteAtlasPlayer;
-  window.render_game_to_text = () => JSON.stringify({ view: state.view, game: state.activeGame, phase: state.runtime?.phase || 'ready', animationManifest: Boolean(state.animationManifest), multiplier: state.runtime?.multiplier || null, step: state.runtime?.step ?? null, target: state.runtime?.target ?? null, role: state.runtime?.role ?? null, size: state.runtime?.size ?? null, mines: state.runtime?.mines ?? null, opened: state.runtime?.opened ? Object.keys(state.runtime.opened).length : 0, helpOpen: state.runtime?.helpOpen ?? null });
+  window.render_game_to_text = () => JSON.stringify({ view: state.view, game: state.activeGame, phase: state.runtime?.phase || 'ready', animationManifest: Boolean(state.animationManifest), multiplier: state.runtime?.multiplier || null, step: state.runtime?.step ?? null, opened: state.runtime?.opened ? Object.keys(state.runtime.opened).length : 0 });
   window.advanceTime = (milliseconds) => {
     const runtime = state.runtime;
     if (!runtime) return window.render_game_to_text();
@@ -412,9 +416,13 @@
   function legalLinks() { return `<div class="auth-legal"><button class="text-link" data-legal="privacy" type="button">${t('legalPrivacy')}</button><button class="text-link" data-legal="terms" type="button">${t('legalTerms')}</button><button class="text-link" data-legal="responsible" type="button">${t('legalResponsible')}</button><a href="/admin">${t('admin')}</a></div>`; }
   function legalDialog() { return `<dialog id="legal-dialog" class="legal-dialog"><button class="dialog-close" data-close-dialog type="button" aria-label="${t('close')}">×</button><div data-legal-body></div></dialog>`; }
 
+  function authModal() { return `<dialog id="auth-modal" class="auth-modal"><button class="dialog-close" data-close-auth type="button" aria-label="Закрыть">×</button><div class="auth-modal-head"><span class="brand-mark">B</span><div><p class="eyebrow">VERDANT ACCESS</p><h2 data-auth-title>Вход в аккаунт</h2></div></div><form class="stack-form" id="modal-auth-form"><label for="modal-auth-email">Email<input id="modal-auth-email" name="email" type="email" autocomplete="email" required placeholder="you@example.com"></label><label for="modal-auth-password">Пароль<input id="modal-auth-password" name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="Минимум 8 символов"></label><label class="modal-name-field" for="modal-auth-name">Имя пользователя<input id="modal-auth-name" name="nickname" autocomplete="nickname" placeholder="Ваше имя"></label><p class="form-message" data-modal-auth-message aria-live="polite"></p><button class="button button-primary button-full" type="submit">Продолжить</button></form><button class="auth-switch" data-auth-switch type="button">Нет аккаунта? Регистрация</button></dialog>`; }
+  function openAuthModal(mode = 'login') { const modal = document.getElementById('auth-modal'); if (!modal) return; modal.dataset.mode = mode; modal.querySelector('[data-auth-title]').textContent = mode === 'register' ? 'Создать аккаун��' : 'Вход в аккаунт'; modal.querySelector('.modal-name-field').hidden = mode !== 'register'; modal.querySelector('[data-auth-switch]').textContent = mode === 'register' ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Регистрация'; modal.showModal(); }
+  function bindAuthModal() { const modal = document.getElementById('auth-modal'); if (!modal) return; modal.querySelector('[data-close-auth]').addEventListener('click', () => modal.close()); modal.querySelector('[data-auth-switch]').addEventListener('click', () => openAuthModal(modal.dataset.mode === 'register' ? 'login' : 'register')); modal.querySelector('form').addEventListener('submit', async (event) => { event.preventDefault(); const data = new FormData(event.currentTarget); const mode = modal.dataset.mode; const message = modal.querySelector('[data-modal-auth-message]'); message.textContent = 'Проверяем данные…'; try { const result = await api(mode === 'register' ? '/api/auth/register' : '/api/auth/login', { method: 'POST', body: JSON.stringify(Object.fromEntries(data)) }); state.player = result.player || result.user || result; state.guestMode = false; modal.close(); render(); } catch (error) { message.textContent = error.message || 'Не удалось выполнить запрос'; } }); }
+
   function renderAuth() {
     stopGameAnimation(); app.className = 'auth-layout';
-    app.innerHTML = `<section class="auth-visual" aria-hidden="true"><div class="brand-lockup"><span class="brand-mark">B</span><span><strong>BET<em>WINNER</em></strong><small>LINE / WORKSPACE</small></span></div><div class="auth-visual-copy"><p class="eyebrow">${t('appKicker')}</p><h1>${t('signInTitle')}</h1><p>${t('signInCopy')}</p></div><div class="signal-readout"><div><span>${t('mode')}</span><strong>${t('simulation')}</strong></div><div><span>${t('games')}</span><strong>${String(games.length).padStart(2, '0')}</strong></div></div></section><section class="auth-card-wrap"><div class="auth-card"><div class="brand-lockup"><span class="brand-mark">B</span><span><strong>BET<em>WINNER</em></strong><small>LINE</small></span></div><p class="eyebrow">${t('appKicker')}</p><h2>${t('signInTitle')}</h2><p class="lede">${t('signInCopy')}</p><form class="stack-form" id="auth-form"><label for="player-id">${t('playerId')}<input id="player-id" name="playerId" autocomplete="username" placeholder="${t('playerIdPlaceholder')}" minlength="3" maxlength="64" required></label><label for="access-code">${t('accessCode')}<input id="access-code" name="accessCode" type="password" autocomplete="current-password" placeholder="${t('accessCodePlaceholder')}" minlength="6" maxlength="128" required></label><button class="button button-primary button-full" type="submit" ${state.busy ? 'disabled' : ''}>${state.busy ? t('signingIn') : t('signIn')}</button><p class="form-message" role="alert" aria-live="polite">${escapeHTML(state.message)}</p><p class="helper">${t('newSession')}</p></form>${legalLinks()}</div></section>${legalDialog()}`;
+    app.innerHTML = `<section class="auth-visual" aria-hidden="true"><div class="brand-lockup"><span class="brand-mark">B</span><span><strong>BET<em>WINNER</em></strong><small>LINE / WORKSPACE</small></span></div><div class="auth-visual-copy"><p class="eyebrow">${t('appKicker')}</p><h1>${t('signInTitle')}</h1><p>${t('signInCopy')}</p></div><div class="signal-readout"><div><span>${t('mode')}</span><strong>${t('simulation')}</strong></div><div><span>${t('games')}</span><strong>06</strong></div></div></section><section class="auth-card-wrap"><div class="auth-card"><div class="brand-lockup"><span class="brand-mark">B</span><span><strong>BET<em>WINNER</em></strong><small>LINE</small></span></div><p class="eyebrow">${t('appKicker')}</p><h2>${t('signInTitle')}</h2><p class="lede">${t('signInCopy')}</p><form class="stack-form" id="auth-form"><label for="player-id">${t('playerId')}<input id="player-id" name="playerId" autocomplete="username" placeholder="${t('playerIdPlaceholder')}" minlength="3" maxlength="64" required></label><label for="access-code">${t('accessCode')}<input id="access-code" name="accessCode" type="password" autocomplete="current-password" placeholder="${t('accessCodePlaceholder')}" minlength="6" maxlength="128" required></label><button class="button button-primary button-full" type="submit" ${state.busy ? 'disabled' : ''}>${state.busy ? t('signingIn') : t('signIn')}</button><p class="form-message" role="alert" aria-live="polite">${escapeHTML(state.message)}</p><p class="helper">${t('newSession')}</p></form>${legalLinks()}</div></section>${legalDialog()}`;
     document.getElementById('auth-form').addEventListener('submit', handleLogin); bindLegalLinks(); bindDialogClose();
   }
 
@@ -437,91 +445,137 @@
     return `<section class="panel level-panel"><div class="panel-head"><div><p class="panel-kicker">${t('level')} ${level}</p><h3>${level >= 6 ? t('longView') : t('signalProgression')}</h3></div><span class="level-number">${String(level).padStart(2, '0')}</span></div><div class="panel-body"><div class="progress-track" role="progressbar" aria-label="${progress}%" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${progress}"><div class="progress-fill" data-progress="${progress}"></div></div><div class="progress-meta"><span>${progress}% ${t('status')}</span><span>${state.player.activeDays} ${t('activeDays').toLowerCase()}</span></div><dl class="data-list"><div><dt>${t('bonusBalance')}</dt><dd>${escapeHTML(formatMoney(state.player.bonusBalanceMinor))}</dd></div><div><dt>${t('currentStreak')}</dt><dd>${state.player.consecutiveActiveDays} ${t('days')}</dd></div></dl></div></section>`;
   }
 
-  function renderAccuracyPanel() {
-    const player = state.player;
-    const accuracy = player.accuracy || 83;
-    const tier = player.accuracyTier || 1;
-    const nextTier = player.nextAccuracyTier;
-    const tierTitle = player.accuracyTitle || 'Basic';
-    const tiers = state.accuracyTiers || [];
-    const nextRequirement = nextTier ? `${Math.max(0, nextTier.requiredActiveDays - (player.activeDays || 0))} ${t('activeDays').toLowerCase()}` : '';
-    return `<section class="panel accuracy-panel"><div class="panel-head"><div><p class="panel-kicker">${t('signalAccuracy')}</p><h3>${accuracy}%</h3></div><span class="accuracy-badge tier-${tier}">${escapeHTML(tierTitle)}</span></div><div class="panel-body"><div class="accuracy-bar"><div class="accuracy-fill" style="width: ${accuracy}%"></div><span class="accuracy-value">${accuracy}%</span></div><div class="accuracy-tiers">${tiers.map((item) => `<div class="accuracy-tier ${item.tier === tier ? 'is-current' : ''} ${item.tier < tier ? 'is-unlocked' : ''}"><span class="tier-accuracy">${item.accuracy}%</span><span class="tier-title">${escapeHTML(item.title)}</span><span class="tier-requirement">${item.requiredActiveDays === 0 ? t('availableNow') : `${item.requiredActiveDays} ${t('activeDays').toLowerCase()}`}</span></div>`).join('')}</div>${nextTier ? `<p class="accuracy-hint">${t('nextAccuracy')} ${escapeHTML(nextTier.title)} / ${nextTier.accuracy}% · ${escapeHTML(nextRequirement)}</p>` : `<div class="accuracy-max">${t('maxAccuracy')}</div>`}</div></section>`;
-  }
-
-  function renderBookmakerBalance() {
-    const player = state.player;
-    const balance = player.bookmakerBalanceMinor || 0;
-    return `<section class="panel bk-balance-panel"><div class="panel-head"><div><p class="panel-kicker">${t('bookmakerBalance')}</p><h3>${escapeHTML(formatMoney(balance))}</h3></div></div><div class="panel-body"><label class="bk-balance-input"><span>${t('enterBkBalance')}</span><input type="number" id="bk-balance-input" min="0" step="1" value="${balance / Math.pow(10, player.currencyFractionDigits || 2)}" placeholder="0"><button class="button button-ghost" type="button" data-action="save-bk-balance">${t('save')}</button></label><p class="bk-balance-hint">${t('bkBalanceHint')}</p></div></section>`;
-  }
-
   function renderActivePlayers() {
-    if (!state.activePlayers.length) return `<div class="empty-state"><span class="empty-mark">—</span><p>${t('noActivePlayers')}</p><small>${t('activePlayersNote')}</small></div>`;
+    if (!state.activePlayers.length) return `<div class="empty-state"><span class="empty-mark">—</span><p>${t('noActivePlayers')}</p><small>${t('demoActivityNote')}</small></div>`;
     return `<div class="player-list">${state.activePlayers.map((player, index) => `<div class="player-row"><span class="avatar" data-active-initial="${index}"></span><div class="player-row-copy"><strong data-active-name="${index}"></strong><span data-active-country="${index}"></span></div><span class="online-dot" role="img" aria-label="${t('online')}"></span></div>`).join('')}</div>`;
   }
 
-  function renderAviatorPanel(compact = false) {
-    const analysis = state.analysis?.game === 'aviator' ? state.analysis : null; const series = analysis?.series || ['1.18x', '1.27x', '1.45x', '1.62x', '1.33x'];
-    return `<section class="panel aviator-panel ${compact ? 'featured-panel' : ''}"><div class="panel-head"><div><p class="panel-kicker">01 / ${t('aviator')}</p><h2>${t('latestSignal')}</h2><p class="panel-copy">${t('riskNote')}</p></div><span class="status-badge">${t('demoAnalysis')}</span></div><div class="panel-body"><div class="chart-wrap"><canvas data-chart="aviator" aria-label="${t('flightPath')}"></canvas><div class="chart-axis"><span>0s</span><span>${t('roundTrace')}</span><span>12s</span></div></div><div class="aviator-readout"><div><span class="readout-label">${t('multiplier')}</span><strong class="big-readout">${escapeHTML(analysis?.multiplier || '1.27x')}</strong><span class="metric-meta">${t('countdown')}: ${analysis?.countdown || 8}s</span></div><div class="round-list">${series.map((item, index) => `<span class="round-pill ${index === series.length - 1 ? 'active' : ''}">${escapeHTML(item)}</span>`).join('')}</div></div>${compact ? `<div class="analysis-actions"><button class="button button-primary" data-game="aviator" type="button">${t('openAnalysis')}</button></div>` : `<div class="analysis-actions"><button class="button button-primary" data-analyze="aviator" type="button" ${state.busy ? 'disabled' : ''}>${state.busy ? t('analysisLoading') : t('getAnalysis')}</button><button class="button button-ghost" data-copy="aviator" type="button">${t('copyResult')}</button></div>`}</div></section>`;
-  }
-
   function gameCards() {
-    return `${renderAviatorPanel(true)}<section class="games-section"><div class="section-heading"><div><p class="panel-kicker">${t('games')} / ${String(games.length).padStart(2, '0')}</p><h2>${t('chooseInstrument')}</h2></div><span class="section-count">${t('liveDemo')}</span></div><div class="game-card-grid">${games.map((game, index) => `<button class="game-card game-card-${game} ${game === state.activeGame ? 'active' : ''}" type="button" data-game="${game}"><span class="game-card-index">0${index + 1}</span><strong>${gameLabel(game)}</strong><span><i class="game-dot"></i>${t('demoAnalysis')}</span></button>`).join('')}</div></section>`;
+    return `<section class="games-section"><div class="section-heading"><div><p class="panel-kicker">${t('games')} / 06</p><h2>${t('chooseInstrument')}</h2></div><span class="section-count">${t('liveDemo')}</span></div><div class="game-card-grid">${games.map((game, index) => `<button class="game-card game-card-${game} ${game === state.activeGame ? 'active' : ''}" type="button" data-game="${game}"><span class="game-card-index">0${index + 1}</span><strong>${gameLabel(game)}</strong><span><i class="game-dot"></i>${t('demoAnalysis')}</span></button>`).join('')}</div></section>`;
   }
 
   function renderOverview() {
-    return `<header class="workspace-header"><div><p class="eyebrow">${t('dashboardKicker')}</p><h1>${t('dashboardTitle')}</h1><p class="lede">${t('dashboardCopy')}</p></div><div class="header-actions"><button class="button button-ghost" data-view="profile" type="button">${t('profile')}</button></div></header><div class="content-width"><div class="status-strip"><span class="status-badge">${t('demoAnalysis')}</span><span class="status-badge muted">${t('simulatedData')}</span><span class="status-badge warning">${t('noGuarantee')}</span><span class="status-strip-note">${t('patternBased')}</span></div>${renderMetrics()}<div class="dashboard-grid"><div>${gameCards()}<section class="beta-section"><div class="section-heading"><div><p class="panel-kicker">${t('betaGames')}</p><h3>${t('keepExploring')}</h3></div><span class="beta-stamp">${t('inDevelopment')}</span></div><p>${t('futureSurfaces')}</p></section></div><aside class="analysis-side"><details class="mobile-utility" open><summary>${t('utilityPanel')}</summary><div class="utility-stack">${renderLevelPanel()}<section class="panel"><div class="panel-head"><div><p class="panel-kicker">${t('activePlayers')}</p><h3>${t('byCountry')}</h3><p class="panel-copy">${t('realPlayersOnly')}</p></div></div><div class="panel-body">${renderActivePlayers()}</div></section></div></details><div class="desktop-utility">${renderLevelPanel()}<section class="panel"><div class="panel-head"><div><p class="panel-kicker">${t('activePlayers')}</p><h3>${t('byCountry')}</h3><p class="panel-copy">${t('realPlayersOnly')}</p></div></div><div class="panel-body">${renderActivePlayers()}</div></section></div></aside></div>${renderFooter()}</div>`;
+    return `<header class="workspace-header"><div><p class="eyebrow">${t('dashboardKicker')}</p><h1>${t('dashboardTitle')}</h1><p class="lede">${t('dashboardCopy')}</p></div><div class="header-actions"><button class="button button-ghost" data-view="profile" type="button">${t('profile')}</button></div></header><div class="content-width"><div class="status-strip"><span class="status-badge">${t('demoAnalysis')}</span><span class="status-badge muted">${t('simulatedData')}</span><span class="status-badge online-badge"><span class="online-pulse" aria-hidden="true"></span>${fakeOnlineCount().toLocaleString(locale)} ${t('onlineNow')}</span><span class="status-badge warning">${t('noGuarantee')}</span><span class="status-strip-note">${t('patternBased')}</span></div>${renderMetrics()}<div class="dashboard-grid"><div>${gameCards()}<section class="beta-section"><div class="section-heading"><div><p class="panel-kicker">${t('betaGames')}</p><h3>${t('keepExploring')}</h3></div><span class="beta-stamp">${t('inDevelopment')}</span></div><p>${t('futureSurfaces')}</p></section></div><aside class="analysis-side"><details class="mobile-utility" open><summary>${t('utilityPanel')}</summary><div class="utility-stack">${renderLevelPanel()}<section class="panel"><div class="panel-head"><div><p class="panel-kicker">${t('activePlayers')}</p><h3>${t('byCountry')}</h3><p class="panel-copy">${t('realPlayersOnly')}</p></div></div><div class="panel-body">${renderActivePlayers()}</div></section></div></details><div class="desktop-utility">${renderLevelPanel()}<section class="panel"><div class="panel-head"><div><p class="panel-kicker">${t('activePlayers')}</p><h3>${t('byCountry')}</h3><p class="panel-copy">${t('realPlayersOnly')}</p></div></div><div class="panel-body">${renderActivePlayers()}</div></section></div></aside></div>${renderFooter()}</div>`;
   }
 
   function renderFooter() { return `<footer class="statement-footer"><div><p>BETWINNER LINE / ${t('analysisEngine')} / ${t('simulatedData')}</p><div class="footer-links"><button class="text-link" data-legal="privacy" type="button">${t('legalPrivacy')}</button><button class="text-link" data-legal="terms" type="button">${t('legalTerms')}</button><button class="text-link" data-legal="responsible" type="button">${t('legalResponsible')}</button><button class="text-link" data-legal="disclaimer" type="button">${t('legalDisclaimer')}</button></div></div><p>${t('disclaimerText')}</p></footer>`; }
 
   function renderAviatorStage() {
-    const analysis = state.analysis?.game === 'aviator' ? state.analysis : null; const runtime = runtimeFor('aviator'); const phase = runtime?.phase || 'ready'; const multiplier = runtime ? `${runtime.multiplier.toFixed(2)}x` : (analysis?.multiplier || '1.27x'); const countdown = runtime?.countdown ?? analysis?.countdown ?? 8;
-    // The supplied Betwinner reference is the desktop game client. Keep that
-    // client selected inside the narrow preview shell instead of letting the
-    // vendor mobile fallback render as a blank handset screen.
-    const isMobileViewport = false;
+    const isMobileViewport = typeof window !== 'undefined' && window.innerWidth <= 780;
     const aviatorUrl = `https://gx-games-54rg78cw-tralt14.click/fg-aviashow-client/game/?activeGameId=0&partnerId=2695&token=&playerId=0&culture=en&isDemo=true&isMobile=${isMobileViewport}&referer=&isFeatureMessagePackEnabled=true&isMessagePackEnabled=false&backUrl=gx-games-54rg78cw-tralt14.click/fg-aviashow-api&gameKindName=AviaShow&gameTypeName=AviaShow&mode=2&partnerPlayerId=`;
     return `<div class="visual-stage external-game-stage aviator-embed-stage" data-runtime-game="aviator"><iframe class="external-game-embed" src="${aviatorUrl}" title="Aviator game" referrerpolicy="no-referrer" allow="fullscreen; autoplay; gamepad" loading="eager"></iframe></div>`;
   }
 
   function renderChickenStage() {
-    return renderChickenReferenceStage();
-  }
-
-  function renderChickenReferenceStage() {
-    const analysis = state.analysis?.game === 'chicken-road' ? state.analysis : null; const runtime = runtimeFor('chicken-road') || { phase: 'ready', step: 0, target: 1, multiplier: 1 }; const safeSteps = analysis?.safeSteps || [1, 2, 3];
-    const cells = [1, 2, 3, 4, 5].map((step) => `<div class="road-step ${runtime.step >= step ? 'is-cleared' : ''} ${runtime.target === step && runtime.phase === 'ready' ? 'is-target' : ''} ${runtime.failedStep === step ? 'is-danger' : ''}" aria-label="${t('step')} ${step}"><span class="step-number">${step}</span><span class="step-marker">${runtime.step >= step ? '✓' : step === runtime.target ? '→' : '·'}</span><small>${safeSteps.includes(step) ? t('safe') : t('risk')}</small></div>`).join('');
     const chickenUrl = 'https://chicken-road-stage.inoutgames.dev/api/modes/game?gameMode=chicken-road&operatorId=1a1233dd-527d-472a-a5d9-f3d816550d15&authToken=e1405a2945d7e42111f20dfa62717753760b738c5599f17d1dde7e21353004e05238e12d04fe0e5ed1f7846257e59f6fbc3ab152b59d482f7b8671494daf14e3&currency=USD&lang=en&_enableCanvasTestGrid=1&theme=&lobbyUrl=';
     return `<div class="visual-stage external-game-stage" data-runtime-game="chicken-road"><iframe class="external-game-embed" src="${chickenUrl}" title="Chicken Road game" referrerpolicy="no-referrer" allow="fullscreen; autoplay; gamepad" loading="eager"></iframe></div>`;
   }
 
-  function renderAppleStage() {
-    const analysis = state.analysis?.game === 'apple-of-fortune' ? state.analysis : null; const runtime = runtimeFor('apple-of-fortune') || { phase: 'ready', activeRow: 1, revealedCells: {} }; const rows = analysis?.rows || Array.from({ length: 4 }, (_, index) => ({ level: index + 1, recommendedCell: index + 2, multiplier: `${(1.1 + index * 0.34).toFixed(2)}x` })); const revealedCells = runtime.revealedCells || {};
-    return `<div class="visual-stage apple-stage pipeline-stage" data-runtime-game="apple-of-fortune"><div class="orchard-glow" aria-hidden="true"></div><div class="apple-board">${rows.map((row) => { const revealed = revealedCells[row.level]; const activeReveal = runtime.revealed?.level === row.level ? runtime.revealed : revealed; const current = row.level === runtime.activeRow; const locked = !current || runtime.phase === 'opening' || runtime.phase === 'ended'; return `<div class="apple-row ${current ? 'is-current' : ''} ${activeReveal ? 'is-revealed' : ''}"><span class="row-number">L${row.level}<small>${escapeHTML(row.multiplier || '')}</small></span><div class="apple-cells">${[1, 2, 3, 4, 5].map((cell) => { const selected = activeReveal?.cell === cell; const safe = selected && activeReveal.safe; const suggested = current && !activeReveal && Number(row.recommendedCell) === cell; const stateClass = selected ? (safe ? 'is-safe' : 'is-danger') : suggested ? 'is-suggested' : ''; return `<button class="apple-cell ${stateClass} ${selected && runtime.phase === 'opening' ? 'is-opening' : ''}" type="button" data-game-action="apple-reveal" data-cell="${cell}" ${locked ? 'disabled' : ''} aria-label="${t('cell')} ${cell}, ${current ? t('available') : t('locked')}"><span class="apple-cell-inner"><img class="apple-tile" src="${ART.apple.tile}" alt="" aria-hidden="true">${selected || suggested ? `<img class="apple-sprite" src="${safe || suggested ? ART.apple.whole : ART.apple.bitten}" alt="${safe || suggested ? t('safe') : t('danger')}">` : ''}${selected || suggested ? `<canvas class="apple-cell-animation" data-animation-cell="${row.level}-${cell}" aria-hidden="true"></canvas>` : ''}<span class="apple-cell-mark">${selected ? (safe ? 'SAFE' : 'DANGER') : suggested ? '•' : ''}</span></span></button>`; }).join('')}</div></div>`; }).join('')}</div><div class="apple-axis"><span>${t('currentRow')}: ${runtime.activeRow}</span><strong class="apple-score" data-apple-score>Счёт: ${runtime.score || 0}</strong></div><div class="stage-caption"><span data-runtime-caption>${runtime.phase === 'ready' ? t('suggestedSafeCell') : phaseLabel(runtime.phase)}</span><span>РАУНД</span></div></div>`;
+  function renderChickenStageLegacy() {
+    const analysis = state.analysis?.game === 'chicken-road' ? state.analysis : null; const runtime = runtimeFor('chicken-road') || { phase: 'ready', step: 0, target: 1, multiplier: 1 }; const safeSteps = analysis?.safeSteps || [1, 2, 3];
+    const cells = [1, 2, 3, 4, 5].map((step) => `<div class="road-step ${runtime.step >= step ? 'is-cleared' : ''} ${runtime.target === step && runtime.phase === 'ready' ? 'is-target' : ''} ${runtime.failedStep === step ? 'is-danger' : ''}" aria-label="${t('step')} ${step}"><span class="step-number">${step}</span><span class="step-marker">${runtime.step >= step ? '✓' : step === runtime.target ? '→' : '·'}</span><small>${safeSteps.includes(step) ? t('safe') : t('risk')}</small></div>`).join('');
+    return `<div class="visual-stage chicken-road-stage pipeline-stage ${runtime.phase === 'jumping' ? 'is-jumping' : ''} ${runtime.phase === 'fallen' ? 'is-fallen' : ''}" data-runtime-game="chicken-road" data-step="${runtime.step}"><div class="road-sky" aria-hidden="true"><span class="road-light"></span><span class="road-cloud cloud-a"></span><span class="road-cloud cloud-b"></span></div><div class="road-playfield"><div class="road-shoulder"></div><div class="road-cells">${cells}</div><canvas class="scene-animation-canvas chicken-animation-canvas" data-animation-canvas="chicken" aria-hidden="true"></canvas><img class="van-object" data-art-layer="vehicle" src="${ART.chicken.van}" alt="" aria-hidden="true"><div class="chick-object" data-art-layer="chick"><img src="${ART.chicken.chick}" alt="${t('chickenRoad')}"></div><div class="road-shadow" aria-hidden="true"></div></div><div class="road-readout"><div><span class="readout-label">${t('roadProgress')}</span><strong data-chicken-step>${runtime.step}/5</strong></div><div><span class="readout-label">${t('multiplier')}</span><strong data-chicken-multiplier>${runtime.multiplier.toFixed(2)}x</strong></div></div><div class="stage-caption"><span data-runtime-caption>${runtime.phase === 'ready' ? t('targetStep') : phaseLabel(runtime.phase)}</span><span>РАУНД</span></div></div>`;
+  }
+
+  function renderAppleTopIcon(kind, action, label, active) {
+    const icons = {
+      info: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.4" stroke="currentColor" stroke-width="1.7"/><path d="M12 11.1v5.3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="7.5" r="1.05" fill="currentColor"/></svg>',
+      soundOn: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M4 9.4v5.2h3.3L12.2 18V6L7.3 9.4H4Z" fill="currentColor"/><path d="M15.6 9.1a3.5 3.5 0 0 1 0 5.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M17.8 6.9a6.8 6.8 0 0 1 0 10.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.75"/></svg>',
+      soundOff: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M4 9.4v5.2h3.3L12.2 18V6L7.3 9.4H4Z" fill="currentColor"/><path d="M15.8 9.5l4.6 5M20.4 9.5l-4.6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    };
+    return `<button class="apple-icon-btn${active ? ' is-active' : ''}" type="button" data-game-action="${action}" aria-label="${escapeHTML(label)}">${icons[kind]}</button>`;
+  }
+
+  function renderAppleGameView() {
+    const runtime = runtimeFor('apple-of-fortune') || createAppleRuntime();
+    const rows = appleRows();
+    const revealedCells = runtime.revealedCells || {};
+    const orderedRows = rows.slice().sort((a, b) => b.level - a.level);
+    const canConfigure = runtime.phase === 'idle' || runtime.phase === 'ended';
+    const activeRowData = rows.find((item) => item.level === runtime.activeRow) || rows[0];
+    const activeMultiplier = Number(String(activeRowData?.multiplier || '1').replace(/^x/i, '')) || 1;
+    const potential = Math.round((Number(runtime.stake) || 0) * activeMultiplier * 100) / 100;
+
+    let statusText;
+    if (runtime.phase === 'idle') statusText = t('appleBetPrompt');
+    else if (runtime.phase === 'ended') statusText = runtime.score > 0 ? `${t('appleWin')}: ${runtime.score} \u20BD` : t('appleBetPrompt');
+    else {
+      const bankedText = runtime.score > 0 ? `${t('appleBanked')}: ${runtime.score} \u20BD \u00B7 ` : '';
+      statusText = `${bankedText}${t('currentRow')} ${runtime.activeRow}/${rows.length} \u00B7 ${t('applePotential')}: ${potential} \u20BD`;
+    }
+
+    const rowsHtml = orderedRows.map((row) => {
+      const revealed = revealedCells[row.level];
+      const activeReveal = runtime.revealed?.level === row.level ? runtime.revealed : revealed;
+      const isActiveRow = row.level === runtime.activeRow && runtime.phase !== 'idle' && runtime.phase !== 'ended';
+      const locked = !(isActiveRow && runtime.phase === 'safe');
+      const cellsHtml = [1, 2, 3, 4, 5].map((cell) => {
+        const selected = activeReveal?.cell === cell;
+        const safe = selected && activeReveal.safe;
+        const suggested = isActiveRow && runtime.phase === 'safe' && !activeReveal && Number(row.recommendedCell) === cell;
+        const stateClass = selected ? (safe ? 'is-safe' : 'is-danger') : suggested ? 'is-suggested' : '';
+        const opening = selected && runtime.phase === 'opening';
+        const showSprite = selected || suggested;
+        return `<button class="apple-cell ${stateClass}${opening ? ' is-opening' : ''}" type="button" data-game-action="apple-reveal" data-cell="${cell}" ${locked ? 'disabled' : ''} aria-label="${t('cell')} ${cell}, ${isActiveRow ? t('available') : t('unopened')}"><span class="apple-cell-inner"><img class="apple-tile" src="${ART.apple.tile}" alt="" aria-hidden="true">${showSprite ? `<img class="apple-sprite" src="${safe || suggested ? ART.apple.whole : ART.apple.bitten}" alt="" aria-hidden="true">` : ''}${showSprite ? `<canvas class="apple-cell-animation" data-animation-cell="${row.level}-${cell}" aria-hidden="true"></canvas>` : ''}</span></button>`;
+      }).join('');
+      const multiplierText = escapeHTML(String(row.multiplier || '').replace(/^x/i, ''));
+      return `<div class="apple-row${isActiveRow ? ' is-current' : ''}${activeReveal ? ' is-revealed' : ''}"><div class="apple-cells">${cellsHtml}</div><span class="apple-row-multiplier${isActiveRow ? ' is-current' : ''}">x${multiplierText}</span></div>`;
+    }).join('');
+
+    const stakeChipsHtml = APPLE_STAKES.map((value) => `<button class="apple-chip${Number(runtime.stake) === value ? ' is-active' : ''}" type="button" data-game-action="apple-stake-chip" data-stake="${value}" ${canConfigure ? '' : 'disabled'}>${value}</button>`).join('');
+
+    const showWinCelebration = runtime.phase === 'ended' && runtime.score > 0;
+    const confettiHtml = Array.from({ length: 24 }, (_, i) => `<span class="apple-confetti-piece" style="--i:${i}"></span>`).join('');
+    const winCelebrationHtml = showWinCelebration ? `<div class="apple-win-overlay" data-apple-win-token="${runtime.roundToken || runtime.score}" aria-live="polite">
+      <div class="apple-win-burst" aria-hidden="true"></div>
+      <div class="apple-confetti" aria-hidden="true">${confettiHtml}</div>
+      <img class="apple-win-apple" src="${ART.apple.whole}" alt="">
+      <div class="apple-win-score" data-apple-win-score data-target="${Number(runtime.score) || 0}">${t('appleWin')} +0 \u20BD</div>
+    </div>` : '';
+
+    const stageHtml = `<div class="apple-fullstage" data-runtime-game="apple-of-fortune">
+      <img class="apple-bg" src="${ART.apple.background}" alt="" aria-hidden="true">
+      <div class="apple-vignette" aria-hidden="true"></div>
+      <img class="apple-character apple-queen" src="${ART.apple.queen}" alt="\u0417\u043B\u0430\u044F \u043A\u043E\u0440\u043E\u043B\u0435\u0432\u0430">
+      <img class="apple-character apple-snow" src="${ART.apple.snowWhite}" alt="\u0411\u0435\u043B\u043E\u0441\u043D\u0435\u0436\u043A\u0430">
+      <img class="apple-logo" src="${ART.apple.logo}" alt="Apple of Fortune">
+      ${winCelebrationHtml}
+      <div class="apple-panel">
+        <img class="apple-vine apple-vine-left" src="${ART.apple.vine}" alt="" aria-hidden="true">
+        <img class="apple-vine apple-vine-right" src="${ART.apple.vine}" alt="" aria-hidden="true">
+        <div class="apple-panel-top">
+          ${renderAppleTopIcon('info', 'apple-info', t('appleInfo'))}
+          <strong class="apple-panel-title" data-runtime-caption>${escapeHTML(statusText)}</strong>
+          ${renderAppleTopIcon(runtime.muted ? 'soundOff' : 'soundOn', 'apple-mute', runtime.muted ? t('appleUnmute') : t('appleMute'), runtime.muted)}
+        </div>
+        <div class="apple-board">${rowsHtml}</div>
+      </div>
+      <div class="apple-bottom-bar">
+        <div class="apple-stake-chips">${stakeChipsHtml}</div>
+        <div class="apple-stake-field">
+          <input type="number" min="0" step="10" inputmode="numeric" value="${Number(runtime.stake) || 0}" data-apple-stake-input ${canConfigure ? '' : 'disabled'} aria-label="${t('appleStake')}">
+          <button type="button" class="apple-stake-clear" data-game-action="apple-stake-clear" ${canConfigure ? '' : 'disabled'} aria-label="${t('appleClear')}">&times;</button>
+        </div>
+        <button class="apple-play-btn" type="button" data-game-action="apple-play" ${canConfigure ? '' : 'disabled'} aria-label="${t('applePlay')}"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M8 5.2v13.6l11.5-6.8L8 5.2Z"/></svg></button>
+        <button class="apple-auto-btn${runtime.auto ? ' is-active' : ''}" type="button" data-game-action="apple-auto" aria-pressed="${runtime.auto ? 'true' : 'false'}">${t('appleAuto')}</button>
+        ${runtime.phase === 'safe' && runtime.score > 0 ? `<button class="apple-cashout-btn" type="button" data-game-action="apple-cashout">${t('appleCashOut')} ${escapeHTML(String(runtime.score))} \u20BD</button>` : ''}
+      </div>
+    </div>`;
+
+    const potentialFormatted = `${potential.toLocaleString('ru-RU')} \u20BD`;
+    const balanceWindowHtml = `<section class="panel apple-balance-panel"><div class="panel-head"><div><p class="panel-kicker">${t('balance')}</p><h2>${t('gameStatus')}</h2></div><span class="status-dot"></span></div><div class="panel-body">${renderMetrics()}<div class="apple-round-metrics"><div class="apple-round-metric apple-round-metric-stake"><span class="metric-label">${t('appleStake')}</span><strong class="metric-value apple-stake-value">${escapeHTML(String(Number(runtime.stake) || 0))} \u20BD</strong></div><div class="apple-round-metric apple-round-metric-potential"><span class="metric-label">${t('applePotential')}</span><strong class="metric-value apple-potential-value">${escapeHTML(potentialFormatted)}</strong></div></div>${!state.message ? '' : `<p class="apple-inline-message">${escapeHTML(state.message)}</p>`}<button class="button button-ghost button-full" data-game-action="apple-reset" ${runtime.phase === 'safe' || runtime.phase === 'opening' ? 'disabled' : ''} type="button">${t('resetBoard')}</button></div></section>`;
+
+    return `<header class="workspace-header game-header"><div><p class="eyebrow">${t('games')} / ${String(games.indexOf('apple-of-fortune') + 1).padStart(2, '0')}</p><h1>${gameLabel('apple-of-fortune')}</h1><p class="lede">${t('gameIntro')}</p></div><div class="header-actions"><button class="game-exit-button" data-view="overview" type="button"><span class="game-exit-icon" aria-hidden="true">&#8592;</span>${t('backToHome')}</button></div></header><div class="content-width game-view apple-game-view"><div class="game-layout"><section class="game-stage apple-game-stage">${stageHtml}</section><aside class="game-side">${balanceWindowHtml}<section class="panel result-panel"><div class="panel-head"><div><p class="panel-kicker">${t('result')}</p><h2>${t('latestSignal')}</h2></div></div><div class="panel-body">${renderResult(state.analysis?.game === 'apple-of-fortune' ? state.analysis : null)}</div></section></aside></div>${renderFooter()}</div>`;
   }
 
   function renderMinesStage() {
-    const analysis = state.analysis?.game === 'mines' ? state.analysis : null;
-    const size = Number(document.getElementById('mine-size')?.value || analysis?.size || 25);
-    const mines = Number(document.getElementById('mine-count')?.value || analysis?.mines || 4);
-    const runtime = runtimeFor('mines') || { phase: 'ready', size, mines, opened: {} };
-    const recommended = analysis?.recommendedCells || [0, 2, 7];
-    const columns = Math.round(Math.sqrt(size));
-    const cells = Array.from({ length: size }, (_, index) => {
-      const cell = runtime.opened?.[index]; const suggested = recommended.includes(index) && !cell; const resultClass = cell ? `is-${cell.result}` : ''; const opening = runtime.phase === 'opening' && runtime.opening === index;
-      const face = cell ? `<span class="mine-face is-revealed ${cell.result === 'safe' ? 'is-safe' : 'is-mine'}" aria-hidden="true"><img src="${cell.result === 'safe' ? ART.mines.diamond : ART.mines.bomb}" alt=""><canvas class="mine-cell-animation" data-mine-animation="${index}" aria-hidden="true"></canvas></span>` : opening ? `<span class="mine-face is-revealed is-opening" aria-hidden="true"><canvas class="mine-cell-animation" data-mine-animation="${index}" aria-hidden="true"></canvas></span>` : suggested ? '<span class="mine-hint" aria-hidden="true"></span>' : '';
-      return `<button class="mine-cell ${suggested ? 'is-suggested' : ''} ${resultClass} ${opening ? 'is-opening' : ''}" type="button" data-game-action="mine-open" data-cell="${index}" ${runtime.phase === 'opening' || runtime.phase === 'mine' || cell ? 'disabled' : ''} aria-label="${t('cell')} ${index + 1}, ${cell ? (cell.result === 'safe' ? t('cellSafe') : t('cellMine')) : suggested ? t('recommended') : t('unopened')}">${face}</button>`;
-    }).join('');
-    const started = runtime.phase !== 'ready' || Object.keys(runtime.opened || {}).length > 0;
-    const board = size === 25 ? `<div class="mines-reference-board ${started ? 'is-active' : ''}" data-art-layer="approved-mines-scene"><img class="mines-reference-art" src="${ART.mines.approvedScene}" alt="" aria-hidden="true"><div class="mine-bet-mask" aria-hidden="true"><strong>СИГНАЛ</strong><span>${t('signalOnly')}</span><span>${t('fieldSize')}: ${columns}×${columns} · ${t('mineCount')}: ${mines}</span></div><div class="mine-banner-mask" aria-hidden="true"></div><div class="mine-overlay" style="--mine-columns:5">${cells}</div></div>` : `<div class="mine-frame mine-frame-fallback"><div class="mine-topline"><span>${t('fieldSize')} / ${columns}×${columns}</span><span>${t('mineCount')} / ${mines}</span></div><div class="mine-grid" style="--mine-columns:${columns}">${cells}</div></div>`;
     const minesGameUrl = 'https://democasino.betsoftgaming.com/cwguestlogin.do?bankId=675&CDN=AUTO&gameId=959';
     return `<div class="visual-stage mines-stage mines-embedded-stage" data-runtime-game="mines"><iframe class="mines-game-embed" src="${minesGameUrl}" title="Mines casino game" referrerpolicy="no-referrer" allow="fullscreen; autoplay" loading="eager"></iframe></div>`;
   }
 
   function renderFootballStage() {
-    const analysis = state.analysis?.game === 'football-penalties' ? state.analysis : null; const runtime = runtimeFor('football-penalties') || { phase: 'ready', role: 'striker', selectedZone: analysis?.recommendedZone || 3, selectedDirection: 3, score: 0 }; const chosen = runtime.role === 'striker' ? runtime.selectedZone : runtime.selectedDirection; const terminal = ['goal', 'save', 'miss'].includes(runtime.phase);
-    const footballGameUrl = 'https://run.demo-evoplay.games/instant/evoplay/penaltyshootout/?operator=250&session=10257241663&window=1&demo=1&s=b4cdf363ff6e026e277829e8a3938187';
-    return `<div class="visual-stage football-stage football-embedded-stage" data-runtime-game="football-penalties"><iframe class="football-game-embed" src="${footballGameUrl}" title="Football Penalty Shootout game" referrerpolicy="no-referrer" allow="fullscreen; autoplay; gamepad" loading="eager"></iframe></div>`;
+    const footballGameUrl = 'https://staging-mines-ui.s3-eu-west-1.amazonaws.com/index.html?game_code=football_miner_94&platform=desktop&play_for_fun=true&casino_token=gamingcorps&currency=EUR&language=en&config=games/football-miner/config.json';
+    return `<div class="visual-stage football-stage football-embedded-stage" data-runtime-game="football-penalties"><iframe class="football-game-embed" src="${footballGameUrl}" title="Football penalty casino game" referrerpolicy="no-referrer" allow="fullscreen; autoplay" loading="eager"></iframe></div>`;
   }
 
   function renderGameStage(game) { if (game === 'aviator') return renderAviatorStage(); if (game === 'chicken-road') return renderChickenStage(); if (game === 'apple-of-fortune') return renderAppleStage(); if (game === 'mines') return renderMinesStage(); return renderFootballStage(); }
@@ -529,8 +583,7 @@
   function renderResult(analysis) {
     if (!analysis) return `<div class="result-empty"><span class="empty-mark">◎</span><p>${t('noHistory')}</p><small>${t('resultAppearsHere')}</small></div>`;
     const details = analysis.game === 'aviator' ? `${t('multiplier')}: ${analysis.multiplier} · ${t('countdown')}: ${analysis.countdown}s` : analysis.game === 'chicken-road' ? `${t('safeSteps')}: ${analysis.safeSteps.join(', ')} · ${t('multiplier')}: ${analysis.multiplier}` : analysis.game === 'apple-of-fortune' ? `${t('rows')}: ${analysis.rows.length} · ${t('safeCell')}: ${analysis.rows[0].recommendedCell}` : analysis.game === 'mines' ? `${t('fieldSize')}: ${analysis.size} · ${t('mineCount')}: ${analysis.mines}` : `${t('shotZones')}: ${analysis.zones} · ${t('direction')}: ${analysis.direction}`;
-    const accuracyLabel = analysis.accuracy ? `${t('signalAccuracy')}: ${analysis.accuracy}%` : '';
-    return `<h3>${t('latestSignal')}</h3><p class="result-detail">${escapeHTML(details)}</p><p>${escapeHTML(analysis.note || analysis.disclaimer)}</p><div class="result-stamp">${t('demoAnalysis')} / ${t('simulatedData')}${accuracyLabel ? ` / ${accuracyLabel}` : ''}</div><div class="analysis-actions"><button class="button button-ghost" data-copy="${analysis.game}" type="button">${t('copyResult')}</button></div>`;
+    return `<h3>${t('latestSignal')}</h3><p class="result-detail">${escapeHTML(details)}</p><p>${escapeHTML(analysis.note || analysis.disclaimer)}</p><div class="result-stamp">${t('demoAnalysis')} / ${t('simulatedData')}</div><div class="analysis-actions"><button class="button button-ghost" data-copy="${analysis.game}" type="button">${t('copyResult')}</button></div>`;
   }
 
   function renderHistory() {
@@ -540,9 +593,9 @@
 
   function gameControls(game) {
     if (game === 'chicken-road') return `<label for="difficulty">${t('difficulty')}<select id="difficulty"><option value="calm">${t('calm')}</option><option value="balanced" selected>${t('balanced')}</option><option value="sharp">${t('sharp')}</option></select></label><div class="control-note">${t('probabilisticNote')}</div>`;
-    if (game === 'mines') { const runtime = runtimeFor(game); const active = ['playing', 'opening', 'mine'].includes(runtime?.phase); return `<label for="mine-size">${t('fieldSize')}<select id="mine-size" ${active ? 'disabled' : ''}><option value="16">4 × 4</option><option value="25" ${Number(runtime?.size || 25) === 25 ? 'selected' : ''}>5 × 5</option><option value="36" ${Number(runtime?.size || 25) === 36 ? 'selected' : ''}>6 × 6</option></select></label><label for="mine-count">${t('mineCount')}<select id="mine-count" ${active ? 'disabled' : ''}><option ${Number(runtime?.mines || 4) === 3 ? 'selected' : ''}>3</option><option ${Number(runtime?.mines || 4) === 4 ? 'selected' : ''}>4</option><option ${Number(runtime?.mines || 4) === 6 ? 'selected' : ''}>6</option><option ${Number(runtime?.mines || 4) === 8 ? 'selected' : ''}>8</option></select></label><div class="control-note">${t('mineNote')}</div>`; }
-    if (game === 'football-penalties') { const runtime = runtimeFor(game); return `<label for="football-role">${t('role')}<select id="football-role" ${runtime?.phase && runtime.phase !== 'ready' ? 'disabled' : ''}><option value="striker" ${(runtime?.role || 'striker') === 'striker' ? 'selected' : ''}>${t('striker')}</option><option value="keeper" ${runtime?.role === 'keeper' ? 'selected' : ''}>${t('keeper')}</option></select></label><div class="control-note">${t('signalZonesNote')}</div>`; }
-    return `<div class="control-note">${t('signalOnly')}</div>`;
+    if (game === 'mines') { const runtime = runtimeFor(game); const active = runtime?.phase === 'analyzing'; return `<label for="mine-size">${t('fieldSize')}<select id="mine-size" ${active ? 'disabled' : ''}><option value="16">4 × 4</option><option value="25" ${Number(runtime?.size || 25) === 25 ? 'selected' : ''}>5 × 5</option><option value="36" ${Number(runtime?.size || 25) === 36 ? 'selected' : ''}>6 × 6</option></select></label><label for="mine-count">${t('mineCount')}<select id="mine-count" ${active ? 'disabled' : ''}><option ${Number(runtime?.mines || 4) === 3 ? 'selected' : ''}>3</option><option ${Number(runtime?.mines || 4) === 4 ? 'selected' : ''}>4</option><option ${Number(runtime?.mines || 4) === 6 ? 'selected' : ''}>6</option><option ${Number(runtime?.mines || 4) === 8 ? 'selected' : ''}>8</option></select></label><div class="control-note">${t('mineNote')}</div>`; }
+    if (game === 'football-penalties') { const runtime = runtimeFor(game); return `<label for="football-role">${t('role')}<select id="football-role" ${runtime?.phase && runtime.phase !== 'ready' ? 'disabled' : ''}><option value="striker" ${(runtime?.role || 'striker') === 'striker' ? 'selected' : ''}>${t('striker')}</option><option value="keeper" ${runtime?.role === 'keeper' ? 'selected' : ''}>${t('keeper')}</option></select></label><div class="control-note">${t('signalOnlyNote')}</div>`; }
+    const runtime = runtimeFor(game); return `<div class="aviator-control-grid"><div class="aviator-live-badge"><span class="status-dot"></span><strong data-runtime-state>${phaseLabel(runtime?.phase || 'ready')}</strong><small>${t('liveRoundHint')}</small></div></div><div class="control-note">${t('aviatorRoundNote')}</div>`;
   }
 
   function debugEffectButtons() {
@@ -556,22 +609,10 @@
     return `<details class="art-debug-panel" open><summary>${t('artDebug')}</summary><p class="debug-hint">${t('debugHint')}</p><div class="debug-effect-list">${debugEffectButtons()}</div><div class="debug-preview ${domEffect ? 'is-dom-preview' : ''}" data-debug-effect-view="${effect}"><canvas data-debug-canvas aria-label="${t('artDebug')}"></canvas><div class="debug-dom-preview" data-debug-dom>${effect === 'chickenJump' || effect === 'chickenFall' ? `<img class="debug-chick" src="${ART.chicken.chick}" alt="${t('chickenRoad')}">` : effect === 'keeperDive' ? `<img class="debug-keeper" src="${ART.football.goalkeeper}" alt="${t('goalkeeper')}">` : `<div class="debug-apple-card"><img class="debug-apple-tile" src="${ART.apple.tile}" alt=""><img class="debug-apple ${effect === 'appleDanger' ? 'is-danger' : ''}" src="${effect === 'appleDanger' ? ART.apple.bitten : ART.apple.whole}" alt=""></div>`}</div><span class="debug-label">${t({ propeller: 'debugPropeller', engineGlow: 'debugEngineGlow', smoke: 'debugSmoke', trail: 'debugTrail', crash: 'debugCrash', sparks: 'debugSparks', chickenJump: 'debugChickenJump', chickenFall: 'debugChickenFall', appleFlip: 'debugAppleFlip', appleSafe: 'debugAppleSafe', appleDanger: 'debugAppleDanger', keeperDive: 'debugKeeperDive' }[effect])}</span></div><button class="button button-ghost" type="button" data-debug-stop>${t('resetPreview')}</button></details>`;
   }
 
-  function renderGameSide(game) {
-    return `<aside class="game-side"><section class="panel control-panel"><div class="panel-head"><div><p class="panel-kicker">${t('controlStack')}</p><h2>${t('gameStatus')}</h2></div><span class="status-dot"></span></div><div class="panel-body control-fields">${gameControls(game)}<button class="button button-primary button-full" data-signal="${game}" type="button" ${state.busy ? 'disabled' : ''}>${state.busy ? t('signalLoading') : t('getSignal')}</button><button class="button button-ghost button-full" data-copy="${game}" type="button" ${state.analysis?.game === game ? '' : 'disabled'}>${t('copyResult')}</button><p class="form-message" role="alert" aria-live="polite">${escapeHTML(state.message)}</p></div></section><section class="panel result-panel"><div class="panel-head"><div><p class="panel-kicker">${t('result')}</p><h2>${t('latestSignal')}</h2></div></div><div class="panel-body">${renderResult(state.analysis?.game === game ? state.analysis : null)}</div></section><section class="panel history-panel"><div class="panel-head"><div><p class="panel-kicker">${t('history')}</p><h3>${t('attempts')}</h3></div></div><div class="panel-body">${game === 'football-penalties' && state.footballHistory.length ? `<div class="history-list">${state.footballHistory.map((item) => `<div class="history-item"><strong>${phaseLabel(item.result)}</strong><span>${item.role === 'striker' ? t('striker') : t('keeper')} · ${item.zone}</span></div>`).join('')}</div>` : renderHistory()}</div></section>${renderAccuracyPanel()}${renderBookmakerBalance()}</aside>`;
-  }
-
-  function refreshGameSide(game) {
-    const side = document.querySelector('.game-side');
-    if (!side || state.view !== 'game' || state.activeGame !== game) return render();
-    side.outerHTML = renderGameSide(game);
-    bindGameSide();
-  }
-
   function renderGameView(game) {
+    if (game === 'apple-of-fortune') return renderAppleGameView();
     const runtime = runtimeFor(game); const terminalFootball = game === 'football-penalties' && ['goal', 'save', 'miss'].includes(runtime?.phase);
-    const externalGame = game !== 'apple-of-fortune';
-    const actionRow = externalGame ? '' : `<div class="game-action-row"><button class="button button-ghost" data-game-action="apple-reset" type="button">${t('resetBoard')}</button></div>`;
-    return `<header class="workspace-header game-header"><div><p class="eyebrow">${t('games')} / ${String(games.indexOf(game) + 1).padStart(2, '0')}</p><h1>${gameLabel(game)}</h1><p class="lede">${t('gameIntro')}</p></div><div class="header-actions"><button class="game-exit-button" data-view="overview" type="button"><span class="game-exit-icon" aria-hidden="true">&#8592;</span>${t('backToHome')}</button></div></header><div class="content-width game-view"><div class="game-layout"><section class="game-stage"><div class="stage-topline"><div><span class="stage-index">0${games.indexOf(game) + 1}</span><span class="status-badge muted">${t('round')}</span></div><span class="round-state" data-game-live-state aria-live="polite">${phaseLabel(runtime?.phase || 'ready')}</span></div>${renderGameStage(game)}${actionRow}${renderArtDebug()}</section>${renderGameSide(game)}</div>${renderFooter()}</div>`;
+    return `<header class="workspace-header game-header"><div><p class="eyebrow">${t('games')} / ${String(games.indexOf(game) + 1).padStart(2, '0')}</p><h1>${gameLabel(game)}</h1><p class="lede">${t('gameIntro')}</p></div><div class="header-actions"><button class="game-exit-button" data-view="overview" type="button"><span class="game-exit-icon" aria-hidden="true">&#8592;</span>${t('backToHome')}</button></div></header><div class="content-width game-view"><div class="game-layout"><section class="game-stage"><div class="stage-topline"><div><span class="stage-index">0${games.indexOf(game) + 1}</span><span class="status-badge muted">РАУНД</span></div><span class="round-state" data-game-live-state aria-live="polite">${phaseLabel(runtime?.phase || 'ready')}</span></div>${renderGameStage(game)}<div class="game-action-row">${game === 'aviator' ? `<button class="button button-primary" data-game-action="aviator-start" type="button" ${runtime && ['countdown', 'takeoff', 'flying'].includes(runtime.phase) ? 'disabled' : ''}>${runtime?.phase === 'ended' ? t('getSignal') : t('startRound')}</button>` : game === 'chicken-road' ? `<button class="button button-primary" data-game-action="chicken-step" type="button" ${runtime?.phase === 'jumping' || runtime?.phase === 'fallen' || runtime?.step >= 5 ? 'disabled' : ''}>${t('jumpStep')}</button><button class="button button-ghost" data-game-action="chicken-reset" type="button">${t('resetRoad')}</button>` : game === 'apple-of-fortune' ? `<button class="button button-ghost" data-game-action="apple-reset" type="button">${t('resetBoard')}</button>` : game === 'mines' ? `<button class="button button-primary" data-game-action="mine-start" type="button" ${runtime?.phase === 'analyzing' ? 'disabled' : ''}>${runtime?.phase === 'analyzing' ? t('analyzingSignal') : t('getSignal')}</button><button class="button button-ghost" data-game-action="mine-reset" type="button">${t('resetField')}</button>` : `<button class="button button-primary" data-game-action="${terminalFootball ? 'football-next' : 'football-run'}" type="button" ${runtime?.phase === 'kick' || runtime?.phase === 'reaction' ? 'disabled' : ''}>${terminalFootball ? t('nextRound') : t('runPenalty')}</button><button class="button button-ghost" data-game-action="football-rules" type="button">${t('rules')}</button>`}</div>${renderArtDebug()}</section><aside class="game-side"><section class="panel control-panel"><div class="panel-head"><div><p class="panel-kicker">${t('controlStack')}</p><h2>${t('gameStatus')}</h2></div><span class="status-dot"></span></div><div class="panel-body control-fields">${gameControls(game)}<button class="button button-primary button-full" data-analyze="${game}" type="button" ${state.busy ? 'disabled' : ''}>${state.busy ? t('analysisLoading') : t('getAnalysis')}</button><button class="button button-ghost button-full" data-copy="${game}" type="button" ${state.analysis?.game === game ? '' : 'disabled'}>${t('copyResult')}</button><p class="form-message" role="alert" aria-live="polite">${escapeHTML(state.message)}</p></div></section><section class="panel result-panel"><div class="panel-head"><div><p class="panel-kicker">${t('result')}</p><h2>${t('latestSignal')}</h2></div></div><div class="panel-body">${renderResult(state.analysis?.game === game ? state.analysis : null)}</div></section><section class="panel history-panel"><div class="panel-head"><div><p class="panel-kicker">${t('history')}</p><h3>${t('attempts')}</h3></div></div><div class="panel-body">${game === 'football-penalties' && state.footballHistory.length ? `<div class="history-list">${state.footballHistory.map((item) => `<div class="history-item"><strong>${phaseLabel(item.result)}</strong><span>${item.role === 'striker' ? t('striker') : t('keeper')} · ${item.zone} · ${formatMoney(item.stake, { currencyFractionDigits: 0, currencyCode: 'RUB' })}</span></div>`).join('')}</div>` : renderHistory()}</div></section></aside></div>${renderFooter()}</div>`;
   }
 
   function renderActivityView() {
@@ -581,17 +622,17 @@
 
   function renderProfileView() {
     const total = state.player.balanceMinor + state.player.bonusBalanceMinor; const meetsAmount = total >= state.minWithdrawalMinor; const canWithdraw = state.player.withdrawalEligible && meetsAmount; const reason = !state.player.withdrawalEligible ? t('withdrawalNeedDays') : !meetsAmount ? `${t('withdrawalNeedAmount')} (${formatMoney(state.minWithdrawalMinor)})` : t('withdrawalDemo');
-    return `<header class="workspace-header"><div><p class="eyebrow">${t('profile')}</p><h1>${t('profile')}</h1><p class="lede">${t('profileNote')}</p></div><div class="header-actions"><button class="button button-ghost" data-view="overview" type="button">${t('overview')}</button></div></header><div class="content-width profile-view"><div class="profile-grid-large"><section class="panel"><div class="profile-identity"><span class="avatar" data-user-initial></span><div><h2 data-user-name></h2><p>${escapeHTML(state.player.playerId)}</p></div></div><div class="profile-body"><dl class="data-list"><div><dt>${t('country')}</dt><dd>${escapeHTML(state.player.countryName || state.player.countryCode || t('notAvailable'))}</dd></div><div><dt>${t('currency')}</dt><dd>${escapeHTML(state.player.currencyCode || t('notAvailable'))}</dd></div><div><dt>${t('level')}</dt><dd>${state.player.level}</dd></div><div><dt>${t('activeDays')}</dt><dd>${state.player.activeDays}</dd></div></dl></div></section><section class="withdrawal-card ${canWithdraw ? '' : 'locked'}"><p class="panel-kicker">${t('withdrawal')}</p><h2>${escapeHTML(formatMoney(total))}</h2><p>${escapeHTML(reason)}</p><button class="button ${canWithdraw ? 'button-primary' : 'button-ghost'} button-full" id="withdraw-button" type="button" ${canWithdraw ? '' : 'disabled'}>${t('withdrawBalance')}</button></section></div><section class="panel profile-level"><div class="panel-head"><div><p class="panel-kicker">${t('level')} ${state.player.level}</p><h2>${t('bonusBalance')}</h2></div></div><div class="panel-body">${renderLevelPanel()}</div></section>${renderFooter()}</div>`;
+    return `<header class="workspace-header"><div><p class="eyebrow">${t('profile')}</p><h1>${t('profile')}</h1><p class="lede">${t('profileNote')}</p></div><div class="header-actions"><button class="button button-ghost" data-view="overview" type="button">${t('overview')}</button></div></header><div class="content-width profile-view"><div class="profile-grid-large"><section class="panel"><div class="profile-identity"><span class="avatar" data-user-initial></span><div><h2 data-user-name></h2><p>${escapeHTML(state.player.playerId)}</p></div></div><div class="profile-body"><dl class="data-list"><div><dt>${t('country')}</dt><dd>${escapeHTML(state.player.countryName || state.player.countryCode || t('notAvailable'))}</dd></div><div><dt>${t('currency')}</dt><dd>${escapeHTML(state.player.currencyCode || t('notAvailable'))}</dd></div><div><dt>${t('level')}</dt><dd>${state.player.level}</dd></div><div><dt>${t('activeDays')}</dt><dd>${state.player.activeDays}</dd></div></dl></div></section><section class="withdrawal-card ${canWithdraw ? '' : 'locked'}"><p class="panel-kicker">${t('withdrawal')}</p><h2>${escapeHTML(formatMoney(total))}</h2><p>${escapeHTML(reason)}</p><button class="button ${canWithdraw ? 'button-primary' : 'button-ghost'} button-full" id="withdraw-button" type="button" ${canWithdraw ? '' : 'disabled'}>${t('withdrawBalance')}</button></section></div><section class="panel manual-balance-panel"><div class="panel-head"><div><p class="panel-kicker">${t('realBalance')}</p><h2>${t('manualBalanceTitle')}</h2></div></div><div class="panel-body"><p class="manual-balance-note">${t('manualBalanceNote')}</p><form id="balance-form" class="manual-balance-form"><label>${t('manualBalanceLabel')}<input type="text" inputmode="decimal" name="balanceAmount" placeholder="${formatMoney(state.player.balanceMinor)}" required></label><button class="button button-primary" type="submit" ${state.busy ? 'disabled' : ''}>${t('manualBalanceButton')}</button></form>${state.balanceMessage ? `<p class="form-message" role="status">${escapeHTML(state.balanceMessage)}</p>` : ''}</div></section><section class="panel profile-level"><div class="panel-head"><div><p class="panel-kicker">${t('level')} ${state.player.level}</p><h2>${t('bonusBalance')}</h2></div></div><div class="panel-body">${renderLevelPanel()}</div></section>${renderFooter()}</div>`;
   }
 
   function renderShell() {
     app.className = 'workspace'; const current = state.view === 'game' ? state.activeGame : state.view; const gameButtons = games.map((game, index) => `<button class="game-nav ${current === game ? 'active' : ''}" type="button" data-game="${game}"><span class="game-nav-icon">${String(index + 1).padStart(2, '0')}</span><span>${gameLabel(game)}</span><span class="game-dot"></span></button>`).join(''); const liveButton = ''; const main = state.view === 'overview' ? renderOverview() : state.view === 'activity' ? renderActivityView() : state.view === 'profile' ? renderProfileView() : renderGameView(state.activeGame);
-    app.innerHTML = `<a class="skip-link" href="#main-content">${t('skipToContent')}</a><aside class="side-rail"><a class="brand-lockup brand-link" href="#" data-view="overview"><span class="brand-mark">B</span><span><strong>BET<em>WINNER</em></strong><small>LINE</small></span></a><p class="rail-label">${t('workspace')}</p><nav class="nav-list" aria-label="${t('workspace')}"><button class="nav-button ${state.view === 'overview' ? 'active' : ''}" type="button" data-view="overview"><span class="nav-icon">01</span>${t('overview')}</button><button class="nav-button ${state.view === 'activity' ? 'active' : ''}" type="button" data-view="activity"><span class="nav-icon">02</span>${t('activity')}</button><button class="nav-button ${state.view === 'profile' ? 'active' : ''}" type="button" data-view="profile"><span class="nav-icon">03</span>${t('profile')}</button></nav><p class="rail-label">${t('games')}</p><nav class="nav-list rail-games" aria-label="${t('games')}">${gameButtons}</nav><div class="rail-footer"><div class="player-chip"><span class="avatar" data-user-initial></span><span data-user-name></span></div><button class="nav-button" id="logout-button" type="button"><span class="nav-icon">↗</span>${t('signOut')}</button></div></aside><div class="workspace-main"><header class="platform-topbar"><a class="topbar-brand" href="#" data-view="overview"><span class="topbar-mark">B</span><span><strong>BET<em>WINNER</em> LINE</strong></span></a><nav class="topbar-categories" aria-label="${t('games')}"><span class="topbar-game-links">${gameButtons}</span></nav><div class="topbar-status"><select class="language-select topbar-language" name="language" aria-label="${t('language')}">${langOptions()}</select></div></header><main id="main-content">${main}</main><nav class="mobile-bottom-nav" aria-label="${t('workspace')}"><button class="nav-button ${state.view === 'overview' ? 'active' : ''}" type="button" data-view="overview"><span class="nav-icon">01</span>${t('overview')}</button><button class="nav-button ${state.view === 'activity' ? 'active' : ''}" type="button" data-view="activity"><span class="nav-icon">02</span>${t('activity')}</button><button class="nav-button ${state.view === 'profile' ? 'active' : ''}" type="button" data-view="profile"><span class="nav-icon">03</span>${t('profile')}</button></nav></div>${legalDialog()}`;
+    app.innerHTML = `${authModal()}<a class="skip-link" href="#main-content">${t('skipToContent')}</a><aside class="side-rail"><a class="brand-lockup brand-link" href="#" data-view="overview"><span class="brand-mark">B</span><span><strong>BET<em>WINNER</em></strong><small>LINE</small></span></a><p class="rail-label">${t('workspace')}</p><nav class="nav-list" aria-label="${t('workspace')}"><button class="nav-button ${state.view === 'overview' ? 'active' : ''}" type="button" data-view="overview"><span class="nav-icon">01</span>${t('overview')}</button><button class="nav-button ${state.view === 'activity' ? 'active' : ''}" type="button" data-view="activity"><span class="nav-icon">02</span>${t('activity')}</button><button class="nav-button ${state.view === 'profile' ? 'active' : ''}" type="button" data-view="profile"><span class="nav-icon">03</span>${t('profile')}</button></nav><p class="rail-label">${t('games')}</p><nav class="nav-list rail-games" aria-label="${t('games')}">${gameButtons}${liveButton}</nav><div class="rail-footer"><div class="player-chip"><span class="avatar" data-user-initial></span><span data-user-name></span></div><button class="nav-button" id="logout-button" type="button"><span class="nav-icon">↗</span>${t('signOut')}</button></div></aside><div class="workspace-main"><header class="platform-topbar"><a class="topbar-brand" href="#" data-view="overview"><span class="topbar-mark">B</span><span><strong>BET<em>WINNER</em> LINE</strong></span></a><nav class="topbar-categories" aria-label="${t('games')}"><span class="topbar-game-links">${gameButtons}</span></nav><div class="topbar-status"><select class="language-select topbar-language" name="language" aria-label="${t('language')}">${langOptions()}</select><button class="topbar-auth-button topbar-register" type="button" data-auth-action="register">Регистрация</button><button class="topbar-auth-button topbar-login" type="button" data-auth-action="login">Вход</button></div></header><main id="main-content">${main}</main><nav class="mobile-bottom-nav" aria-label="${t('workspace')}"><button class="nav-button ${state.view === 'overview' ? 'active' : ''}" type="button" data-view="overview"><span class="nav-icon">01</span>${t('overview')}</button><button class="nav-button ${state.view === 'activity' ? 'active' : ''}" type="button" data-view="activity"><span class="nav-icon">02</span>${t('activity')}</button><button class="nav-button ${state.view === 'profile' ? 'active' : ''}" type="button" data-view="profile"><span class="nav-icon">03</span>${t('profile')}</button></nav></div>${legalDialog()}`;
     document.querySelectorAll('[data-user-name]').forEach((node) => { node.textContent = state.player.nickname || state.player.playerId; }); document.querySelectorAll('[data-user-initial]').forEach((node) => { node.textContent = initial(state.player.nickname || state.player.playerId); }); document.querySelectorAll('[data-active-name]').forEach((node) => { node.textContent = state.activePlayers[Number(node.dataset.activeName)]?.nickname || t('notAvailable'); }); document.querySelectorAll('[data-active-country]').forEach((node) => { const item = state.activePlayers[Number(node.dataset.activeCountry)]; node.textContent = item?.countryName || item?.countryCode || ''; }); document.querySelectorAll('[data-active-initial]').forEach((node) => { node.textContent = initial(state.activePlayers[Number(node.dataset.activeInitial)]?.nickname); }); document.querySelectorAll('[data-progress]').forEach((node) => { node.style.width = `${Math.max(0, Math.min(100, Number(node.dataset.progress) || 0))}%`; });
-    bindShell(); hydrateSceneArt();
+    bindShell(); bindAuthModal(); hydrateSceneArt();
   }
 
-  function render() { document.documentElement.lang = locale; document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr'; if (!state.player) renderAuth(); else if (!state.player.profileCompleted) renderOnboarding(); else renderShell(); }
+  function render() { document.documentElement.lang = locale; document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr'; if (!state.player && state.guestMode) state.player = guestPlayer(); if (!state.player) renderAuth(); else if (!state.player.profileCompleted) renderOnboarding(); else renderShell(); }
 
   async function handleLogin(event) {
     event.preventDefault(); const form = new FormData(event.currentTarget); state.busy = true; state.message = ''; render();
@@ -605,6 +646,17 @@
     catch (error) { state.busy = false; state.message = error.message; render(); }
   }
 
+  async function handleBalanceSave(event) {
+    event.preventDefault(); const form = new FormData(event.currentTarget);
+    const fractionDigits = Number(state.player?.currencyFractionDigits ?? 2);
+    const amount = Number(String(form.get('balanceAmount') || '').replace(',', '.'));
+    if (!Number.isFinite(amount) || amount < 0) { state.balanceMessage = t('manualBalanceInvalid'); render(); return; }
+    const balanceMinor = Math.round(amount * 10 ** fractionDigits);
+    state.busy = true; state.balanceMessage = ''; render();
+    try { const result = await api('/api/player/balance', { method: 'PATCH', body: { balanceMinor } }); state.player = result.player; state.busy = false; state.balanceMessage = t('manualBalanceSaved'); render(); }
+    catch (error) { state.busy = false; state.balanceMessage = error.message; render(); }
+  }
+
   async function refreshActivity() {
     try { const result = await api('/api/player/activity'); state.activity = result; state.activePlayers = result.activePlayers || []; state.player = result.summary || state.player; state.minWithdrawalMinor = result.minWithdrawalMinor || state.minWithdrawalMinor; if (state.view !== 'auth') render(); }
     catch { /* Current workspace remains useful when activity is temporarily unavailable. */ }
@@ -616,26 +668,11 @@
     catch { /* Empty history is a valid first-run state. */ }
   }
 
-  function waitForSignal(milliseconds) { return new Promise((resolve) => window.setTimeout(resolve, milliseconds)); }
-
-  function startSignalAnimation(game) {
-    if (game === 'aviator') return startAviatorRound({ targetMultiplier: Number.parseFloat(state.analysis?.multiplier) || 1.3, skipCountdown: true });
-    if (game === 'chicken-road') return startChickenSignal();
-    if (game === 'mines') return startMineSignal();
-    if (game === 'football-penalties') return startFootballSignal();
-  }
-
   async function requestAnalysis(game) {
-    const payload = {}; const footballRole = game === 'football-penalties' ? (document.getElementById('football-role')?.value || runtimeFor('football-penalties')?.role || 'striker') : null; if (game === 'chicken-road') payload.difficulty = document.getElementById('difficulty')?.value || 'balanced'; if (game === 'mines') { payload.size = Number(document.getElementById('mine-size')?.value || 25); payload.mines = Number(document.getElementById('mine-count')?.value || 4); }
-    const mineSettings = game === 'mines' ? { size: payload.size, mines: payload.mines } : null;
+    const payload = {}; if (game === 'chicken-road') payload.difficulty = document.getElementById('difficulty')?.value || 'balanced'; if (game === 'mines') { payload.size = Number(document.getElementById('mine-size')?.value || 25); payload.mines = Number(document.getElementById('mine-count')?.value || 4); }
     stopGameAnimation(); state.busy = true; state.message = ''; render();
-    try {
-      const [result, history] = await Promise.all([api(`/api/games/${game}/analyze`, { method: 'POST', body: payload }), api(`/api/games/${game}/history`), waitForSignal(2300)]);
-      state.analysis = result.analysis; state.player = result.activity.player; state.history = history.history || []; state.busy = false; state.message = ''; state.runtime = createReadyRuntime(game);
-      if (mineSettings) { state.runtime.size = mineSettings.size; state.runtime.mines = mineSettings.mines; }
-      if (game === 'football-penalties') state.runtime.role = footballRole;
-      render(); startSignalAnimation(game);
-    } catch (error) { state.busy = false; state.message = error.message; render(); }
+    try { const result = await api(`/api/games/${game}/analyze`, { method: 'POST', body: payload }); state.analysis = result.analysis; state.player = result.activity.player; state.busy = false; state.runtime = createReadyRuntime(game); const history = await api(`/api/games/${game}/history`); state.history = history.history || []; render(); }
+    catch (error) { state.busy = false; state.message = error.message; render(); }
   }
 
   async function copyResult(game) {
@@ -650,57 +687,59 @@
   }
 
   function openRules() { const dialog = document.getElementById('legal-dialog'); if (!dialog) return; const body = dialog.querySelector('[data-legal-body]'); body.innerHTML = `<p class="eyebrow">${t('footballPenalties')} / ${t('simulationMode')}</p><h2>${t('rules')}</h2><p data-rules-text></p>`; body.querySelector('[data-rules-text]').textContent = t('footballRulesText'); dialog.showModal(); }
+  function openAppleRules() { const dialog = document.getElementById('legal-dialog'); if (!dialog) return; const body = dialog.querySelector('[data-legal-body]'); body.innerHTML = `<p class="eyebrow">${t('appleFortune')}</p><h2>${t('rules')}</h2><p data-rules-text></p>`; body.querySelector('[data-rules-text]').textContent = t('appleRulesText'); dialog.showModal(); }
   function bindLegalLinks() { document.querySelectorAll('[data-legal]').forEach((button) => button.addEventListener('click', () => openLegal(button.dataset.legal))); }
   function bindDialogClose() { document.querySelector('[data-close-dialog]')?.addEventListener('click', () => document.getElementById('legal-dialog')?.close()); }
 
-  function scrollWorkspaceToTop() { window.scrollTo(0, 0); document.querySelector('.workspace-main')?.scrollTo?.(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }
-
-  function bindGameSide() {
-    document.querySelectorAll('.game-side [data-signal]').forEach((button) => button.addEventListener('click', () => requestAnalysis(button.dataset.signal)));
-    document.querySelectorAll('.game-side [data-copy]').forEach((button) => button.addEventListener('click', () => copyResult(button.dataset.copy)));
-    document.querySelector('.game-side #mine-size')?.addEventListener('change', resetMineFromControls);
-    document.querySelector('.game-side #mine-count')?.addEventListener('change', resetMineFromControls);
-    document.querySelector('.game-side #football-role')?.addEventListener('change', (event) => { const runtime = runtimeFor('football-penalties') || createFootballRuntime(); runtime.role = event.target.value; state.runtime = runtime; render(); });
+  const LIVE_GAME_URL = 'https://betwinner-72427.pro/games-frame/games/373?co=1&cu=1&lg=ru&wh=55&tzo=3';
+  function openGameFrame() {
+    let dialog = document.getElementById('game-frame-dialog');
+    if (!dialog) {
+      dialog = document.createElement('dialog');
+      dialog.id = 'game-frame-dialog';
+      dialog.className = 'game-frame-dialog';
+      dialog.innerHTML = `<button class="dialog-close" data-close-frame type="button" aria-label="${t('close')}">×</button><div class="game-frame-head"><span class="game-frame-title">Betwinner Live</span></div><iframe class="game-frame-embed" title="Betwinner Live" allow="autoplay; fullscreen; payment" allowfullscreen referrerpolicy="no-referrer"></iframe>`;
+      document.body.appendChild(dialog);
+      dialog.querySelector('[data-close-frame]').addEventListener('click', () => dialog.close());
+      dialog.addEventListener('close', () => { const frame = dialog.querySelector('iframe'); if (frame) frame.src = 'about:blank'; });
+      dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+    }
+    dialog.querySelector('iframe').src = LIVE_GAME_URL;
+    dialog.showModal();
   }
+
+  function scrollWorkspaceToTop() { window.scrollTo(0, 0); document.querySelector('.workspace-main')?.scrollTo?.(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; }
 
   function bindShell() {
   document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', async (event) => { event.preventDefault(); stopGameAnimation(); state.view = button.dataset.view; state.message = ''; scrollWorkspaceToTop(); if (state.view === 'activity') await refreshActivity(); else render(); }));
   document.querySelectorAll('[data-game]').forEach((button) => button.addEventListener('click', () => openGame(button.dataset.game)));
-    bindGameSide();
+    document.querySelectorAll('[data-auth-action]').forEach((button) => button.addEventListener('click', () => openAuthModal(button.dataset.authAction)));
+    document.querySelectorAll('[data-game-frame]').forEach((button) => button.addEventListener('click', () => openGameFrame()));
+    document.querySelectorAll('[data-analyze]').forEach((button) => button.addEventListener('click', () => requestAnalysis(button.dataset.analyze)));
+    document.querySelectorAll('[data-copy]').forEach((button) => button.addEventListener('click', () => copyResult(button.dataset.copy)));
     document.querySelectorAll('.language-select, .rail-language').forEach((select) => select.addEventListener('change', () => { locale = select.value; localStorage.setItem('verdant-locale', locale); render(); }));
-    document.getElementById('logout-button')?.addEventListener('click', logout); document.getElementById('withdraw-button')?.addEventListener('click', openWithdrawDialog);
-    document.querySelectorAll('[data-game-action]').forEach((button) => button.addEventListener('click', () => handleGameAction(button.dataset.gameAction, button.dataset.cell, button.dataset.zone)));
+    document.getElementById('logout-button')?.addEventListener('click', logout); document.getElementById('withdraw-button')?.addEventListener('click', openWithdrawDialog); document.getElementById('balance-form')?.addEventListener('submit', handleBalanceSave);
+    document.querySelectorAll('[data-game-action]').forEach((button) => button.addEventListener('click', () => handleGameAction(button.dataset.gameAction, button.dataset.cell, button.dataset.zone, button.dataset.stake)));
+    document.querySelector('[data-apple-stake-input]')?.addEventListener('input', (event) => setAppleStake(event.target.value));
+    document.getElementById('mine-size')?.addEventListener('change', resetMineFromControls); document.getElementById('mine-count')?.addEventListener('change', resetMineFromControls);
+    document.getElementById('football-role')?.addEventListener('change', (event) => { const runtime = runtimeFor('football-penalties') || createFootballRuntime(); runtime.role = event.target.value; state.runtime = runtime; render(); });
     document.querySelectorAll('[data-debug-effect]').forEach((button) => button.addEventListener('click', () => startDebugEffect(button.dataset.debugEffect))); document.querySelector('[data-debug-stop]')?.addEventListener('click', () => { stopGameAnimation(); render(); });
-    document.querySelector('[data-action="save-bk-balance"]')?.addEventListener('click', handleSaveBkBalance);
-    bindLegalLinks(); bindDialogClose();
-  }
-
-  async function handleSaveBkBalance() {
-    const input = document.getElementById('bk-balance-input');
-    if (!input) return;
-    const value = parseFloat(input.value) || 0;
-    try {
-      const resp = await api('/api/player/bookmaker-balance', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ balance: value }) });
-      if (resp.player?.bookmakerBalanceMinor !== undefined) state.player.bookmakerBalanceMinor = resp.player.bookmakerBalanceMinor;
-      state.message = t('saved');
-    } catch (err) {
-      state.message = err.message || 'Error';
-    }
-    render();
+    bindLegalLinks();
+    bindDialogClose();
   }
 
   function openWithdrawDialog() { const dialog = document.getElementById('legal-dialog'); if (!dialog) return; const body = dialog.querySelector('[data-legal-body]'); body.innerHTML = `<p class="eyebrow">${t('withdrawal')}</p><h2>${t('withdrawBalance')}</h2><p data-withdraw-copy></p><button class="button button-ghost" data-close-dialog type="button">${t('close')}</button>`; body.querySelector('[data-withdraw-copy]').textContent = t('withdrawalDemo'); body.querySelector('[data-close-dialog]').addEventListener('click', () => dialog.close()); dialog.showModal(); }
   async function logout() { try { await api('/api/auth/logout', { method: 'POST' }); } finally { stopGameAnimation(); state.player = null; state.activity = null; state.activePlayers = []; state.view = 'overview'; render(); } }
 
   function createReadyRuntime(game) {
-    if (game === 'aviator') return { game, token: Date.now(), phase: 'ready', countdown: 0, multiplier: 1.27, progress: 0.58, startedAt: 0, crashAt: 0, helpOpen: true, sprites: createAtlasSet(), timers: new Set() };
+    if (game === 'aviator') return { game, token: Date.now(), phase: 'ready', countdown: 0, multiplier: 1.27, progress: 0.58, startedAt: 0, crashAt: 0, sprites: createAtlasSet(), timers: new Set() };
     if (game === 'chicken-road') return createChickenRuntime();
     if (game === 'apple-of-fortune') return createAppleRuntime();
     if (game === 'mines') return createMineRuntime();
     return createFootballRuntime();
   }
 
-  function createAviatorRuntime(options = {}) { const sprites = createAtlasSet(); Object.values(sprites).forEach((player) => player.play()); const targetMultiplier = Math.max(1.05, Number(options.targetMultiplier) || 1.3); const flyingDuration = Math.max(820, Math.min(9000, Math.round((targetMultiplier - 1) * 3600))); const skipCountdown = options.skipCountdown === true; return { game: 'aviator', token: Date.now(), phase: skipCountdown ? 'takeoff' : 'countdown', countdown: skipCountdown ? 0 : 7, countdownStep: 0, countdownStartedAt: performance.now(), multiplier: 1, progress: 0, startedAt: skipCountdown ? performance.now() : 0, crashAt: 0, targetMultiplier, flyingDuration, helpOpen: false, sprites, timers: new Set() }; }
+  function createAviatorRuntime() { const sprites = createAtlasSet(); Object.values(sprites).forEach((player) => player.play()); return { game: 'aviator', token: Date.now(), phase: 'countdown', countdown: 7, countdownStep: 0, countdownStartedAt: performance.now(), multiplier: 1, progress: 0, startedAt: 0, crashAt: 0, sprites, timers: new Set() }; }
 
   function scheduleAviatorCountdown(token) {
     scheduleRuntime(() => {
@@ -718,49 +757,78 @@
     }, 1000);
   }
 
-  function startAviatorRound(options = {}) { stopGameAnimation(); state.runtime = createAviatorRuntime(options); render(); if (!options.skipCountdown) scheduleAviatorCountdown(state.runtime.token); state.sceneLoop.start((now) => { const runtime = runtimeFor('aviator'); if (!runtime) return state.sceneLoop.stop(); if (runtime.phase === 'countdown') drawAviatorScene(now); else tickAviator(runtime.token, now); }); }
+  function startAviatorRound() { stopGameAnimation(); state.runtime = createAviatorRuntime(); render(); scheduleAviatorCountdown(state.runtime.token); state.sceneLoop.start((now) => { const runtime = runtimeFor('aviator'); if (!runtime) return state.sceneLoop.stop(); if (runtime.phase === 'countdown') drawAviatorScene(now); else tickAviator(runtime.token, now); }); }
   function startAviatorTakeoff() { const runtime = runtimeFor('aviator'); if (!runtime) return; runtime.phase = 'takeoff'; runtime.startedAt = performance.now(); updateRuntimeDom('aviator'); drawAviatorScene(); }
   function tickAviator(token, now) {
-    const runtime = runtimeFor('aviator'); if (!runtime || runtime.token !== token) return state.sceneLoop.stop(); const elapsed = now - runtime.startedAt; const takeoffDuration = reducedMotion() ? 0 : 720; const flyingDuration = reducedMotion() ? 420 : runtime.flyingDuration;
-    if (elapsed < takeoffDuration + flyingDuration) { runtime.phase = elapsed < takeoffDuration ? 'takeoff' : 'flying'; runtime.progress = Math.min(1, elapsed / (takeoffDuration + flyingDuration)); runtime.multiplier = 1 + (runtime.targetMultiplier - 1) * Math.min(1, Math.max(0, elapsed - takeoffDuration * 0.35) / Math.max(1, flyingDuration)); drawAviatorScene(now); updateRuntimeDom('aviator'); return; }
-    if (!runtime.crashAt) { runtime.crashAt = now; runtime.phase = 'crash'; runtime.progress = 1; runtime.multiplier = runtime.targetMultiplier; updateRuntimeDom('aviator'); }
+    const runtime = runtimeFor('aviator'); if (!runtime || runtime.token !== token) return state.sceneLoop.stop(); const elapsed = now - runtime.startedAt; const takeoffDuration = 720; const flyingDuration = reducedMotion() ? 1200 : 5100;
+    if (elapsed < takeoffDuration + flyingDuration) { runtime.phase = elapsed < takeoffDuration ? 'takeoff' : 'flying'; runtime.progress = Math.min(1, elapsed / (takeoffDuration + flyingDuration)); runtime.multiplier = 1 + Math.min(1.34, Math.max(0, elapsed - 240) / 4050); drawAviatorScene(now); updateRuntimeDom('aviator'); return; }
+    if (!runtime.crashAt) { runtime.crashAt = now; runtime.phase = 'crash'; runtime.progress = 1; runtime.multiplier = 2.34; updateRuntimeDom('aviator'); }
     drawAviatorScene(now); updateRuntimeDom('aviator'); if (now - runtime.crashAt >= (reducedMotion() ? 0 : 1180)) { runtime.phase = 'ended'; state.sceneLoop.stop(); updateRuntimeDom('aviator'); drawAviatorScene(now); }
   }
 
-  function createChickenRuntime() { return { game: 'chicken-road', token: Date.now(), phase: 'ready', step: 0, target: 1, signalTarget: 0, multiplier: 1, motionStarted: 0, animationStartedAt: 0, timers: new Set() }; }
+  function createChickenRuntime() { return { game: 'chicken-road', token: Date.now(), phase: 'ready', step: 0, target: 1, multiplier: 1, motionStarted: 0, animationStartedAt: 0, timers: new Set() }; }
   function startChickenStep() { const runtime = runtimeFor('chicken-road') || createChickenRuntime(); if (runtime.phase === 'jumping' || runtime.phase === 'fallen' || runtime.step >= 5) return; runtime.target = runtime.step + 1; runtime.fromStep = runtime.step; runtime.motionStarted = performance.now(); runtime.animationStartedAt = runtime.motionStarted; runtime.phase = 'jumping'; state.runtime = runtime; render(); state.sceneLoop.start((now) => tickChicken(runtime.token, now)); }
-  function startChickenSignal() { const runtime = runtimeFor('chicken-road') || createChickenRuntime(); if (runtime.phase === 'jumping') return; if (runtime.phase === 'fallen' || runtime.step >= 5) { stopGameAnimation(); state.runtime = createChickenRuntime(); return startChickenSignal(); } const safeSteps = state.analysis?.game === 'chicken-road' && Array.isArray(state.analysis.safeSteps) ? state.analysis.safeSteps.map(Number) : [1, 2, 3]; const targetStep = Math.max(1, Math.min(5, Number(state.analysis?.targetStep) || safeSteps[safeSteps.length - 1] || 3)); runtime.signalTarget = targetStep; runtime.target = Math.min(runtime.step + 1, targetStep); runtime.fromStep = runtime.step; runtime.signalStep = runtime.target; runtime.motionStarted = performance.now(); runtime.animationStartedAt = runtime.motionStarted; runtime.phase = 'jumping'; state.runtime = runtime; render(); state.sceneLoop.start((now) => tickChicken(runtime.token, now)); }
-  function tickChicken(token, now) { const runtime = runtimeFor('chicken-road'); if (!runtime || runtime.token !== token) return state.sceneLoop.stop(); const progress = Math.min(1, (now - runtime.motionStarted) / (reducedMotion() ? 0 : 620)); hydrateChickenPose(runtime, progress); if (progress < 1) return; const safeSteps = state.analysis?.game === 'chicken-road' ? (state.analysis.safeSteps || []).map(Number) : [1, 2, 3]; if (safeSteps.includes(Number(runtime.target))) { runtime.step = runtime.target; runtime.multiplier = [1, 1.12, 1.28, 1.48, 1.78, 2.25][runtime.step] || 1; runtime.animationStartedAt = now; state.sceneLoop.stop(); if (runtime.step < (runtime.signalTarget || runtime.step)) { runtime.phase = 'ready'; render(); scheduleRuntime(() => { const current = runtimeFor('chicken-road'); if (!current || current.token !== token) return; current.target = current.step + 1; current.fromStep = current.step; current.signalStep = current.target; current.motionStarted = performance.now(); current.animationStartedAt = current.motionStarted; current.phase = 'jumping'; state.sceneLoop.start((frameNow) => tickChicken(current.token, frameNow)); }, 180); } else { runtime.phase = 'safe'; render(); } } else { runtime.failedStep = runtime.target; runtime.phase = 'fallen'; runtime.motionStarted = now; runtime.animationStartedAt = now; state.sceneLoop.stop(); render(); state.sceneLoop.start((frameNow) => tickChickenFall(runtime.token, frameNow)); } }
+  function tickChicken(token, now) { const runtime = runtimeFor('chicken-road'); if (!runtime || runtime.token !== token) return state.sceneLoop.stop(); const progress = Math.min(1, (now - runtime.motionStarted) / (reducedMotion() ? 0 : 620)); hydrateChickenPose(runtime, progress); if (progress < 1) return; const safeSteps = state.analysis?.game === 'chicken-road' ? state.analysis.safeSteps : [1, 2, 3]; if (safeSteps.includes(runtime.target)) { runtime.step = runtime.target; runtime.multiplier = 1 + runtime.step * 0.19; runtime.phase = 'safe'; runtime.animationStartedAt = now; state.sceneLoop.stop(); render(); } else { runtime.failedStep = runtime.target; runtime.phase = 'fallen'; runtime.motionStarted = now; runtime.animationStartedAt = now; state.sceneLoop.stop(); render(); state.sceneLoop.start((frameNow) => tickChickenFall(runtime.token, frameNow)); } }
   function tickChickenFall(token, now) { const runtime = runtimeFor('chicken-road'); if (!runtime || runtime.token !== token) return state.sceneLoop.stop(); const progress = Math.min(1, (now - runtime.motionStarted) / (reducedMotion() ? 0 : 520)); hydrateChickenPose(runtime, progress); if (progress >= 1) state.sceneLoop.stop(); }
   function resetChicken() { stopGameAnimation(); state.runtime = createChickenRuntime(); render(); }
 
-  function createAppleRuntime() { return { game: 'apple-of-fortune', token: Date.now(), phase: 'ready', activeRow: 1, score: 0, revealed: null, revealedCells: {}, animationStartedAt: 0, timers: new Set() }; }
-  function revealApple(cell) { const runtime = runtimeFor('apple-of-fortune') || createAppleRuntime(); if (runtime.phase === 'opening' || runtime.phase === 'ended') return; const rows = state.analysis?.game === 'apple-of-fortune' ? state.analysis.rows : Array.from({ length: 4 }, (_, index) => ({ level: index + 1, recommendedCell: index + 2 })); const row = rows.find((item) => item.level === runtime.activeRow) || rows[0]; runtime.revealed = { level: runtime.activeRow, cell: Number(cell), safe: Number(cell) === Number(row.recommendedCell) }; runtime.animationStartedAt = performance.now(); runtime.phase = 'opening'; state.runtime = runtime; render(); scheduleRuntime(() => { runtime.revealedCells[runtime.revealed.level] = runtime.revealed; if (runtime.revealed.safe) runtime.score = (runtime.score || 0) + 100 * runtime.activeRow; if (runtime.revealed.safe && runtime.activeRow < rows.length) { runtime.activeRow += 1; runtime.phase = 'safe'; } else runtime.phase = 'ended'; runtime.revealed = null; render(); }, 560); }
+  function createAppleRuntime() { return { game: 'apple-of-fortune', token: Date.now(), phase: 'idle', activeRow: 1, score: 0, stake: 10, auto: false, muted: false, revealed: null, revealedCells: {}, animationStartedAt: 0, timers: new Set() }; }
+  function appleRows() { return state.analysis?.game === 'apple-of-fortune' && Array.isArray(state.analysis.rows) && state.analysis.rows.length ? state.analysis.rows : appleFallbackRows(); }
+  function appleFractionDigits() { return Number(state.player?.currencyFractionDigits ?? 2); }
+  function toAppleMinor(amount) { return Math.round((Number(amount) || 0) * (10 ** appleFractionDigits())); }
+  function setAppleStake(value) { const runtime = runtimeFor('apple-of-fortune') || createAppleRuntime(); if (runtime.phase !== 'idle' && runtime.phase !== 'ended') return; runtime.stake = Math.max(0, Math.round(Number(value) || 0)); state.runtime = runtime; render(); }
+  function toggleAppleMute() { const runtime = runtimeFor('apple-of-fortune') || createAppleRuntime(); runtime.muted = !runtime.muted; state.runtime = runtime; render(); }
+  function toggleAppleAuto() { const wasAuto = runtimeFor('apple-of-fortune')?.auto; const runtime = runtimeFor('apple-of-fortune') || createAppleRuntime(); runtime.auto = !runtime.auto; state.runtime = runtime; render(); if (!wasAuto && runtime.auto && (runtime.phase === 'idle' || runtime.phase === 'ended')) startAppleRound(); }
+  function startAppleRound() {
+    const previous = runtimeFor('apple-of-fortune'); const stake = previous?.stake ?? 10; const auto = previous?.auto || false; const muted = previous?.muted || false;
+    const stakeMinor = toAppleMinor(stake);
+    if (stakeMinor <= 0) { state.message = t('appleInsufficientBalance'); if (auto) { const runtime = previous || createAppleRuntime(); runtime.auto = false; state.runtime = runtime; } render(); return; }
+    if (stakeMinor > (state.player.balanceMinor || 0)) {
+      state.message = t('appleInsufficientBalance');
+      const runtime = previous || createAppleRuntime(); runtime.auto = false; state.runtime = runtime; render(); return;
+    }
+    state.player.balanceMinor -= stakeMinor;
+    stopGameAnimation(); state.runtime = { ...createAppleRuntime(), stake, auto, muted, phase: 'safe', activeRow: 1 }; state.message = ''; render();
+  }
+  function revealApple(cell) { const runtime = runtimeFor('apple-of-fortune'); if (!runtime || runtime.phase !== 'safe') return; const rows = appleRows(); const row = rows.find((item) => item.level === runtime.activeRow) || rows[0]; runtime.revealed = { level: runtime.activeRow, cell: Number(cell), safe: Number(cell) === Number(row.recommendedCell) }; runtime.animationStartedAt = performance.now(); runtime.phase = 'opening'; state.runtime = runtime; render(); scheduleRuntime(() => { const wasSafe = runtime.revealed.safe; const multiplierValue = Number(String(row.multiplier || '1').replace(/^x/i, '')) || 1; runtime.revealedCells[runtime.revealed.level] = runtime.revealed; if (wasSafe) { runtime.score = Number((runtime.stake * multiplierValue).toFixed(2)); if (runtime.activeRow < rows.length) { runtime.activeRow += 1; runtime.phase = 'safe'; } else { runtime.phase = 'ended'; state.player.balanceMinor += toAppleMinor(runtime.score); } } else { runtime.score = 0; runtime.phase = 'ended'; } runtime.revealed = null; state.runtime = runtime; render(); if (runtime.auto) { if (runtime.phase === 'safe') { const nextRow = rows.find((item) => item.level === runtime.activeRow); scheduleRuntime(() => revealApple(nextRow?.recommendedCell || 1), 650); } else { scheduleRuntime(() => startAppleRound(), 1500); } } }, 560); }
+  function cashOutApple() {
+    const runtime = runtimeFor('apple-of-fortune'); if (!runtime || runtime.phase !== 'safe' || !(runtime.score > 0)) return;
+    state.player.balanceMinor += toAppleMinor(runtime.score); runtime.phase = 'ended'; runtime.auto = false; state.runtime = runtime; render();
+  }
 
-  function createMineRuntime() { return { game: 'mines', token: Date.now(), phase: 'ready', size: Number(document.getElementById('mine-size')?.value || 25), mines: Number(document.getElementById('mine-count')?.value || 4), opened: {}, opening: null, previewResult: null, signalCells: [], signalIndex: 0, animationStartedAt: 0, timers: new Set() }; }
-  function startMineRound(sizeOverride, minesOverride) { const runtime = runtimeFor('mines') || createMineRuntime(); if (runtime.phase !== 'ready') return; runtime.size = Number(sizeOverride || document.getElementById('mine-size')?.value || runtime.size || 25); runtime.mines = Number(minesOverride || document.getElementById('mine-count')?.value || runtime.mines || 4); runtime.phase = 'playing'; runtime.token = Date.now(); state.runtime = runtime; render(); }
+  function createMineRuntime() { return { game: 'mines', token: Date.now(), phase: 'ready', size: Number(document.getElementById('mine-size')?.value || 25), mines: Number(document.getElementById('mine-count')?.value || 4), minePositions: [], accuracy: 0, animationStartedAt: 0, timers: new Set() }; }
+  function startMineRound() {
+    const runtime = runtimeFor('mines') || createMineRuntime();
+    if (runtime.phase === 'analyzing') return;
+    runtime.size = Number(document.getElementById('mine-size')?.value || runtime.size || 25);
+    runtime.mines = Math.max(1, Math.min(runtime.size - 1, Number(document.getElementById('mine-count')?.value || runtime.mines || 4)));
+    runtime.phase = 'analyzing'; runtime.minePositions = []; runtime.token = Date.now();
+    state.runtime = runtime; render();
+    scheduleRuntime(() => {
+      const current = runtimeFor('mines'); if (!current || current.token !== runtime.token) return;
+      const positions = new Set(); while (positions.size < current.mines) positions.add(Math.floor(Math.random() * current.size));
+      current.minePositions = Array.from(positions); current.accuracy = 83 + Math.floor(Math.random() * 12); current.phase = 'revealed';
+      state.runtime = current; render();
+    }, 900);
+  }
   function resetMineFromControls() { stopGameAnimation(); state.runtime = createMineRuntime(); render(); }
-  function openMine(cell) { const runtime = runtimeFor('mines') || createMineRuntime(); if (runtime.phase !== 'playing' || runtime.phase === 'opening' || runtime.phase === 'mine' || runtime.opened[cell]) return; const recommended = state.analysis?.game === 'mines' ? state.analysis.recommendedCells : [0, 2, 7]; runtime.opening = Number(cell); runtime.previewResult = recommended.includes(Number(cell)) ? 'safe' : 'mine'; runtime.animationStartedAt = performance.now(); runtime.phase = 'opening'; state.runtime = runtime; render(); scheduleRuntime(() => { const result = runtime.previewResult; runtime.opened[cell] = { result }; runtime.opening = null; runtime.phase = result === 'mine' ? 'mine' : 'playing'; render(); }, 460); }
-  function startMineSignal() { const runtime = runtimeFor('mines') || createMineRuntime(); runtime.size = Number(state.analysis?.size || runtime.size || 25); runtime.mines = Number(state.analysis?.mines || runtime.mines || 4); runtime.opened = {}; runtime.opening = null; runtime.signalCells = (Array.isArray(state.analysis?.recommendedCells) ? state.analysis.recommendedCells : [0, 2, 7]).map(Number).slice(0, 3); runtime.signalIndex = 0; runtime.phase = 'playing'; runtime.token = Date.now(); state.runtime = runtime; render(); scheduleMineSignalCell(runtime.token); }
-  function scheduleMineSignalCell(token) { const runtime = runtimeFor('mines'); if (!runtime || runtime.token !== token) return; if (runtime.signalIndex >= runtime.signalCells.length) { runtime.phase = 'safe'; render(); return; } const cell = runtime.signalCells[runtime.signalIndex]; runtime.opening = cell; runtime.previewResult = 'safe'; runtime.animationStartedAt = performance.now(); runtime.phase = 'opening'; render(); scheduleRuntime(() => { const current = runtimeFor('mines'); if (!current || current.token !== token) return; current.opened[cell] = { result: 'safe' }; current.opening = null; current.signalIndex += 1; current.phase = current.signalIndex < current.signalCells.length ? 'playing' : 'safe'; render(); if (current.phase === 'playing') scheduleRuntime(() => scheduleMineSignalCell(token), 180); }, 460); }
 
-  function createFootballRuntime() { return { game: 'football-penalties', token: Date.now(), phase: 'ready', role: 'striker', selectedZone: 3, selectedDirection: 3, score: 0, shotZone: 3, result: null, animationStartedAt: 0, timers: new Set() }; }
+  function createFootballRuntime() { return { game: 'football-penalties', token: Date.now(), phase: 'ready', role: 'striker', selectedZone: 3, selectedDirection: 3, stake: 100, score: 0, shotZone: 3, result: null, animationStartedAt: 0, timers: new Set() }; }
   function selectFootballZone(zone, direction = false) { const runtime = runtimeFor('football-penalties') || createFootballRuntime(); if (runtime.phase !== 'ready') return; if (direction) runtime.selectedDirection = Number(zone); else runtime.selectedZone = Number(zone); state.runtime = runtime; render(); window.setTimeout(() => runFootball(), 40); }
   function runFootball() { const runtime = runtimeFor('football-penalties') || createFootballRuntime(); if (runtime.phase !== 'ready') return; runtime.role = document.getElementById('football-role')?.value || runtime.role || 'striker'; runtime.shotZone = runtime.role === 'striker' ? runtime.selectedZone : ((runtime.token % 5) + 1); runtime.result = null; runtime.phase = 'kick'; runtime.motionStarted = performance.now(); runtime.animationStartedAt = runtime.motionStarted; state.runtime = runtime; render(); state.sceneLoop.start((now) => tickFootball(runtime.token, now)); }
-  function startFootballSignal() { const runtime = runtimeFor('football-penalties') || createFootballRuntime(); const recommendedZone = Math.max(1, Math.min(5, Number(state.analysis?.recommendedZone) || 3)); runtime.role = document.getElementById('football-role')?.value || runtime.role || 'striker'; if (runtime.role === 'striker') runtime.selectedZone = recommendedZone; else runtime.selectedDirection = recommendedZone; state.runtime = runtime; render(); window.setTimeout(() => runFootball(), 40); }
   function tickFootball(token, now) {
     const runtime = runtimeFor('football-penalties'); if (!runtime || runtime.token !== token) return state.sceneLoop.stop();
     const flightDuration = reducedMotion() ? 0 : 650; const reactionDuration = reducedMotion() ? 0 : 420;
     if (runtime.phase === 'kick') {
       const progress = flightDuration ? Math.min(1, (now - runtime.motionStarted) / flightDuration) : 1; hydrateFootballPose(runtime, progress); if (progress < 1) return;
-      const chosen = runtime.role === 'striker' ? runtime.selectedZone : runtime.selectedDirection; runtime.result = runtime.role === 'keeper' ? (chosen === runtime.shotZone ? 'save' : 'goal') : (chosen === 1 ? 'miss' : chosen === 3 ? 'save' : 'goal'); runtime.score = (runtime.score || 0) + (runtime.result === 'goal' ? 1 : 0); runtime.phase = 'reaction'; runtime.resultStartedAt = now; runtime.animationStartedAt = now; state.footballHistory.unshift({ role: runtime.role, zone: chosen, result: runtime.result }); state.footballHistory = state.footballHistory.slice(0, 6); render(); return;
+      const chosen = runtime.role === 'striker' ? runtime.selectedZone : runtime.selectedDirection; runtime.result = runtime.role === 'keeper' ? (chosen === runtime.shotZone ? 'save' : 'goal') : (chosen === 1 ? 'miss' : chosen === 3 ? 'save' : 'goal'); runtime.score = (runtime.score || 0) + (runtime.result === 'goal' ? 1 : 0); runtime.phase = 'reaction'; runtime.resultStartedAt = now; runtime.animationStartedAt = now; state.footballHistory.unshift({ role: runtime.role, stake: runtime.stake, zone: chosen, result: runtime.result }); state.footballHistory = state.footballHistory.slice(0, 6); render(); return;
     }
     if (runtime.phase !== 'reaction') return;
     const reactionProgress = reactionDuration ? Math.min(1, (now - runtime.resultStartedAt) / reactionDuration) : 1; hydrateFootballPose(runtime, reactionProgress); if (reactionProgress < 1) return; runtime.phase = runtime.result; state.sceneLoop.stop(); render();
   }
 
-  function handleGameAction(action, cell, zone) {
-    if (action === 'aviator-start') return startAviatorRound(); if (action === 'aviator-help-close') { const runtime = runtimeFor('aviator'); if (runtime) { runtime.helpOpen = false; render(); } return; } if (action === 'aviator-help-open') { const runtime = runtimeFor('aviator') || createReadyRuntime('aviator'); runtime.helpOpen = true; state.runtime = runtime; render(); return; } if (action === 'mine-start') return startMineRound(); if (action === 'chicken-step') return startChickenStep(); if (action === 'chicken-reset') return resetChicken(); if (action === 'apple-reveal') return revealApple(cell); if (action === 'apple-reset') { stopGameAnimation(); state.runtime = createAppleRuntime(); return render(); } if (action === 'mine-open') return openMine(cell); if (action === 'mine-reset') return resetMineFromControls(); if (action === 'football-zone') return selectFootballZone(zone); if (action === 'football-direction') return selectFootballZone(zone, true); if (action === 'football-run') return runFootball(); if (action === 'football-next') { const previous = runtimeFor('football-penalties') || {}; stopGameAnimation(); state.runtime = { ...createFootballRuntime(), role: previous.role || 'striker', selectedZone: previous.selectedZone || 3, selectedDirection: previous.selectedDirection || 3 }; return render(); } if (action === 'football-rules') return openRules();
+  function handleGameAction(action, cell, zone, stake) {
+    if (action === 'aviator-start') return startAviatorRound(); if (action === 'mine-start') return startMineRound(); if (action === 'chicken-step') return startChickenStep(); if (action === 'chicken-reset') return resetChicken(); if (action === 'apple-reveal') return revealApple(cell); if (action === 'apple-reset') { stopGameAnimation(); state.runtime = createAppleRuntime(); return render(); } if (action === 'apple-play') return startAppleRound(); if (action === 'apple-stake-chip') return setAppleStake(stake); if (action === 'apple-stake-clear') return setAppleStake(0); if (action === 'apple-auto') return toggleAppleAuto(); if (action === 'apple-cashout') return cashOutApple(); if (action === 'apple-mute') return toggleAppleMute(); if (action === 'apple-info') return openAppleRules(); if (action === 'mine-reset') return resetMineFromControls(); if (action === 'football-zone') return selectFootballZone(zone); if (action === 'football-direction') return selectFootballZone(zone, true); if (action === 'football-run') return runFootball(); if (action === 'football-next') { const previous = runtimeFor('football-penalties') || {}; stopGameAnimation(); state.runtime = { ...createFootballRuntime(), role: previous.role || 'striker', selectedZone: previous.selectedZone || 3, selectedDirection: previous.selectedDirection || 3, stake: previous.stake || 100 }; return render(); } if (action === 'football-rules') return openRules();
   }
 
   // One monotonic line is the only owner of aircraft translation. Flattened source sheets are
@@ -803,34 +871,11 @@
     context.fillStyle = '#f8faf8'; context.font = '700 48px sans-serif'; context.textAlign = 'right'; context.textBaseline = 'middle'; context.fillText(String(runtime.countdown), width - 14, centerY - radius * 0.20); context.restore();
   }
 
-  function drawReferenceAviatorScene(context, width, height, runtime, now) {
-    const phase = runtime?.phase || 'ready';
-    const progress = runtime?.progress ?? 0;
-    const moving = !['ready', 'countdown'].includes(phase);
-    const normalized = moving ? Math.max(0, Math.min(1, progress)) : 0;
-    const centerX = width * (moving ? 0.10 + normalized * 0.46 : 0.30);
-    const centerY = height * (moving ? 0.68 - normalized * 0.42 : 0.68);
-    const size = Math.min(width * 0.20, height * 0.40);
-    const clip = phase === 'crash' ? 'aviator_crash_explosion' : phase === 'flying' ? 'aviator_flight_loop' : phase === 'takeoff' ? 'aviator_round_launch' : 'aviator_plane_idle';
-    const elapsed = phase === 'crash' ? Math.max(0, now - (runtime?.crashAt || now)) : Math.max(0, now - (runtime?.startedAt || now));
-    const rendered = state.animationManifest && !isArtDebug()
-      ? drawAnimationClip(context, clip, elapsed, centerX - size / 2, centerY - size / 2, size, size, { alpha: phase === 'ended' ? 0.18 : 0.98, alignAlphaBounds: true })
-      : false;
-    if (!rendered && phase !== 'ended') drawCenteredImage(context, ART.aviator.aircraftComposite, centerX, centerY, size, size * (552 / 1063), { alpha: 0.98, rotation: -0.04 });
-    if (phase === 'crash' || phase === 'ended') {
-      const sprites = runtime?.sprites || createAtlasSet();
-      const crashElapsed = Math.max(0, now - (runtime?.crashAt || now));
-      if (phase === 'crash') sprites.crash.draw(context, centerX, centerY, size * 1.25, size * 1.25, { elapsed: crashElapsed, alpha: 0.9 });
-    }
-  }
-
   function drawAviatorScene(now = performance.now()) {
     document.querySelectorAll('[data-game-canvas="aviator"], [data-chart="aviator"]').forEach((canvas) => {
       const rect = canvas.getBoundingClientRect(); const ratio = Math.min(window.devicePixelRatio || 1, 2); const width = Math.max(1, Math.floor(rect.width)); const height = Math.max(1, Math.floor(rect.height)); const pixelWidth = Math.round(width * ratio); const pixelHeight = Math.round(height * ratio);
       if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) { canvas.width = pixelWidth; canvas.height = pixelHeight; }
       const context = canvas.getContext('2d'); if (!context) return; context.setTransform(ratio, 0, 0, ratio, 0, 0); context.clearRect(0, 0, width, height); context.imageSmoothingEnabled = true;
-      const referenceStage = canvas.closest('[data-reference-skin="aviator"]');
-      if (referenceStage) { drawReferenceAviatorScene(context, width, height, runtimeFor('aviator'), now); return; }
       const sky = context.createLinearGradient(0, 0, 0, height); sky.addColorStop(0, '#071d2b'); sky.addColorStop(0.58, '#0a392a'); sky.addColorStop(1, '#05160e'); context.fillStyle = sky; context.fillRect(0, 0, width, height);
       context.strokeStyle = 'rgba(163, 237, 140, 0.105)'; context.lineWidth = 1; for (let x = 0; x < width; x += Math.max(28, width / 12)) { context.beginPath(); context.moveTo(x, 0); context.lineTo(x, height); context.stroke(); } for (let y = 0; y < height; y += Math.max(30, height / 8)) { context.beginPath(); context.moveTo(0, y); context.lineTo(width, y); context.stroke(); }
       const runtime = runtimeFor('aviator'); const phase = runtime?.phase || 'ready'; const progress = runtime?.progress ?? 0.58; const point = pointOnAviatorPath(width, height, progress); const mountain = artImage(ART.aviator.mountain);
@@ -917,14 +962,7 @@
     const stage = document.querySelector('[data-runtime-game="chicken-road"] .road-playfield'); const canvas = stage?.querySelector('[data-animation-canvas="chicken"]'); if (!stage || !canvas || !state.animationManifest) return;
     const elapsed = Math.max(0, now - (runtime.animationStartedAt || now));
     const id = runtime.phase === 'jumping' ? 'chicken_chick_jump_forward' : runtime.phase === 'danger' ? 'chicken_chick_danger_reaction' : runtime.phase === 'fallen' ? 'chicken_chick_fail_fall' : runtime.phase === 'safe' ? 'chicken_chick_success_bounce' : 'chicken_chick_idle';
-    const frame = prepareAnimationCanvas(canvas);
-    if (!frame) return;
-    const from = CHICKEN_SCENE.stepAnchors[Math.max(0, Math.min(5, runtime.fromStep ?? runtime.step ?? 0))];
-    const to = CHICKEN_SCENE.stepAnchors[Math.max(0, Math.min(5, runtime.target ?? runtime.step ?? 0))];
-    const moving = runtime.phase === 'jumping'; const progress = moving ? Math.max(0, Math.min(1, (now - (runtime.motionStarted || now)) / 620)) : 1;
-    const eased = progress < 1 ? progress * progress * (3 - 2 * progress) : 1; const anchor = moving ? from + (to - from) * eased : CHICKEN_SCENE.stepAnchors[Math.max(0, Math.min(5, runtime.step || 0))];
-    const arc = moving ? Math.sin(Math.PI * progress) * Math.min(56, frame.height * 0.25) : 0; const size = Math.min(132, Math.max(80, frame.width * 0.20));
-    const drawn = drawAnimationClip(frame.context, id, elapsed, anchor * frame.width - size / 2, frame.height - 40 - size - arc, size, size, { contain: true, alpha: 0.98, alignAlphaBounds: true });
+    const drawn = drawAnimationCanvas(canvas, id, elapsed);
     stage.classList.toggle('has-animation-clip', drawn);
   }
 
@@ -936,6 +974,28 @@
       const elapsed = revealed && runtime.phase !== 'opening' ? animationClipDuration(id) : Math.max(0, now - (runtime.animationStartedAt || now));
       const drawn = Boolean(id) && drawAnimationCanvas(canvas, id, elapsed); button?.classList.toggle('has-animation-clip', drawn);
     });
+  }
+
+  function hydrateAppleWinCelebration() {
+    const overlay = document.querySelector('.apple-win-overlay[data-apple-win-token]');
+    if (!overlay) return;
+    const token = overlay.dataset.appleWinToken;
+    if (state.appleWinAnimatedToken === token) return;
+    state.appleWinAnimatedToken = token;
+    const scoreEl = overlay.querySelector('[data-apple-win-score]');
+    if (!scoreEl) return;
+    const target = Number(scoreEl.dataset.target) || 0;
+    const startedAt = performance.now();
+    const duration = 900;
+    const label = t('appleWin');
+    const tick = (now) => {
+      const progress = Math.min(1, (now - startedAt) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = Math.round(target * eased * 100) / 100;
+      scoreEl.textContent = `${label} +${value} \u20BD`;
+      if (progress < 1 && document.body.contains(scoreEl)) window.requestAnimationFrame(tick);
+    };
+    window.requestAnimationFrame(tick);
   }
 
   function hydrateMinesAnimation(runtime, now = performance.now()) {
@@ -966,24 +1026,44 @@
   }
 
   function startDebugEffect(effect) { stopGameAnimation(); const sprites = createAtlasSet(); Object.values(sprites).forEach((player) => player.play()); state.debugRuntime = { token: Date.now(), effect, startedAt: performance.now(), sprites }; render(); state.sceneLoop.start((now) => tickDebug(state.debugRuntime?.token, now)); }
-  function hydrateSceneArt() { const now = performance.now(); drawAviatorScene(now); const runtime = runtimeFor('chicken-road'); if (runtime) { const chickenProgress = runtime.phase === 'jumping' ? Math.min(1, Math.max(0, (now - (runtime.motionStarted || now)) / 620)) : runtime.phase === 'fallen' ? Math.min(1, Math.max(0, (now - (runtime.motionStarted || now)) / 520)) : 1; hydrateChickenPose(runtime, chickenProgress); hydrateChickenAnimation(runtime, now); } const apple = runtimeFor('apple-of-fortune'); if (apple) hydrateAppleAnimation(apple, now); const mines = runtimeFor('mines'); if (mines) hydrateMinesAnimation(mines, now); const football = runtimeFor('football-penalties'); if (football) { const footballProgress = football.phase === 'kick' ? Math.min(1, Math.max(0, (now - (football.motionStarted || now)) / 650)) : football.phase === 'reaction' ? Math.min(1, Math.max(0, (now - (football.resultStartedAt || now)) / 420)) : 1; hydrateFootballPose(football, footballProgress); } if (state.debugRuntime) drawDebugCanvas(now); }
+  function hydrateSceneArt() { const now = performance.now(); drawAviatorScene(now); const runtime = runtimeFor('chicken-road'); if (runtime) { const chickenProgress = runtime.phase === 'jumping' ? Math.min(1, Math.max(0, (now - (runtime.motionStarted || now)) / 620)) : runtime.phase === 'fallen' ? Math.min(1, Math.max(0, (now - (runtime.motionStarted || now)) / 520)) : 1; hydrateChickenPose(runtime, chickenProgress); hydrateChickenAnimation(runtime, now); } const apple = runtimeFor('apple-of-fortune'); if (apple) { hydrateAppleAnimation(apple, now); hydrateAppleWinCelebration(); } const mines = runtimeFor('mines'); if (mines) hydrateMinesAnimation(mines, now); const football = runtimeFor('football-penalties'); if (football) { const footballProgress = football.phase === 'kick' ? Math.min(1, Math.max(0, (now - (football.motionStarted || now)) / 650)) : football.phase === 'reaction' ? Math.min(1, Math.max(0, (now - (football.resultStartedAt || now)) / 420)) : 1; hydrateFootballPose(football, footballProgress); } if (state.debugRuntime) drawDebugCanvas(now); }
   function drawCharts() { drawAviatorScene(); }
+
+  function guestPlayer() {
+    return { playerId: 'guest-demo', nickname: 'Guest Player', countryCode: 'DE', currencyCode: 'EUR', currencyLocale: 'de-DE', currencyFractionDigits: 2, balanceMinor: 125000, bonusBalanceMinor: 25000, level: 3, levelProgress: 62, activeDays: 12, consecutiveActiveDays: 4, withdrawalEligible: false, withdrawalEligibleAt: null, profileCompleted: true };
+  }
 
   async function init() {
     preloadArt();
+    state.player = guestPlayer();
+    // Render the sportsbook workspace immediately. Catalogs and art are enhancements,
+    // so an unauthenticated visitor can see and open all six games without registering.
     render();
-    if ('requestIdleCallback' in window) window.requestIdleCallback(() => loadAnimationManifest(), { timeout: 1800 }); else window.setTimeout(loadAnimationManifest, 1800);
-    try {
+  if ('requestIdleCallback' in window) window.requestIdleCallback(() => loadAnimationManifest(), { timeout: 1800 }); else window.setTimeout(loadAnimationManifest, 1800);
+  try {
       const [catalogs, config] = await Promise.all([api('/api/catalogs'), api('/api/config')]);
       state.catalogs = catalogs;
       state.minWithdrawalMinor = config.minWithdrawalMinor || state.minWithdrawalMinor;
-      state.accuracyTiers = config.accuracyTiers || state.accuracyTiers;
-      try { const me = await api('/api/player/me'); state.player = me.player; render(); if (state.player.profileCompleted) refreshActivity(); } catch (error) { if (error.status !== 401) { state.message = error.message; render(); } }
+      try { const me = await api('/api/player/me'); state.player = me.player; render(); if (state.player.profileCompleted) refreshActivity(); } catch (error) { if (error.status !== 401) state.message = error.message; }
     } catch (error) {
       state.message = error.message;
       render();
     }
   }
+
+  // Delegated, bound once on document so dialog close buttons always work even if the
+  // shell HTML (and therefore the button node) gets replaced by a render() while a
+  // native <dialog> is open. Direct per-render bindings can miss a race where a click
+  // lands right as innerHTML is swapped out.
+  document.addEventListener('click', (event) => {
+    const closeDialogTarget = event.target.closest('[data-close-dialog]');
+    if (closeDialogTarget) { document.getElementById('legal-dialog')?.close(); return; }
+    const closeAuthTarget = event.target.closest('[data-close-auth]');
+    if (closeAuthTarget) { document.getElementById('auth-modal')?.close(); return; }
+    const closeFrameTarget = event.target.closest('[data-close-frame]');
+    if (closeFrameTarget) { document.getElementById('game-frame-dialog')?.close(); return; }
+    if (event.target.id === 'legal-dialog' || event.target.id === 'auth-modal') event.target.close();
+  });
 
   state.sceneLoop = new SceneAnimationLoop(); window.addEventListener('resize', () => { if (state.view === 'game' || state.view === 'overview') hydrateSceneArt(); }); window.addEventListener('pagehide', stopGameAnimation); init();
 }());
