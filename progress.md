@@ -142,3 +142,13 @@ Full audit against the extracted art pack, all 8 usable style/reference screensh
 - Mines supports 4×4, 5×5 and 6×6 fields plus mine-count selection in the existing right-hand control panel. The reference Diamond Mines background, board, cell and gem art remain local and responsive.
 - Signal confidence uses the entered amount without charging or deducting it; formatting follows the profile currency. Guest sessions receive the same local demo flow when the protected analysis endpoint returns 401.
 - Desktop and mobile browser QA covered 390×844 and 412×915 layouts, all four automatic game flows, all Mines sizes, and the fixed striker role. Browser console reported 0 errors/warnings. `node --check public/app.js`, `node --check server/services.js`, and `npm test` passed (34/34).
+
+## 2026-09-20 (signal animation polish and Apple conversion)
+
+- Reworked the local AviaShow signal animation without replacing its supplied scene: the aircraft atlas is rotated to face right, a dark seated pilot silhouette is attached to the plane, the curved Bézier trail is replaced by straight takeoff/cruise segments, and a clipped yellow starfall layer runs below the flight line.
+- Split Aviator playback into a 2.6-second climb and a substantially longer cruise. The multiplier remains exactly `1.00x` until maximum altitude, then rises during horizontal travel while the aircraft follows a gentle vertical bob.
+- Removed per-step full-page renders from Chicken Road and Mines. Their existing DOM nodes now update in place, eliminating black reload flashes while preserving the supplied sprites, board and surrounding site design.
+- Centered Mines rewards with the tracked upright `public/assets/generated/mines-diamond.svg`; verified equal insets on every side and retained 4×4, 5×5 and 6×6 field generation.
+- Converted the existing full Apple of Fortune fairy-tale scene to signal-only play: removed stake chips, stake input, Play, Auto, Cashout and balance/potential widgets; `Get signal` now opens a weighted automatic path row by row.
+- Fixed the Apple stage container to remain full width on desktop and mobile after adding the shared signal header. Football was intentionally not changed pending the requested references.
+- Browser QA verified the four requested scenes, automatic Apple progression, centered Mines gems, 16/25/36-cell boards, synchronized Aviator statuses, no horizontal overflow at 390×844, and zero browser console errors/warnings. `node --check`, `git diff --check`, and the complete Node test suite pass.

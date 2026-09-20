@@ -716,7 +716,7 @@ h1, h2, h3 { text-wrap: balance; }
 .apple-cell:hover:not(:disabled) { border-color: #f8dc91; transform: translateY(-2px); }.apple-cell:disabled { cursor: not-allowed; opacity: 0.5; }.apple-cell.is-suggested { border-color: #baf08b; box-shadow: 0 0 0 2px rgba(186, 240, 139, 0.16); }.apple-cell.is-safe { color: #142d18; background: #b3eb80; }.apple-cell.is-danger { color: #fff0db; background: #a95b4d; }.apple-face { position: relative; z-index: 1; font-size: 3.4rem; transform: scale(2.4); }.apple-leaf { position: absolute; right: 6px; top: 4px; color: rgba(219, 247, 143, 0.65); font-size: 0.66rem; }.apple-cell.is-flipping { animation: apple-flip 520ms ease both; }
 
 /* Apple of Fortune: full fairy-tale stage, wood board with side multiplier column */
-.apple-game-stage { display: flex; min-height: 0; padding: clamp(8px, 1.4vw, 14px); }
+.apple-game-stage { display: flex; flex-direction: column; min-height: 0; padding: clamp(8px, 1.4vw, 14px); }
 .apple-balance-panel .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .apple-round-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
 .apple-round-metric { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--color-rule); border-radius: 10px; background: var(--color-surface-raised); }
@@ -734,6 +734,7 @@ h1, h2, h3 { text-wrap: balance; }
 .apple-fullstage .apple-snow { right: -2%; }
 .apple-fullstage .apple-logo { position: absolute; z-index: 5; top: 2%; right: 2%; width: clamp(96px, 14vw, 168px); filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5)); pointer-events: none; }
 .apple-fullstage .apple-panel { position: relative; z-index: 4; display: grid; gap: 10px; width: min(92%, 640px); margin: clamp(14px, 3vw, 30px) auto 0; padding: clamp(10px, 1.6vw, 18px); border: 5px solid #a1723c; border-radius: 16px; background: linear-gradient(150deg, #6d4a29, #392616); box-shadow: 0 14px 0 rgba(10, 8, 5, 0.55), inset 0 0 0 2px rgba(244, 197, 120, 0.24), 0 20px 34px rgba(0, 0, 0, 0.4); }
+.apple-fullstage.is-signal-only .apple-panel { margin-bottom: clamp(18px, 3vw, 32px); }
 .apple-fullstage .apple-vine { position: absolute; z-index: 6; width: clamp(56px, 9vw, 108px); pointer-events: none; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4)); }
 .apple-fullstage .apple-vine-left { top: -14px; left: -14px; }
 .apple-fullstage .apple-vine-right { top: -14px; right: -14px; transform: scaleX(-1); }
@@ -747,6 +748,7 @@ h1, h2, h3 { text-wrap: balance; }
 .apple-fullstage .apple-row.is-current .apple-cells { outline: 1px solid rgba(247, 201, 103, 0.5); }
 .apple-fullstage .apple-cells { display: grid; flex: 1; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; border-radius: 6px; }
 .apple-fullstage .apple-cell { position: relative; min-height: 0; aspect-ratio: 2.4 / 1; overflow: hidden; padding: 0; border: none; border-radius: 4px; background: none; cursor: pointer; transition: transform 200ms var(--motion-snap); }
+.apple-fullstage.is-signal-only .apple-cell { cursor: default; pointer-events: none; }
 .apple-fullstage .apple-cell:hover:not(:disabled) { transform: translateY(-2px); }
 .apple-fullstage .apple-cell:disabled { cursor: not-allowed; }
 .apple-fullstage .apple-cell-inner { position: relative; display: block; width: 100%; height: 100%; }
@@ -1161,9 +1163,16 @@ h1, h2, h3 { text-wrap: balance; }
 .reference-aviator-history { position: absolute; z-index: 3; top: 10px; right: 18px; left: 18px; display: flex; gap: 18px; overflow: hidden; color: #9b7222; font: 600 .55rem/1 var(--font-mono); white-space: nowrap; }
 .reference-aviator-history span:nth-child(4n) { color: #7e3f19; }
 .reference-aviator-curve { position: absolute; z-index: 2; inset: 15% 7% 9% 4%; width: 89%; height: 76%; overflow: visible; }
-.reference-aviator-curve path { fill: none; stroke: #d59f19; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; filter: drop-shadow(0 0 7px rgba(255,207,65,.55)); }
+.reference-aviator-curve path { fill: none; stroke: #f0ba22; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100; stroke-dashoffset: 100; filter: drop-shadow(0 0 8px rgba(255,207,65,.68)); }
+.reference-aviator-stars { position: absolute; z-index: 1; inset: 34% 8% 5% 4%; overflow: hidden; opacity: 0; clip-path: polygon(0 100%, 34% 5%, 100% 5%, 100% 100%); transition: opacity .35s ease; }
+.reference-aviator-stars i { position: absolute; top: calc(var(--star-y) * 1%); left: calc(var(--star-x) * 1%); width: var(--star-size); height: calc(var(--star-size) * 2.5); border-radius: 50%; background: linear-gradient(180deg, rgba(255,244,157,0), #ffe25d 45%, #e5a815); box-shadow: 0 0 8px #ffc82f; opacity: .8; animation: reference-starfall 1.45s var(--star-delay) linear infinite; }
+.reference-aviator[data-phase="takeoff"] .reference-aviator-stars, .reference-aviator[data-phase="flying"] .reference-aviator-stars { opacity: .92; }
 .reference-aviator-plane { position: absolute; z-index: 5; left: 7%; bottom: 13%; width: 160px; height: 90px; transition: opacity .2s ease; filter: drop-shadow(0 10px 9px rgba(0,0,0,.72)); }
-.reference-plane-crop { position: absolute; top: 50%; left: 50%; width: 167px; height: 409px; background: url('/assets/local-games/aviator/plane.webp') -756px -113px / 1000px 524px no-repeat; transform: translate(-50%,-50%) rotate(-90deg) scale(.37); }
+.reference-plane-crop { position: absolute; top: 50%; left: 50%; width: 167px; height: 409px; background: url('/assets/local-games/aviator/plane.webp') -756px -113px / 1000px 524px no-repeat; transform: translate(-50%,-50%) rotate(90deg) scale(.37); }
+.reference-plane-pilot { position: absolute; z-index: 3; top: 14px; right: 59px; width: 31px; height: 30px; transform: rotate(5deg); filter: drop-shadow(0 2px 1px rgba(0,0,0,.5)); }
+.reference-plane-pilot::before { position: absolute; top: 0; right: 1px; width: 10px; height: 10px; border-radius: 50%; background: #090909; content: ''; }
+.reference-plane-pilot::after { position: absolute; top: 8px; right: 6px; width: 19px; height: 8px; border-radius: 10px 2px 8px 8px; background: #090909; box-shadow: -8px 5px 0 -2px #090909; content: ''; transform: rotate(-17deg); transform-origin: right center; }
+.reference-plane-pilot b { position: absolute; top: 4px; right: 8px; width: 24px; height: 5px; border-radius: 70% 10% 70% 20%; background: #090909; transform: rotate(-18deg); transform-origin: right center; }
 .reference-plane-propeller { position: absolute; z-index: 2; top: 26px; right: -1px; width: 4px; height: 40px; border-radius: 100%; background: linear-gradient(180deg, transparent, #f7d44b 24%, #f7d44b 76%, transparent); transform-origin: center; animation: reference-propeller 90ms linear infinite; }
 .reference-aviator[data-phase="ready"] .reference-aviator-plane { opacity: .12; }
 .reference-aviator[data-phase="ended"] .reference-aviator-plane { animation: reference-aviator-away .58s ease-in both; }
@@ -1172,6 +1181,7 @@ h1, h2, h3 { text-wrap: balance; }
 .reference-aviator-readout span { margin-top: 10px; color: #d9d9d9; font: 700 .64rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
 .reference-aviator-ready { position: absolute; z-index: 5; right: 0; bottom: 22px; left: 0; color: rgba(255,255,255,.55); font: 700 .58rem/1 var(--font-mono); letter-spacing: .14em; text-align: center; }
 @keyframes reference-propeller { to { transform: rotate(360deg); } }
+@keyframes reference-starfall { 0% { opacity: 0; transform: translate3d(0,-24px,0) scale(.6); } 18% { opacity: .92; } 100% { opacity: 0; transform: translate3d(-18px,86px,0) scale(1.08); } }
 @keyframes reference-aviator-away { to { opacity: 0; transform: translate(90px,-65px) scale(.8); } }
 
 /* Chicken Road — original slate lanes, medallions and chicken sprites. */
@@ -1191,9 +1201,9 @@ h1, h2, h3 { text-wrap: balance; }
 .reference-road-lane.is-current .reference-road-medal { border-color: #188940; color: #eaffee; background: radial-gradient(circle at 38% 28%, #4ada6e, #1eae4a 68%, #157a35 69%); box-shadow: 0 0 26px rgba(42,224,96,.45), inset 0 0 0 3px rgba(216,255,223,.25); }
 .reference-road-lane.is-used .reference-road-medal { border-color: #a27b18; color: #fff5b8; background: radial-gradient(circle at 38% 28%, #e6c347, #bd8e16 68%, #795b13 69%); }
 .reference-road-grate { position: absolute; z-index: 2; bottom: 2px; left: 50%; width: 78px; height: 55px; border: 7px solid #555f81; border-bottom: 0; border-radius: 42px 42px 0 0; background: repeating-linear-gradient(90deg, #252b46 0 6px, #596282 6px 10px); transform: translateX(-50%); }
-.reference-chicken-actor { position: absolute; z-index: 8; bottom: 18px; left: calc(7% + var(--chicken-step) * 15%); width: clamp(76px, 13vw, 112px); aspect-ratio: 1; transform: translateX(-50%); transition: left 540ms cubic-bezier(.2,.78,.24,1); filter: drop-shadow(0 8px 5px rgba(20,22,39,.52)); }
+.reference-chicken-actor { position: absolute; z-index: 8; bottom: 18px; left: calc(7% + var(--chicken-step) * 15%); width: clamp(76px, 13vw, 112px); aspect-ratio: 1; transform: translateX(-50%); transition: left 760ms cubic-bezier(.22,.72,.2,1); filter: drop-shadow(0 8px 5px rgba(20,22,39,.52)); will-change: left, transform; }
 .reference-chicken-actor span { position: absolute; inset: 0; background-image: var(--chicken-sprite); background-repeat: no-repeat; background-size: 500% 500%; background-position: 0 0; }
-.reference-chicken[data-phase="jumping"] .reference-chicken-actor { animation: reference-chicken-jump 610ms cubic-bezier(.2,.7,.25,1) both; }
+.reference-chicken[data-phase="jumping"] .reference-chicken-actor { animation: reference-chicken-jump 760ms cubic-bezier(.2,.7,.25,1) both; }
 .reference-chicken[data-phase="jumping"] .reference-chicken-actor span { background-size: 400% 300%; }
 .reference-chicken-result { position: absolute; z-index: 9; right: 18px; bottom: 36px; color: rgba(255,255,255,.72); font: 700 .58rem/1 var(--font-mono); letter-spacing: .08em; }
 @keyframes reference-chicken-jump { 0%,100% { transform: translateX(-50%) translateY(0) rotate(0); } 48% { transform: translateX(-50%) translateY(-74px) rotate(-7deg); } }
@@ -1208,7 +1218,7 @@ h1, h2, h3 { text-wrap: balance; }
 .reference-mine-tile { position: absolute; inset: 0; background: url('/assets/local-games/mines/cell.png') 80% 0 / auto 100% no-repeat; }
 .reference-mine-cell.is-safe { background: radial-gradient(circle, #263d73, #120c2f); animation: reference-mine-open .55s cubic-bezier(.2,.8,.24,1) both; }
 .reference-mine-cell.is-safe .reference-mine-tile { opacity: .18; }
-.reference-mine-gem { position: absolute; z-index: 3; inset: 10%; background: url('/assets/local-games/mines/gem.png') 0 0 / 700% 300% no-repeat; filter: drop-shadow(0 0 12px #62a8ff); }
+.reference-mine-gem { position: absolute; z-index: 3; inset: 14%; background: url('/assets/generated/mines-diamond.svg') center / contain no-repeat; filter: drop-shadow(0 0 12px #62a8ff); transform: translateZ(0); }
 .reference-mines-status { position: absolute; z-index: 4; bottom: 17px; left: 34px; display: grid; gap: 5px; color: #f0a7f3; font: 700 .58rem/1 var(--font-mono); letter-spacing: .08em; }
 .reference-mines-status strong { color: #ffdc5d; }
 @keyframes reference-mine-open { 0% { transform: scale(.76) rotateY(90deg); } 70% { transform: scale(1.08) rotateY(0); } 100% { transform: scale(1); } }

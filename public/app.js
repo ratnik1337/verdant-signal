@@ -139,7 +139,7 @@
     catalogs: null, player: null, guestMode: true, view: 'overview', activeGame: 'aviator', analysis: null,
     history: [], activePlayers: [], activity: null, busy: false, message: '', balanceMessage: '', minWithdrawalMinor: 10000,
     runtime: null, footballHistory: [], debugRuntime: null, sceneLoop: null, animationManifest: null,
-    signalAmounts: { aviator: 100, 'chicken-road': 100, mines: 100, 'football-penalties': 100 },
+    signalAmounts: { aviator: 100, 'chicken-road': 100, 'apple-of-fortune': 100, mines: 100, 'football-penalties': 100 },
   };
 
   let locale = localStorage.getItem('verdant-locale') || 'ru';
@@ -418,9 +418,9 @@
     const runtime = runtimeFor(game); if (!runtime) return;
     const root = document.querySelector(`[data-runtime-game="${game}"]`); if (root) root.dataset.phase = runtime.phase;
     if (game === 'aviator') {
-      const multiplier = document.querySelector('[data-runtime-multiplier]'); const status = document.querySelector('[data-runtime-state]'); const countdown = document.querySelector('[data-runtime-countdown]'); const countdownHero = document.querySelector('[data-countdown-hero]'); const countdownHeroNumber = document.querySelector('[data-runtime-countdown-hero]'); const caption = document.querySelector('[data-runtime-caption]'); const liveState = document.querySelector('[data-game-live-state]'); const startButton = document.querySelector('[data-game-action="aviator-start"]');
+      const multiplier = document.querySelector('[data-runtime-multiplier]'); const countdown = document.querySelector('[data-runtime-countdown]'); const countdownHero = document.querySelector('[data-countdown-hero]'); const countdownHeroNumber = document.querySelector('[data-runtime-countdown-hero]'); const caption = document.querySelector('[data-runtime-caption]'); const liveState = document.querySelector('[data-game-live-state]'); const startButton = document.querySelector('[data-game-action="aviator-start"]');
       if (multiplier) multiplier.textContent = `${Number(runtime.multiplier || 1).toFixed(2)}x`;
-      if (status) status.textContent = phaseLabel(runtime.phase);
+      document.querySelectorAll('[data-runtime-state]').forEach((status) => { status.textContent = phaseLabel(runtime.phase); });
       if (countdown) countdown.textContent = runtime.phase === 'countdown' ? `${t('countdown')}: ${runtime.countdown}` : '';
       if (countdownHero) countdownHero.hidden = runtime.phase !== 'countdown';
       if (countdownHeroNumber) countdownHeroNumber.textContent = runtime.phase === 'countdown' ? String(runtime.countdown) : '';
@@ -432,8 +432,11 @@
         root.style.setProperty('--flight-progress', progress);
         const plane = root.querySelector('[data-aviator-plane]');
         if (plane) {
-          const x = 7 + progress * 72;
-          const y = 13 + Math.pow(progress, 0.7) * 58;
+          const takeoff = Math.max(0, Math.min(1, Number(runtime.takeoffProgress) || 0));
+          const cruise = Math.max(0, Math.min(1, Number(runtime.cruiseProgress) || 0));
+          const x = cruise > 0 ? 32 + cruise * 50 : 7 + takeoff * 25;
+          const bob = cruise > 0 ? Math.sin(cruise * Math.PI * 2) * 2.2 + Math.sin(cruise * Math.PI * 5) * .55 : 0;
+          const y = 13 + takeoff * 49 + bob;
           plane.style.left = `${x}%`;
           plane.style.bottom = `${y}%`;
         }
@@ -441,6 +444,63 @@
         if (curve) curve.style.strokeDashoffset = String(100 - progress * 100);
       }
     }
+  }
+
+  function updateChickenSignalDom(runtime, animate = false) {
+    const root = document.querySelector('[data-runtime-game="chicken-road"]');
+    if (!root) return;
+    if (animate) {
+      root.dataset.phase = 'safe';
+      void root.offsetWidth;
+    }
+    root.dataset.phase = runtime.phase;
+    root.dataset.step = String(runtime.step || 0);
+    root.style.setProperty('--chicken-step', String(runtime.nextStep || runtime.step || 0));
+    root.style.setProperty('--chicken-sprite', `url('${runtime.phase === 'fallen' ? LOCAL_GAME_ART.chicken.dead : runtime.phase === 'jumping' ? LOCAL_GAME_ART.chicken.jump : LOCAL_GAME_ART.chicken.idle}')`);
+    root.querySelectorAll('.reference-road-lane').forEach((lane, index) => {
+      const laneNumber = index + 1;
+      lane.classList.toggle('is-used', laneNumber < runtime.step);
+      lane.classList.toggle('is-current', laneNumber === runtime.step || (runtime.phase === 'ended' && laneNumber === runtime.targetStep));
+    });
+    const result = root.querySelector('[data-chicken-result]');
+    if (result) {
+      const multipliers = state.analysis?.multipliers || ['1.12x', '1.28x', '1.47x', '1.70x', '1.98x', '2.33x'];
+      result.textContent = runtime.step ? `${multipliers[runtime.step - 1]} · ${phaseLabel(runtime.phase)}` : phaseLabel(runtime.phase);
+    }
+    document.querySelectorAll('[data-runtime-state], [data-game-live-state]').forEach((node) => { node.textContent = phaseLabel(runtime.phase); });
+  }
+
+  function updateMineSignalDom(runtime, revealedIndex = null) {
+    const root = document.querySelector('[data-runtime-game="mines"]');
+    if (!root) return;
+    root.dataset.phase = runtime.phase;
+    root.querySelectorAll('.reference-mine-cell.is-suggested').forEach((cell) => cell.classList.remove('is-suggested'));
+    if (revealedIndex !== null) {
+      const cell = root.querySelector(`[data-mine-index="${revealedIndex}"]`);
+      if (cell && !cell.classList.contains('is-safe')) {
+        cell.classList.add('is-safe');
+        cell.insertAdjacentHTML('beforeend', '<i class="reference-mine-gem" aria-hidden="true"></i>');
+      }
+    }
+    const status = root.querySelector('[data-mines-status]');
+    if (status) status.textContent = runtime.phase === 'revealed' ? `${runtime.revealedCells.length} SAFE` : phaseLabel(runtime.phase);
+    document.querySelectorAll('[data-runtime-state], [data-game-live-state]').forEach((node) => { node.textContent = phaseLabel(runtime.phase); });
+  }
+
+  function updateAppleSignalDom(runtime, row, opening) {
+    const root = document.querySelector('[data-runtime-game="apple-of-fortune"]');
+    if (!root || !row) return;
+    root.dataset.phase = runtime.phase;
+    root.querySelectorAll('.apple-row').forEach((node) => node.classList.toggle('is-current', Number(node.dataset.appleRow) === Number(row.level)));
+    const cell = root.querySelector(`[data-apple-row="${row.level}"][data-apple-cell="${row.recommendedCell}"]`);
+    if (cell) {
+      cell.classList.toggle('is-opening', Boolean(opening));
+      cell.classList.toggle('is-safe', !opening);
+      if (!cell.querySelector('.apple-sprite')) cell.insertAdjacentHTML('beforeend', `<img class="apple-sprite" src="${ART.apple.whole}" alt="" aria-hidden="true">`);
+    }
+    const caption = root.querySelector('[data-runtime-caption]');
+    if (caption) caption.textContent = runtime.phase === 'ended' ? `${phaseLabel('ended')} · x${String(row.multiplier || '').replace(/^x/i, '')}` : `${phaseLabel('opening')} · ${runtime.activeRow}/${runtime.targetRow}`;
+    document.querySelectorAll('[data-runtime-state], [data-game-live-state]').forEach((node) => { node.textContent = phaseLabel(runtime.phase); });
   }
   function phaseLabel(phase) {
     return t({ ready: 'ready', analyzing: 'analysisLoading', revealing: 'opening', revealed: 'roundEnded', countdown: 'countdownState', takeoff: 'takeoff', flying: 'flying', crash: 'crash', ended: 'roundEnded', jumping: 'jumping', safe: 'safeStep', fallen: 'stepFailed', opening: 'opening', mine: 'cellMine', goal: 'goal', save: 'save', miss: 'miss', kick: 'kick', reaction: 'kick' }[phase] || 'ready');
@@ -506,11 +566,13 @@
     const runtime = runtimeFor('aviator') || createReadyRuntime('aviator');
     const progress = Math.max(0, Math.min(1, Number(runtime.progress) || 0));
     const multiplier = Number(runtime.multiplier || 1).toFixed(2);
+    const stars = Array.from({ length: 24 }, (_, index) => `<i style="--star-x:${(index * 37) % 96};--star-y:${(index * 53) % 88};--star-delay:${(index % 8) * -.18}s;--star-size:${2 + (index % 4)}px"></i>`).join('');
     return `<div class="visual-stage reference-game reference-aviator" data-runtime-game="aviator" data-phase="${escapeHTML(runtime.phase)}" style="--flight-progress:${progress}">
       <img class="reference-aviator-logo" src="${LOCAL_GAME_ART.aviator.logo}" alt="AviaShow">
       <div class="reference-aviator-history" aria-hidden="true"><span>1.38x</span><span>1.57x</span><span>1.71x</span><span>4.36x</span><span>2.48x</span><span>1.73x</span><span>14.00x</span></div>
-      <svg class="reference-aviator-curve" viewBox="0 0 1000 560" preserveAspectRatio="none" aria-hidden="true"><path data-aviator-curve pathLength="100" d="M 8 530 C 210 526, 250 480, 330 390 S 520 215, 790 95"></path></svg>
-      <div class="reference-aviator-plane" data-aviator-plane aria-hidden="true"><span class="reference-plane-crop"></span><i class="reference-plane-propeller"></i></div>
+      <div class="reference-aviator-stars" aria-hidden="true">${stars}</div>
+      <svg class="reference-aviator-curve" viewBox="0 0 1000 560" preserveAspectRatio="none" aria-hidden="true"><path data-aviator-curve pathLength="100" d="M 8 530 L 320 205 L 920 205"></path></svg>
+      <div class="reference-aviator-plane" data-aviator-plane aria-hidden="true"><span class="reference-plane-crop"></span><i class="reference-plane-pilot"><b></b></i><i class="reference-plane-propeller"></i></div>
       <div class="reference-aviator-readout"><strong data-runtime-multiplier>${multiplier}x</strong><span data-runtime-state>${phaseLabel(runtime.phase)}</span></div>
       <div class="reference-aviator-ready" data-aviator-ready>${runtime.phase === 'ready' ? 'GET SIGNAL TO START' : ''}</div>
     </div>`;
@@ -526,7 +588,7 @@
     return `<div class="visual-stage reference-game reference-chicken" data-runtime-game="chicken-road" data-phase="${escapeHTML(runtime.phase)}" data-step="${step}" style="--chicken-step:${step}">
       <header class="reference-chicken-bar"><img src="${LOCAL_GAME_ART.chicken.logo}" alt="Chicken Road"><span>LIVE WINS <b>•</b> ONLINE</span></header>
       <div class="reference-road-scene"><div class="reference-road-lanes">${medals}</div><div class="reference-chicken-actor" data-chicken-actor style="--chicken-sprite:url('${sprite}')"><span></span></div></div>
-      <div class="reference-chicken-result"><span>${step ? `${multipliers[step - 1]} · ${phaseLabel(runtime.phase)}` : 'WAITING FOR SIGNAL'}</span></div>
+      <div class="reference-chicken-result"><span data-chicken-result>${step ? `${multipliers[step - 1]} · ${phaseLabel(runtime.phase)}` : 'WAITING FOR SIGNAL'}</span></div>
     </div>`;
   }
 
@@ -546,59 +608,30 @@
   }
 
   function renderAppleGameView() {
-    const runtime = runtimeFor('apple-of-fortune') || createAppleRuntime();
+    const runtime = runtimeFor('apple-of-fortune') || createAppleSignalRuntime();
     const rows = appleRows();
     const revealedCells = runtime.revealedCells || {};
     const orderedRows = rows.slice().sort((a, b) => b.level - a.level);
-    const canConfigure = runtime.phase === 'idle' || runtime.phase === 'ended';
     const activeRowData = rows.find((item) => item.level === runtime.activeRow) || rows[0];
-    const activeMultiplier = Number(String(activeRowData?.multiplier || '1').replace(/^x/i, '')) || 1;
-    const potential = Math.round((Number(runtime.stake) || 0) * activeMultiplier * 100) / 100;
-
-    let statusText;
-    if (runtime.phase === 'idle') statusText = t('appleBetPrompt');
-    else if (runtime.phase === 'ended') statusText = runtime.score > 0 ? `${t('appleWin')}: ${runtime.score} \u20BD` : t('appleBetPrompt');
-    else {
-      const bankedText = runtime.score > 0 ? `${t('appleBanked')}: ${runtime.score} \u20BD \u00B7 ` : '';
-      statusText = `${bankedText}${t('currentRow')} ${runtime.activeRow}/${rows.length} \u00B7 ${t('applePotential')}: ${potential} \u20BD`;
-    }
-
+    const statusText = runtime.phase === 'ended'
+      ? `${phaseLabel('ended')} · x${String(activeRowData?.multiplier || '').replace(/^x/i, '')}`
+      : runtime.phase === 'opening'
+        ? `${phaseLabel('opening')} · ${runtime.activeRow}/${runtime.targetRow || rows.length}`
+        : phaseLabel('ready');
     const rowsHtml = orderedRows.map((row) => {
       const revealed = revealedCells[row.level];
-      const activeReveal = runtime.revealed?.level === row.level ? runtime.revealed : revealed;
-      const isActiveRow = row.level === runtime.activeRow && runtime.phase !== 'idle' && runtime.phase !== 'ended';
-      const locked = !(isActiveRow && runtime.phase === 'safe');
       const cellsHtml = [1, 2, 3, 4, 5].map((cell) => {
-        const selected = activeReveal?.cell === cell;
-        const safe = selected && activeReveal.safe;
-        const suggested = isActiveRow && runtime.phase === 'safe' && !activeReveal && Number(row.recommendedCell) === cell;
-        const stateClass = selected ? (safe ? 'is-safe' : 'is-danger') : suggested ? 'is-suggested' : '';
-        const opening = selected && runtime.phase === 'opening';
-        const showSprite = selected || suggested;
-        return `<button class="apple-cell ${stateClass}${opening ? ' is-opening' : ''}" type="button" data-game-action="apple-reveal" data-cell="${cell}" ${locked ? 'disabled' : ''} aria-label="${t('cell')} ${cell}, ${isActiveRow ? t('available') : t('unopened')}"><span class="apple-cell-inner"><img class="apple-tile" src="${ART.apple.tile}" alt="" aria-hidden="true">${showSprite ? `<img class="apple-sprite" src="${safe || suggested ? ART.apple.whole : ART.apple.bitten}" alt="" aria-hidden="true">` : ''}${showSprite ? `<canvas class="apple-cell-animation" data-animation-cell="${row.level}-${cell}" aria-hidden="true"></canvas>` : ''}</span></button>`;
+        const safe = Number(revealed?.cell) === cell;
+        return `<div class="apple-cell${safe ? ' is-safe' : ''}" data-apple-row="${row.level}" data-apple-cell="${cell}" aria-label="${t('cell')} ${cell}"><span class="apple-cell-inner"><img class="apple-tile" src="${ART.apple.tile}" alt="" aria-hidden="true">${safe ? `<img class="apple-sprite" src="${ART.apple.whole}" alt="" aria-hidden="true">` : ''}</span></div>`;
       }).join('');
-      const multiplierText = escapeHTML(String(row.multiplier || '').replace(/^x/i, ''));
-      return `<div class="apple-row${isActiveRow ? ' is-current' : ''}${activeReveal ? ' is-revealed' : ''}"><div class="apple-cells">${cellsHtml}</div><span class="apple-row-multiplier${isActiveRow ? ' is-current' : ''}">x${multiplierText}</span></div>`;
+      return `<div class="apple-row${row.level === runtime.activeRow && runtime.phase === 'opening' ? ' is-current' : ''}" data-apple-row="${row.level}"><div class="apple-cells">${cellsHtml}</div><span class="apple-row-multiplier${row.level === runtime.activeRow && runtime.phase === 'opening' ? ' is-current' : ''}">x${escapeHTML(String(row.multiplier || '').replace(/^x/i, ''))}</span></div>`;
     }).join('');
-
-    const stakeChipsHtml = APPLE_STAKES.map((value) => `<button class="apple-chip${Number(runtime.stake) === value ? ' is-active' : ''}" type="button" data-game-action="apple-stake-chip" data-stake="${value}" ${canConfigure ? '' : 'disabled'}>${value}</button>`).join('');
-
-    const showWinCelebration = runtime.phase === 'ended' && runtime.score > 0;
-    const confettiHtml = Array.from({ length: 24 }, (_, i) => `<span class="apple-confetti-piece" style="--i:${i}"></span>`).join('');
-    const winCelebrationHtml = showWinCelebration ? `<div class="apple-win-overlay" data-apple-win-token="${runtime.roundToken || runtime.score}" aria-live="polite">
-      <div class="apple-win-burst" aria-hidden="true"></div>
-      <div class="apple-confetti" aria-hidden="true">${confettiHtml}</div>
-      <img class="apple-win-apple" src="${ART.apple.whole}" alt="">
-      <div class="apple-win-score" data-apple-win-score data-target="${Number(runtime.score) || 0}">${t('appleWin')} +0 \u20BD</div>
-    </div>` : '';
-
-    const stageHtml = `<div class="apple-fullstage" data-runtime-game="apple-of-fortune">
+    const stageHtml = `<div class="apple-fullstage is-signal-only" data-runtime-game="apple-of-fortune" data-phase="${escapeHTML(runtime.phase)}">
       <img class="apple-bg" src="${ART.apple.background}" alt="" aria-hidden="true">
       <div class="apple-vignette" aria-hidden="true"></div>
       <img class="apple-character apple-queen" src="${ART.apple.queen}" alt="\u0417\u043B\u0430\u044F \u043A\u043E\u0440\u043E\u043B\u0435\u0432\u0430">
       <img class="apple-character apple-snow" src="${ART.apple.snowWhite}" alt="\u0411\u0435\u043B\u043E\u0441\u043D\u0435\u0436\u043A\u0430">
       <img class="apple-logo" src="${ART.apple.logo}" alt="Apple of Fortune">
-      ${winCelebrationHtml}
       <div class="apple-panel">
         <img class="apple-vine apple-vine-left" src="${ART.apple.vine}" alt="" aria-hidden="true">
         <img class="apple-vine apple-vine-right" src="${ART.apple.vine}" alt="" aria-hidden="true">
@@ -609,22 +642,9 @@
         </div>
         <div class="apple-board">${rowsHtml}</div>
       </div>
-      <div class="apple-bottom-bar">
-        <div class="apple-stake-chips">${stakeChipsHtml}</div>
-        <div class="apple-stake-field">
-          <input type="number" min="0" step="10" inputmode="numeric" value="${Number(runtime.stake) || 0}" data-apple-stake-input ${canConfigure ? '' : 'disabled'} aria-label="${t('appleStake')}">
-          <button type="button" class="apple-stake-clear" data-game-action="apple-stake-clear" ${canConfigure ? '' : 'disabled'} aria-label="${t('appleClear')}">&times;</button>
-        </div>
-        <button class="apple-play-btn" type="button" data-game-action="apple-play" ${canConfigure ? '' : 'disabled'} aria-label="${t('applePlay')}"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M8 5.2v13.6l11.5-6.8L8 5.2Z"/></svg></button>
-        <button class="apple-auto-btn${runtime.auto ? ' is-active' : ''}" type="button" data-game-action="apple-auto" aria-pressed="${runtime.auto ? 'true' : 'false'}">${t('appleAuto')}</button>
-        ${runtime.phase === 'safe' && runtime.score > 0 ? `<button class="apple-cashout-btn" type="button" data-game-action="apple-cashout">${t('appleCashOut')} ${escapeHTML(String(runtime.score))} \u20BD</button>` : ''}
-      </div>
     </div>`;
-
-    const potentialFormatted = `${potential.toLocaleString('ru-RU')} \u20BD`;
-    const balanceWindowHtml = `<section class="panel apple-balance-panel"><div class="panel-head"><div><p class="panel-kicker">${t('balance')}</p><h2>${t('gameStatus')}</h2></div><span class="status-dot"></span></div><div class="panel-body">${renderMetrics()}<div class="apple-round-metrics"><div class="apple-round-metric apple-round-metric-stake"><span class="metric-label">${t('appleStake')}</span><strong class="metric-value apple-stake-value">${escapeHTML(String(Number(runtime.stake) || 0))} \u20BD</strong></div><div class="apple-round-metric apple-round-metric-potential"><span class="metric-label">${t('applePotential')}</span><strong class="metric-value apple-potential-value">${escapeHTML(potentialFormatted)}</strong></div></div>${!state.message ? '' : `<p class="apple-inline-message">${escapeHTML(state.message)}</p>`}<button class="button button-ghost button-full" data-game-action="apple-reset" ${runtime.phase === 'safe' || runtime.phase === 'opening' ? 'disabled' : ''} type="button">${t('resetBoard')}</button></div></section>`;
-
-    return `<header class="workspace-header game-header"><div><p class="eyebrow">${t('games')} / ${String(games.indexOf('apple-of-fortune') + 1).padStart(2, '0')}</p><h1>${gameLabel('apple-of-fortune')}</h1><p class="lede">${t('gameIntro')}</p></div><div class="header-actions"><button class="game-exit-button" data-view="overview" type="button"><span class="game-exit-icon" aria-hidden="true">&#8592;</span>${t('backToHome')}</button></div></header><div class="content-width game-view apple-game-view"><div class="game-layout"><section class="game-stage apple-game-stage">${stageHtml}</section><aside class="game-side">${balanceWindowHtml}<section class="panel result-panel"><div class="panel-head"><div><p class="panel-kicker">${t('result')}</p><h2>${t('latestSignal')}</h2></div></div><div class="panel-body">${renderResult(state.analysis?.game === 'apple-of-fortune' ? state.analysis : null)}</div></section></aside></div>${renderFooter()}</div>`;
+    const controls = `<section class="panel control-panel"><div class="panel-head"><div><p class="panel-kicker">${t('controlStack')}</p><h2>${t('gameStatus')}</h2></div><span class="status-dot"></span></div><div class="panel-body control-fields">${gameControls('apple-of-fortune')}<button class="button button-primary button-full" data-analyze="apple-of-fortune" type="button" ${state.busy ? 'disabled' : ''}>${state.busy ? t('analysisLoading') : t('getSignal')}</button><button class="button button-ghost button-full" data-copy="apple-of-fortune" type="button" ${state.analysis?.game === 'apple-of-fortune' ? '' : 'disabled'}>${t('copyResult')}</button><p class="form-message" role="alert" aria-live="polite">${escapeHTML(state.message)}</p></div></section>`;
+    return `<header class="workspace-header game-header"><div><p class="eyebrow">${t('games')} / ${String(games.indexOf('apple-of-fortune') + 1).padStart(2, '0')}</p><h1>${gameLabel('apple-of-fortune')}</h1><p class="lede">${t('gameIntro')}</p></div><div class="header-actions"><button class="game-exit-button" data-view="overview" type="button"><span class="game-exit-icon" aria-hidden="true">&#8592;</span>${t('backToHome')}</button></div></header><div class="content-width game-view apple-game-view"><div class="game-layout"><section class="game-stage apple-game-stage"><div class="stage-topline"><div><span class="stage-index">03</span><span class="status-badge muted">\u0420\u0410\u0423\u041D\u0414</span></div><span class="round-state" data-game-live-state aria-live="polite">${phaseLabel(runtime.phase)}</span></div>${stageHtml}</section><aside class="game-side">${controls}<section class="panel result-panel"><div class="panel-head"><div><p class="panel-kicker">${t('result')}</p><h2>${t('latestSignal')}</h2></div></div><div class="panel-body">${renderResult(state.analysis?.game === 'apple-of-fortune' ? state.analysis : null)}</div></section><section class="panel history-panel"><div class="panel-head"><div><p class="panel-kicker">${t('history')}</p><h3>${t('attempts')}</h3></div></div><div class="panel-body">${renderHistory()}</div></section></aside></div>${renderFooter()}</div>`;
   }
 
   function renderMinesStage() {
@@ -633,11 +653,11 @@
     const columns = Math.sqrt(size);
     const revealed = new Set(runtime.revealedCells || []);
     const recommended = new Set(state.analysis?.game === 'mines' ? state.analysis.recommendedCells || [] : []);
-    const cells = Array.from({ length: size }, (_, index) => `<div class="reference-mine-cell ${revealed.has(index) ? 'is-safe' : ''} ${recommended.has(index) && runtime.phase === 'ready' ? 'is-suggested' : ''}" aria-label="${t('cell')} ${index + 1}"><span class="reference-mine-tile"></span>${revealed.has(index) ? '<i class="reference-mine-gem"></i>' : ''}</div>`).join('');
+    const cells = Array.from({ length: size }, (_, index) => `<div class="reference-mine-cell ${revealed.has(index) ? 'is-safe' : ''} ${recommended.has(index) && runtime.phase === 'ready' ? 'is-suggested' : ''}" data-mine-index="${index}" aria-label="${t('cell')} ${index + 1}"><span class="reference-mine-tile"></span>${revealed.has(index) ? '<i class="reference-mine-gem" aria-hidden="true"></i>' : ''}</div>`).join('');
     return `<div class="visual-stage reference-game reference-mines" data-runtime-game="mines" data-phase="${escapeHTML(runtime.phase)}">
       <img class="reference-mines-logo" src="${LOCAL_GAME_ART.mines.logo}" alt="Diamond Mines">
       <div class="reference-mines-board" style="--mine-columns:${columns}">${cells}</div>
-      <div class="reference-mines-status"><span>${columns} × ${columns}</span><strong>${runtime.phase === 'revealed' ? `${revealed.size} SAFE` : phaseLabel(runtime.phase)}</strong></div>
+      <div class="reference-mines-status"><span>${columns} × ${columns}</span><strong data-mines-status>${runtime.phase === 'revealed' ? `${revealed.size} SAFE` : phaseLabel(runtime.phase)}</strong></div>
     </div>`;
   }
 
@@ -658,7 +678,7 @@
 
   function renderResult(analysis) {
     if (!analysis) return `<div class="result-empty"><span class="empty-mark">◎</span><p>${t('noHistory')}</p><small>${t('resultAppearsHere')}</small></div>`;
-    const details = analysis.game === 'aviator' ? `${t('multiplier')}: ${analysis.multiplier} · ${t('countdown')}: ${analysis.countdown}s` : analysis.game === 'chicken-road' ? `${t('safeSteps')}: ${analysis.safeSteps.join(', ')} · ${t('multiplier')}: ${analysis.multiplier}` : analysis.game === 'apple-of-fortune' ? `${t('rows')}: ${analysis.rows.length} · ${t('safeCell')}: ${analysis.rows[0].recommendedCell}` : analysis.game === 'mines' ? `${t('fieldSize')}: ${analysis.size} · ${t('mineCount')}: ${analysis.mines}` : `${t('shotZones')}: ${analysis.zones} · ${t('direction')}: ${analysis.direction}`;
+    const details = analysis.game === 'aviator' ? `${t('multiplier')}: ${analysis.multiplier} · ${t('countdown')}: ${analysis.countdown}s` : analysis.game === 'chicken-road' ? `${t('safeSteps')}: ${analysis.safeSteps.join(', ')} · ${t('multiplier')}: ${analysis.multiplier}` : analysis.game === 'apple-of-fortune' ? `${t('rows')}: ${analysis.targetRow || analysis.rows.length} · ${t('safeCell')}: ${analysis.rows.slice(0, analysis.targetRow || analysis.rows.length).map((row) => row.recommendedCell).join(' → ')}` : analysis.game === 'mines' ? `${t('fieldSize')}: ${analysis.size} · ${t('mineCount')}: ${analysis.mines}` : `${t('shotZones')}: ${analysis.zones} · ${t('direction')}: ${analysis.direction}`;
     const amount = Number(analysis.signalAmount || 0);
     const amountText = amount > 0 ? formatMoney(amount * (10 ** Number(state.player?.currencyFractionDigits ?? 2))) : '';
     return `<h3>${t('latestSignal')}</h3>${Number.isFinite(Number(analysis.accuracy)) ? `<div class="signal-accuracy"><span>${t('signalAccuracy')}</span><strong>${Number(analysis.accuracy)}%</strong></div>` : ''}<p class="result-detail">${escapeHTML(details)}</p>${amountText ? `<p class="signal-amount-result">${t('signalAmount')}: <strong>${escapeHTML(amountText)}</strong></p>` : ''}<p>${escapeHTML(analysis.note || analysis.disclaimer)}</p><div class="result-stamp">${t('demoAnalysis')} / ${t('simulatedData')}</div><div class="analysis-actions"><button class="button button-ghost" data-copy="${analysis.game}" type="button">${t('copyResult')}</button></div>`;
@@ -800,6 +820,7 @@
     const base = { game, gameLabel: gameLabel(game), demo: true, mode: 'SIMULATED DATA', status: 'AI ANALYSIS', generatedAt: new Date().toISOString(), signalAmount: amount, accuracy: localAccuracy(amount), disclaimer: t('disclaimerText') };
     if (game === 'aviator') { const multiplier = localAviatorMultiplier(); return { ...base, multiplier: `${multiplier.toFixed(2)}x`, countdown: 2 + Math.floor(Math.random() * 2), note: 'The generated signal is played locally.' }; }
     if (game === 'chicken-road') { const multipliers = ['1.12x', '1.28x', '1.47x', '1.70x', '1.98x', '2.33x']; const targetStep = localWeighted([[1,.2],[2,.28],[3,.25],[4,.15],[5,.08],[6,.04]]); return { ...base, targetStep, safeSteps: Array.from({ length: targetStep }, (_, index) => index + 1), multiplier: multipliers[targetStep - 1], multipliers, note: 'The chicken follows the generated signal automatically.' }; }
+    if (game === 'apple-of-fortune') { const targetRow = localWeighted([[1,.2],[2,.22],[3,.2],[4,.15],[5,.1],[6,.06],[7,.04],[8,.02],[9,.008],[10,.002]]); return { ...base, targetRow, rows: APPLE_MULTIPLIERS.map((multiplier, index) => ({ level: index + 1, recommendedCell: 1 + Math.floor(Math.random() * 5), cells: [1,2,3,4,5], multiplier: `x${multiplier}` })), note: 'The generated signal opens the recommended path automatically.' }; }
     if (game === 'mines') { const size = [16,25,36].includes(Number(payload.size)) ? Number(payload.size) : 25; const mines = Math.min(Math.max(Number(payload.mines) || 4, 1), Math.floor(size / 2)); const minePositions = localSample(size, mines); return { ...base, size, mines, minePositions, recommendedCells: localSample(size, Math.min(5, size - mines), new Set(minePositions)), note: 'Highlighted cells are a simulation aid, not a guaranteed route.' }; }
     const recommendedZone = 1 + Math.floor(Math.random() * 5); const roll = Math.random(); const result = roll < .76 ? 'goal' : roll < .95 ? 'save' : 'miss'; return { ...base, zones: 5, role: 'striker', recommendedZone, direction: ['left','left-center','center','right-center','right'][recommendedZone - 1], result, outcome: result.toUpperCase(), note: 'The striker follows the generated shot signal automatically.' };
   }
@@ -843,16 +864,17 @@
   async function logout() { try { await api('/api/auth/logout', { method: 'POST' }); } finally { stopGameAnimation(); state.player = null; state.activity = null; state.activePlayers = []; state.view = 'overview'; render(); } }
 
   function createReadyRuntime(game) {
-    if (game === 'aviator') return { game, token: Date.now(), phase: 'ready', countdown: 0, multiplier: 1.27, progress: 0.58, startedAt: 0, crashAt: 0, sprites: createAtlasSet(), timers: new Set() };
+    if (game === 'aviator') return { game, token: Date.now(), phase: 'ready', countdown: 0, multiplier: 1, progress: 0, takeoffProgress: 0, cruiseProgress: 0, startedAt: 0, crashAt: 0, sprites: createAtlasSet(), timers: new Set() };
     if (game === 'chicken-road') return createChickenRuntime();
-    if (game === 'apple-of-fortune') return createAppleRuntime();
+    if (game === 'apple-of-fortune') return createAppleSignalRuntime();
     if (game === 'mines') return createMineRuntime();
     return createFootballRuntime();
   }
 
   function createSignalRuntime(game, analysis) {
-    if (game === 'aviator') return { game, token: Date.now(), phase: 'ready', multiplier: 1, targetMultiplier: Number.parseFloat(analysis.multiplier) || 1.25, progress: 0, startedAt: 0, timers: new Set() };
+    if (game === 'aviator') return { game, token: Date.now(), phase: 'ready', multiplier: 1, targetMultiplier: Number.parseFloat(analysis.multiplier) || 1.25, progress: 0, takeoffProgress: 0, cruiseProgress: 0, startedAt: 0, timers: new Set() };
     if (game === 'chicken-road') return { ...createChickenRuntime(), targetStep: Number(analysis.targetStep || analysis.safeSteps?.length || 1), multiplier: 1 };
+    if (game === 'apple-of-fortune') return createAppleSignalRuntime(analysis);
     if (game === 'mines') return { ...createMineRuntime(), size: Number(analysis.size) || 25, mines: Number(analysis.mines) || 4, revealedCells: [], phase: 'ready' };
     return { ...createFootballRuntime(), shotZone: Number(analysis.recommendedZone) || 3, result: analysis.result || 'goal', stake: Number(analysis.signalAmount) || 100 };
   }
@@ -865,8 +887,9 @@
       state.sceneLoop.start((now) => tickSignalAviator(runtime.token, now));
       return;
     }
-    if (game === 'chicken-road') { runtime.phase = 'jumping'; runtime.step = 0; render(); advanceChickenSignal(runtime.token); return; }
-    if (game === 'mines') { runtime.phase = 'revealing'; runtime.revealedCells = []; render(); advanceMineSignal(runtime.token, 0); return; }
+    if (game === 'chicken-road') { runtime.phase = 'jumping'; runtime.step = 0; runtime.nextStep = 1; updateChickenSignalDom(runtime, true); advanceChickenSignal(runtime.token); return; }
+    if (game === 'apple-of-fortune') { runtime.phase = 'opening'; runtime.activeRow = 1; runtime.revealedCells = {}; advanceAppleSignal(runtime.token, 0); return; }
+    if (game === 'mines') { runtime.phase = 'revealing'; runtime.revealedCells = []; updateMineSignalDom(runtime); advanceMineSignal(runtime.token, 0); return; }
     runtime.phase = 'kick'; runtime.score = 0; render();
     scheduleRuntime(() => { const current = runtimeFor('football-penalties'); if (!current) return; current.phase = current.result; current.score = current.result === 'goal' ? 1 : 0; state.footballHistory.unshift({ role: 'striker', stake: current.stake, zone: current.shotZone, result: current.result }); state.footballHistory = state.footballHistory.slice(0, 6); render(); }, 1250);
   }
@@ -875,34 +898,75 @@
     const runtime = runtimeFor('aviator');
     if (!runtime || runtime.token !== token) return state.sceneLoop.stop();
     const target = Math.max(1.01, Number(runtime.targetMultiplier) || 1.25);
-    const duration = reducedMotion() ? 350 : Math.min(7200, 3200 + Math.log2(target) * 900);
-    const progress = Math.min(1, (now - runtime.startedAt) / duration);
-    const eased = 1 - Math.pow(1 - progress, 2.2);
-    runtime.progress = eased;
-    runtime.phase = progress < 0.18 ? 'takeoff' : 'flying';
+    const takeoffDuration = reducedMotion() ? 80 : 2600;
+    const cruiseDuration = reducedMotion() ? 320 : Math.min(14000, 7200 + Math.log2(target) * 1700);
+    const elapsed = Math.max(0, now - runtime.startedAt);
+    if (elapsed < takeoffDuration) {
+      const takeoff = Math.min(1, elapsed / takeoffDuration);
+      runtime.takeoffProgress = 1 - Math.pow(1 - takeoff, 2.4);
+      runtime.cruiseProgress = 0;
+      runtime.progress = runtime.takeoffProgress * .34;
+      runtime.phase = 'takeoff';
+      runtime.multiplier = 1;
+      updateRuntimeDom('aviator');
+      return;
+    }
+    const cruise = Math.min(1, (elapsed - takeoffDuration) / cruiseDuration);
+    const eased = 1 - Math.pow(1 - cruise, 1.8);
+    runtime.takeoffProgress = 1;
+    runtime.cruiseProgress = cruise;
+    runtime.progress = .34 + eased * .66;
+    runtime.phase = 'flying';
     runtime.multiplier = 1 + (target - 1) * eased;
     updateRuntimeDom('aviator');
-    if (progress < 1) return;
-    runtime.multiplier = target; runtime.phase = 'ended'; state.sceneLoop.stop(); updateRuntimeDom('aviator'); render();
+    if (cruise < 1) return;
+    runtime.multiplier = target; runtime.phase = 'ended'; state.sceneLoop.stop(); updateRuntimeDom('aviator');
   }
 
   function advanceChickenSignal(token) {
     const runtime = runtimeFor('chicken-road');
     if (!runtime || runtime.token !== token) return;
+    runtime.nextStep = Math.min(runtime.targetStep, runtime.step + 1);
+    runtime.phase = 'jumping';
+    updateChickenSignalDom(runtime, true);
     scheduleRuntime(() => {
       const current = runtimeFor('chicken-road'); if (!current || current.token !== token) return;
-      current.step += 1; current.multiplier = Number.parseFloat(state.analysis?.multipliers?.[current.step - 1] || state.analysis?.multiplier) || 1;
-      current.phase = current.step >= current.targetStep ? 'ended' : 'safe'; render();
-      if (current.step < current.targetStep) scheduleRuntime(() => { current.phase = 'jumping'; render(); advanceChickenSignal(token); }, 260);
-    }, 610);
+      current.step = current.nextStep; current.multiplier = Number.parseFloat(state.analysis?.multipliers?.[current.step - 1] || state.analysis?.multiplier) || 1;
+      current.phase = current.step >= current.targetStep ? 'ended' : 'safe'; updateChickenSignalDom(current);
+      if (current.step < current.targetStep) scheduleRuntime(() => advanceChickenSignal(token), 280);
+    }, 760);
+  }
+
+  function advanceAppleSignal(token, index) {
+    const runtime = runtimeFor('apple-of-fortune');
+    const rows = state.analysis?.game === 'apple-of-fortune' ? state.analysis.rows || [] : [];
+    const targetRow = Math.max(1, Math.min(rows.length, Number(runtime?.targetRow) || 1));
+    if (!runtime || runtime.token !== token || !rows.length) return;
+    if (index >= targetRow) {
+      runtime.phase = 'ended';
+      const lastRow = rows[targetRow - 1];
+      runtime.activeRow = targetRow;
+      updateAppleSignalDom(runtime, lastRow, false);
+      return;
+    }
+    const row = rows[index];
+    runtime.phase = 'opening';
+    runtime.activeRow = row.level;
+    updateAppleSignalDom(runtime, row, true);
+    scheduleRuntime(() => {
+      const current = runtimeFor('apple-of-fortune'); if (!current || current.token !== token) return;
+      current.revealedCells[row.level] = { level: row.level, cell: row.recommendedCell, safe: true };
+      updateAppleSignalDom(current, row, false);
+      scheduleRuntime(() => advanceAppleSignal(token, index + 1), 260);
+    }, 620);
   }
 
   function advanceMineSignal(token, index) {
     const runtime = runtimeFor('mines');
     const cells = state.analysis?.game === 'mines' ? state.analysis.recommendedCells || [] : [];
     if (!runtime || runtime.token !== token) return;
-    if (index >= cells.length) { runtime.phase = 'revealed'; render(); return; }
-    scheduleRuntime(() => { const current = runtimeFor('mines'); if (!current || current.token !== token) return; current.revealedCells.push(cells[index]); render(); advanceMineSignal(token, index + 1); }, 360);
+    if (index >= cells.length) { runtime.phase = 'revealed'; updateMineSignalDom(runtime); return; }
+    scheduleRuntime(() => { const current = runtimeFor('mines'); if (!current || current.token !== token) return; current.revealedCells.push(cells[index]); updateMineSignalDom(current, cells[index]); advanceMineSignal(token, index + 1); }, 440);
   }
 
   function createAviatorRuntime() { const sprites = createAtlasSet(); Object.values(sprites).forEach((player) => player.play()); return { game: 'aviator', token: Date.now(), phase: 'countdown', countdown: 7, countdownStep: 0, countdownStartedAt: performance.now(), multiplier: 1, progress: 0, startedAt: 0, crashAt: 0, sprites, timers: new Set() }; }
@@ -938,6 +1002,7 @@
   function tickChickenFall(token, now) { const runtime = runtimeFor('chicken-road'); if (!runtime || runtime.token !== token) return state.sceneLoop.stop(); const progress = Math.min(1, (now - runtime.motionStarted) / (reducedMotion() ? 0 : 520)); hydrateChickenPose(runtime, progress); if (progress >= 1) state.sceneLoop.stop(); }
   function resetChicken() { stopGameAnimation(); state.runtime = createChickenRuntime(); render(); }
 
+  function createAppleSignalRuntime(analysis = null) { return { game: 'apple-of-fortune', token: Date.now(), phase: 'ready', activeRow: 1, targetRow: Math.max(1, Math.min(10, Number(analysis?.targetRow) || 1)), muted: false, revealedCells: {}, timers: new Set() }; }
   function createAppleRuntime() { return { game: 'apple-of-fortune', token: Date.now(), phase: 'idle', activeRow: 1, score: 0, stake: 10, auto: false, muted: false, revealed: null, revealedCells: {}, animationStartedAt: 0, timers: new Set() }; }
   function appleRows() { return state.analysis?.game === 'apple-of-fortune' && Array.isArray(state.analysis.rows) && state.analysis.rows.length ? state.analysis.rows : appleFallbackRows(); }
   function appleFractionDigits() { return Number(state.player?.currencyFractionDigits ?? 2); }

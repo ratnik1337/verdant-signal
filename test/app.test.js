@@ -171,6 +171,13 @@ test('signal analysis records the entered amount and returns playable local-game
   assert.ok(chicken.body.analysis.targetStep >= 1 && chicken.body.analysis.targetStep <= 6);
   assert.equal(chicken.body.analysis.safeSteps.length, chicken.body.analysis.targetStep);
 
+  const apple = await agent.post('/api/games/apple-of-fortune/analyze').send({ amount: 250 });
+  assert.equal(apple.status, 200);
+  assert.equal(apple.body.analysis.signalAmount, 250);
+  assert.equal(apple.body.analysis.rows.length, 10);
+  assert.ok(apple.body.analysis.targetRow >= 1 && apple.body.analysis.targetRow <= 10);
+  assert.ok(apple.body.analysis.rows.slice(0, apple.body.analysis.targetRow).every((row) => row.recommendedCell >= 1 && row.recommendedCell <= 5));
+
   for (const size of [16, 25, 36]) {
     const mines = await agent.post('/api/games/mines/analyze').send({ amount: 100, size, mines: 4 });
     assert.equal(mines.status, 200);

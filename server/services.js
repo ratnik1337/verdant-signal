@@ -256,7 +256,8 @@ function createServices({ db, countries, currencies, minWithdrawalMinor }) {
       analysis = { ...base, targetStep, safeSteps: Array.from({ length: targetStep }, (_, index) => index + 1), currentStep: targetStep, multiplier: multipliers[targetStep - 1], multipliers, note: 'The chicken follows the generated signal automatically.' };
     } else if (game === 'apple-of-fortune') {
       const APPLE_MULTIPLIERS = ['1.23', '1.54', '1.93', '2.41', '4.02', '6.71', '11.18', '27.97', '69.93', '349.68'];
-    analysis = { ...base, rows: APPLE_MULTIPLIERS.map((multiplier, index) => ({ level: index + 1, recommendedCell: ((zone + index) % 5) + 1, cells: [1, 2, 3, 4, 5], multiplier: `x${multiplier}` })), note: 'One safe cell is shown for visual simulation; all outcomes remain uncertain.' };
+      const targetRow = weightedChoice([[1, 0.2], [2, 0.22], [3, 0.2], [4, 0.15], [5, 0.1], [6, 0.06], [7, 0.04], [8, 0.02], [9, 0.008], [10, 0.002]]);
+      analysis = { ...base, targetRow, rows: APPLE_MULTIPLIERS.map((multiplier, index) => ({ level: index + 1, recommendedCell: ((zone + index) % 5) + 1, cells: [1, 2, 3, 4, 5], multiplier: `x${multiplier}` })), note: 'The generated signal opens the recommended path automatically.' };
     } else if (game === 'mines') {
       const size = [16, 25, 36].includes(Number(input.size)) ? Number(input.size) : 25;
       const mines = Math.min(Math.max(Number(input.mines) || 4, 1), Math.floor(size / 2));
